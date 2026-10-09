@@ -571,20 +571,16 @@ ul{list-style:none}
 const API = '/api';
 const TOKEN_KEY = 'yamato_admin_token';
 
-let STATE = {
-  orders: [],
-  stats: null,
-  filter: 'all',
-  loading: false,
-  refreshInterval: null
-};
+function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
+function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
+function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
 
 /* =========================================================
    AUTH
    ========================================================= */
-function getToken() { return localStorage.getItem(TOKEN_KEY); }
-function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
-function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
+function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
+function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
 
 async function doLogin(e) {
   e.preventDefault();
