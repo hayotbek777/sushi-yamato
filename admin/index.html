@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0E0E10">
+<title>Yamato Admin — Buyurtmalar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
+:root{
+  --ink:#0E0E10;
+  --ink-2:#1a1a1e;
+  --ink-3:#2a2a30;
+  --washi:#F6F1E8;
+  --washi-2:#EDE6D8;
+  --white:#ffffff;
+  --red:#DC1F26;
+  --red-dark:#A8181F;
+  --matcha:#2FBF71;
+  --gold:#E4B15A;
+  --blue:#3B82F6;
+  --purple:#8B5CF6;
+  --orange:#F59E0B;
+  --muted:#8a8a92;
+  --line:rgba(14,14,16,.08);
+  --line-2:rgba(14,14,16,.14);
+  --shadow-sm:0 1px 2px rgba(14,14,16,.04),0 2px 8px rgba(14,14,16,.04);
+  --shadow-md:0 4px 12px rgba(14,14,16,.06),0 12px 32px rgba(14,14,16,.08);
+  --shadow-lg:0 24px 60px rgba(14,14,16,.14);
+  --radius:16px;
+  --radius-lg:22px;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--washi);
+  color:var(--ink);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+img{max-width:100%;display:block}
+svg{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+#loginScreen{
+  position:fixed;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  background:linear-gradient(135deg,#0E0E10 0%,#1a1a1e 100%);
+}
+#loginScreen.hide{display:none}
+.login-card{
+  width:100%;max-width:420px;
+  background:var(--washi);
+  border-radius:var(--radius-lg);
+  padding:40px 36px;
+  box-shadow:var(--shadow-lg);
+}
+.login-logo{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:28px;
+}
+.login-logo .mark{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,var(--red),var(--red-dark));
+  display:grid;place-items:center;
+  color:#fff;font-weight:900;font-size:1.2rem;
+}
+.login-logo h1{font-size:1.1rem;font-weight:900;letter-spacing:-.02em}
+.login-logo small{display:block;font-size:.72rem;color:var(--muted);font-weight:500;letter-spacing:.1em;text-transform:uppercase}
+.login-card h2{font-size:1.5rem;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
+.login-card p.sub{font-size:.88rem;color:var(--muted);margin-bottom:28px}
+.field{margin-bottom:16px}
+.field label{
+  display:block;font-size:.76rem;font-weight:600;
+  color:var(--muted);margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:.06em;
+}
+.field input{
+  width:100%;padding:13px 16px;border-radius:12px;
+  border:1.5px solid var(--line-2);background:var(--white);
+  font-size:.94rem;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.field input:focus{
+  border-color:var(--ink);
+  box-shadow:0 0 0 3px rgba(14,14,16,.06);
+}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 24px;border-radius:12px;
+  font-weight:700;font-size:.9rem;
+  transition:all .25s var(--ease);white-space:nowrap;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--ink);color:#fff;width:100%}
+.btn-primary:hover{background:var(--red)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.login-error{
+  background:rgba(220,31,38,.1);color:var(--red-dark);
+  padding:11px 14px;border-radius:10px;
+  font-size:.84rem;font-weight:500;
+  margin-bottom:16px;display:none;
+}
+.login-error.show{display:block}
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+#dashboard{display:none}
+#dashboard.show{display:block}
+
+.header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid var(--line);
+}
+.header-inner{
+  max-width:1400px;margin:0 auto;
+  padding:0 24px;height:68px;
+  display:flex;align-items:center;gap:16px;
+}
+.header .logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1rem;letter-spacing:-.02em}
+.header .logo .mark{
+  width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(135deg,var(--red),var(--red-dark));
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:.9rem;
+}
+.header .logo small{display:block;font-size:.66rem;color:var(--muted);font-weight:500;letter-spacing:.1em;text-transform:uppercase}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.header-user{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 14px 6px 6px;border-radius:999px;
+  background:var(--washi-2);
+  font-size:.84rem;font-weight:600;
+}
+.header-user .av{
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  display:grid;place-items:center;
+  color:#fff;font-weight:700;font-size:.78rem;
+}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;
+  display:grid;place-items:center;
+  transition:background .2s;
+}
+.icon-btn:hover{background:rgba(14,14,16,.06)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+.wrap{max-width:1400px;margin:0 auto;padding:28px 24px 60px}
+
+/* =========================================================
+   STATS
+   ========================================================= */
+.stats{
+  display:grid;gap:14px;
+  grid-template-columns:repeat(2,1fr);
+  margin-bottom:28px;
+}
+@media(min-width:768px){.stats{grid-template-columns:repeat(4,1fr);gap:18px}}
+.stat{
+  background:var(--white);border-radius:var(--radius);
+  padding:20px;border:1px solid var(--line);
+  position:relative;overflow:hidden;
+  transition:transform .3s var(--ease),box-shadow .3s var(--ease);
+}
+.stat:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.stat .ico{
+  width:42px;height:42px;border-radius:12px;
+  display:grid;place-items:center;
+  margin-bottom:14px;
+}
+.stat .ico svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.stat.c1 .ico{background:linear-gradient(135deg,var(--red),var(--red-dark))}
+.stat.c2 .ico{background:linear-gradient(135deg,var(--matcha),#1a9e57)}
+.stat.c3 .ico{background:linear-gradient(135deg,var(--gold),var(--orange))}
+.stat.c4 .ico{background:linear-gradient(135deg,var(--purple),#6D28D9)}
+.stat .label{font-size:.74rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.stat .value{font-size:clamp(1.2rem,2.4vw,1.6rem);font-weight:900;letter-spacing:-.03em}
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+.filters{
+  display:flex;gap:8px;overflow-x:auto;
+  padding-bottom:4px;margin-bottom:20px;
+  scrollbar-width:none;
+}
+.filters::-webkit-scrollbar{display:none}
+.chip{
+  flex-shrink:0;padding:9px 16px;border-radius:999px;
+  background:var(--white);border:1px solid var(--line);
+  font-size:.84rem;font-weight:600;white-space:nowrap;
+  transition:all .25s var(--ease);
+  display:flex;align-items:center;gap:6px;
+}
+.chip:hover{border-color:var(--ink)}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip .count{
+  background:rgba(255,255,255,.18);
+  padding:1px 7px;border-radius:999px;
+  font-size:.7rem;font-weight:700;
+}
+.chip:not(.active) .count{background:var(--washi-2);color:var(--muted)}
+
+.toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search-box{
+  flex:1;min-width:200px;position:relative;
+}
+.search-box svg{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;
+}
+.search-box input{
+  width:100%;padding:12px 16px 12px 42px;
+  border-radius:12px;border:1px solid var(--line-2);
+  background:var(--white);font-size:.9rem;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.search-box input:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(14,14,16,.06)}
+.refresh-btn{
+  padding:12px 18px;border-radius:12px;
+  background:var(--white);border:1px solid var(--line-2);
+  font-size:.88rem;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+  transition:all .25s var(--ease);
+}
+.refresh-btn:hover{border-color:var(--ink);background:var(--ink);color:#fff}
+.refresh-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.refresh-btn.spinning svg{animation:spin .8s linear}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* =========================================================
+   ORDER CARDS
+   ========================================================= */
+.orders{display:grid;gap:14px}
+.order{
+  background:var(--white);border-radius:var(--radius);
+  border:1px solid var(--line);
+  overflow:hidden;
+  transition:box-shadow .3s var(--ease),border-color .3s;
+}
+.order:hover{box-shadow:var(--shadow-md);border-color:transparent}
+.order-head{
+  padding:16px 20px;
+  display:flex;align-items:center;gap:14px;
+  cursor:pointer;flex-wrap:wrap;
+}
+.order-num{
+  font-weight:900;font-size:1rem;letter-spacing:-.02em;
+  display:flex;align-items:center;gap:8px;
+}
+.order-num .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--red);
+  animation:pulse 1.6s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.order-meta{
+  display:flex;align-items:center;gap:14px;
+  font-size:.82rem;color:var(--muted);
+  margin-left:auto;flex-wrap:wrap;
+}
+.order-meta b{color:var(--ink);font-weight:700}
+.order-total{font-weight:900;font-size:1rem;color:var(--ink);white-space:nowrap}
+.order-status{
+  padding:6px 12px;border-radius:999px;
+  font-size:.72rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.05em;
+  white-space:nowrap;
+}
+.status-new{background:rgba(220,31,38,.12);color:var(--red-dark)}
+.status-accepted{background:rgba(59,130,246,.12);color:#1e40af}
+.status-cooking{background:rgba(245,158,11,.15);color:#92400e}
+.status-delivering{background:rgba(139,92,246,.12);color:#5b21b6}
+.status-done{background:rgba(47,191,113,.14);color:#166534}
+.status-cancelled{background:rgba(138,138,146,.15);color:#52525b}
+
+.order-chevron{
+  width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:2.4;
+  transition:transform .3s var(--ease);
+}
+.order.open .order-chevron{transform:rotate(180deg)}
+
+.order-body{
+  display:none;
+  padding:0 20px 20px;
+  border-top:1px solid var(--line);
+  background:var(--washi);
+}
+.order.open .order-body{display:block;animation:fadeIn .3s var(--ease)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+.order-section{margin-top:18px}
+.order-section h4{
+  font-size:.72rem;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;
+}
+.info-grid{
+  display:grid;gap:10px;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+}
+.info-item{
+  background:var(--white);border-radius:10px;
+  padding:11px 14px;border:1px solid var(--line);
+}
+.info-item small{display:block;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;font-weight:600}
+.info-item b{font-size:.88rem;font-weight:600;word-break:break-word}
+
+.items-list{display:flex;flex-direction:column;gap:6px}
+.item-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--white);border-radius:10px;
+  padding:10px 14px;border:1px solid var(--line);
+  font-size:.86rem;
+}
+.item-row .qty{
+  min-width:32px;height:28px;border-radius:8px;
+  background:var(--ink);color:#fff;
+  display:grid;place-items:center;
+  font-weight:800;font-size:.78rem;
+  flex-shrink:0;
+}
+.item-row .name{flex:1;font-weight:600}
+.item-row .price{font-weight:800;white-space:nowrap}
+
+.summary{
+  background:var(--white);border-radius:10px;
+  padding:14px 16px;border:1px solid var(--line);
+  display:flex;flex-direction:column;gap:8px;
+  max-width:320px;
+}
+.sum-row{display:flex;justify-content:space-between;font-size:.86rem}
+.sum-row.total{
+  font-size:1.05rem;font-weight:900;
+  padding-top:10px;border-top:1px solid var(--line);
+}
+
+.actions{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-top:18px;padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.action-btn{
+  padding:9px 16px;border-radius:10px;
+  font-size:.82rem;font-weight:700;
+  display:flex;align-items:center;gap:6px;
+  transition:all .2s var(--ease);
+  border:1.5px solid transparent;
+}
+.action-btn:hover{transform:translateY(-1px)}
+.action-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.action-btn.accept{background:var(--blue);color:#fff}
+.action-btn.accept:hover{background:#2563eb}
+.action-btn.cook{background:var(--orange);color:#fff}
+.action-btn.cook:hover{background:#d97706}
+.action-btn.deliver{background:var(--purple);color:#fff}
+.action-btn.deliver:hover{background:#7c3aed}
+.action-btn.done{background:var(--matcha);color:#fff}
+.action-btn.done:hover{background:#1a9e57}
+.action-btn.cancel{background:transparent;border-color:var(--line-2);color:var(--muted)}
+.action-btn.cancel:hover{border-color:var(--red);color:var(--red)}
+.action-btn.call{background:var(--ink);color:#fff}
+.action-btn.call:hover{background:var(--red)}
+
+/* =========================================================
+   EMPTY & LOADING
+   ========================================================= */
+.empty{
+  text-align:center;padding:80px 20px;
+  color:var(--muted);
+}
+.empty svg{
+  width:72px;height:72px;stroke:currentColor;fill:none;
+  stroke-width:1.2;margin:0 auto 20px;opacity:.35;
+}
+.empty h3{font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:6px}
+.empty p{font-size:.9rem}
+
+.loading{
+  display:flex;flex-direction:column;align-items:center;
+  padding:80px 20px;gap:16px;color:var(--muted);
+}
+.spinner{
+  width:40px;height:40px;border-radius:50%;
+  border:3px solid var(--line-2);border-top-color:var(--red);
+  animation:spin 1s linear infinite;
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+.toast-wrap{
+  position:fixed;top:84px;right:20px;z-index:400;
+  display:flex;flex-direction:column;gap:8px;
+  pointer-events:none;
+}
+.toast{
+  background:var(--ink);color:#fff;
+  padding:13px 18px;border-radius:12px;
+  display:flex;align-items:center;gap:10px;
+  font-size:.86rem;font-weight:500;
+  box-shadow:var(--shadow-lg);
+  transform:translateX(120%);
+  transition:transform .4s var(--ease);
+  pointer-events:auto;max-width:340px;
+}
+.toast.show{transform:translateX(0)}
+.toast .t-ico{
+  width:22px;height:22px;border-radius:50%;
+  display:grid;place-items:center;flex-shrink:0;
+}
+.toast.success .t-ico{background:var(--matcha)}
+.toast.error .t-ico{background:var(--red)}
+.toast .t-ico svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media(max-width:640px){
+  .header-inner{padding:0 16px;height:62px}
+  .header .logo small{display:none}
+  .header-user span{display:none}
+  .header-user{padding:5px}
+  .wrap{padding:20px 16px 50px}
+  .order-head{padding:14px 16px;gap:10px}
+  .order-body{padding:0 16px 16px}
+  .order-meta{width:100%;margin-left:0;gap:10px}
+  .order-total{font-size:.94rem}
+  .summary{max-width:100%}
+  .toast-wrap{top:74px;left:16px;right:16px}
+  .toast{max-width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="mark">Y</div>
+      <div>
+        <h1>Yamato Sushi</h1>
+        <small>Admin Panel</small>
+      </div>
+    </div>
+    <h2>Kirish</h2>
+    <p class="sub">Buyurtmalarni boshqarish uchun tizimga kiring.</p>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm" onsubmit="doLogin(event)">
+      <div class="field">
+        <label>Login</label>
+        <input type="text" id="loginUser" placeholder="Login" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label>Parol</label>
+        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" id="loginBtn">KIRISH →</button>
+    </form>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="dashboard">
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="mark">Y</div>
+        <div>
+          Yamato Admin
+          <small>Buyurtmalar</small>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="header-user">
+          <div class="av">A</div>
+          <span id="userName">admin</span>
+        </div>
+        <button class="icon-btn" onclick="doLogout()" title="Chiqish">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat c1">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+        <div class="label">Bugun</div>
+        <div class="value" id="statToday">0</div>
+      </div>
+      <div class="stat c2">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="label">Bugungi summa</div>
+        <div class="value" id="statTodaySum">0</div>
+      </div>
+      <div class="stat c3">
+        <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div class="label">Jami buyurtma</div>
+        <div class="value" id="statTotal">0</div>
+      </div>
+      <div class="stat c4">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
+        <div class="label">Jami summa</div>
+        <div class="value" id="statTotalSum">0</div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters" id="filters">
+      <button class="chip active" data-status="all">Barchasi <span class="count" id="c-all">0</span></button>
+      <button class="chip" data-status="new">🆕 Yangi <span class="count" id="c-new">0</span></button>
+      <button class="chip" data-status="accepted">✅ Qabul <span class="count" id="c-accepted">0</span></button>
+      <button class="chip" data-status="cooking">🔥 Tayyorlanmoqda <span class="count" id="c-cooking">0</span></button>
+      <button class="chip" data-status="delivering">🚚 Yetkazilmoqda <span class="count" id="c-delivering">0</span></button>
+      <button class="chip" data-status="done">✔️ Yakunlangan <span class="count" id="c-done">0</span></button>
+      <button class="chip" data-status="cancelled">❌ Bekor <span class="count" id="c-cancelled">0</span></button>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" placeholder="Buyurtma raqami, ism yoki telefon..." oninput="renderOrders()">
+      </div>
+      <button class="refresh-btn" id="refreshBtn" onclick="loadOrders(true)">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        Yangilash
+      </button>
+    </div>
+
+    <!-- ORDERS -->
+    <div id="ordersContainer">
+      <div class="loading">
+        <div class="spinner"></div>
+        <span>Yuklanmoqda...</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* =========================================================
+   KONFIGURATSIYA
+   ========================================================= */
+const API = '/api';
+const TOKEN_KEY = 'yamato_admin_token';
+
+let STATE = {
+  orders: [],
+  stats: null,
+  filter: 'all',
+  loading: false,
+  refreshInterval: null
+};
+
+/* =========================================================
+   AUTH
+   ========================================================= */
+function getToken() { return localStorage.getItem(TOKEN_KEY); }
+function setToken(t) { localStorage.setItem(TOKEN_KEY, t); }
+function clearToken() { localStorage.removeItem(TOKEN_KEY); }
+
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginError');
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+
+  err.classList.remove('show');
+  btn.disabled = true;
+  btn.textContent = 'Tekshirilmoqda...';
+
+  try {
+    const res = await fetch(`${API}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+
+    if (data.success && data.token) {
+      setToken(data.token);
+      showDashboard(data.user);
+    } else {
+      err.textContent = data.error || 'Login yoki parol xato';
+      err.classList.add('show');
+    }
+  } catch (e) {
+    err.textContent = 'Server bilan aloqa yo\'q';
+    err.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'KIRISH →';
+  }
+}
+
+function doLogout() {
+  clearToken();
+  if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
+  document.getElementById('dashboard').classList.remove('show');
+  document.getElementById('loginScreen').classList.remove('hide');
+  document.getElementById('loginForm').reset();
+}
+
+function showDashboard(user) {
+  document.getElementById('loginScreen').classList.add('hide');
+  document.getElementById('dashboard').classList.add('show');
+  if (user) document.getElementById('userName').textContent = user;
+  loadOrders(true);
+
+  if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
+  STATE.refreshInterval = setInterval(() => loadOrders(false), 30000);
+}
+
+/* =========================================================
+   API CHAQIRUVLAR
+   ========================================================= */
+async function apiFetch(path, options = {}) {
+  const token = getToken();
+  const res = await fetch(`${API}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      ...(options.headers || {})
+    }
+  });
+
+  if (res.status === 401) {
+    doLogout();
+    toast('Sessiya tugadi. Qayta kiring.', 'error');
+    throw new Error('Unauthorized');
+  }
+  return res.json();
+}
+
+async function loadOrders(showLoading = false) {
+  if (STATE.loading) return;
+  STATE.loading = true;
+
+  const btn = document.getElementById('refreshBtn');
+  if (showLoading) {
+    btn.classList.add('spinning');
+    document.getElementById('ordersContainer').innerHTML =
+      '<div class="loading"><div class="spinner"></div><span>Yuklanmoqda...</span></div>';
+  }
+
+  try {
+    const [ordersData, statsData] = await Promise.all([
+      apiFetch('/orders?status=all'),
+      apiFetch('/orders?stats=1')
+    ]);
+
+    if (ordersData.success) STATE.orders = ordersData.orders || [];
+    if (statsData.success) STATE.stats = statsData.stats;
+
+    renderStats();
+    renderOrders();
+  } catch (e) {
+    console.warn(e);
+  } finally {
+    STATE.loading = false;
+    btn.classList.remove('spinning');
+  }
+}
+
+async function changeStatus(id, status) {
+  try {
+    const data = await apiFetch('/update', {
+      method: 'POST',
+      body: JSON.stringify({ id, status })
+    });
+    if (data.success) {
+      toast('Holat yangilandi', 'success');
+      loadOrders(false);
+    } else {
+      toast(data.error || 'Xatolik', 'error');
+    }
+  } catch (e) {
+    toast('Server bilan aloqa yo\'q', 'error');
+  }
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function renderStats() {
+  const s = STATE.stats || {};
+  document.getElementById('statToday').textContent = s.todayOrders || 0;
+  document.getElementById('statTodaySum').textContent = fmtShort(s.todaySum || 0);
+  document.getElementById('statTotal').textContent = s.totalOrders || 0;
+  document.getElementById('statTotalSum').textContent = fmtShort(s.totalSum || 0);
+
+  const byStatus = s.byStatus || {};
+  const all = Object.values(byStatus).reduce((a, b) => a + b, 0);
+  setCount('c-all', all);
+  ['new', 'accepted', 'cooking', 'delivering', 'done', 'cancelled'].forEach(st => {
+    setCount('c-' + st, byStatus[st] || 0);
+  });
+}
+function setCount(id, n) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = n;
+}
+
+function renderOrders() {
+  const container = document.getElementById('ordersContainer');
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+
+  let list = STATE.orders;
+  if (STATE.filter !== 'all') list = list.filter(o => o.status === STATE.filter);
+  if (q) {
+    list = list.filter(o =>
+      (o.order_num || '').toLowerCase().includes(q) ||
+      (o.name || '').toLowerCase().includes(q) ||
+      (o.phone || '').toLowerCase().includes(q)
+    );
+  }
+
+  if (!list.length) {
+    container.innerHTML = `
+      <div class="empty">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <h3>Buyurtma topilmadi</h3>
+        <p>${q ? 'Qidiruv bo\'yicha hech narsa yo\'q' : 'Hozircha buyurtmalar yo\'q'}</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(orderHTML).join('');
+
+  container.querySelectorAll('.order-head').forEach(head => {
+    head.addEventListener('click', () => {
+      head.parentElement.classList.toggle('open');
+    });
+  });
+}
+
+function orderHTML(o) {
+  const statusLabels = {
+    new: 'Yangi', accepted: 'Qabul qilindi', cooking: 'Tayyorlanmoqda',
+    delivering: 'Yetkazilmoqda', done: 'Yakunlangan', cancelled: 'Bekor qilindi'
+  };
+  const statusLabel = statusLabels[o.status] || o.status;
+
+  const items = Array.isArray(o.items) ? o.items : [];
+  const itemsHTML = items.map(it => `
+    <div class="item-row">
+      <div class="qty">${it.qty}×</div>
+      <div class="name">${escapeHtml(it.name)}</div>
+      <div class="price">${fmt(it.sum)}</div>
+    </div>
+  `).join('');
+
+  const timeLabel = o.time_type === 'later' ? 'Keyinroq' : 'Hozir';
+  const payLabels = { cash: 'Naqd', karta: 'Karta', click: 'Click', payme: 'Payme' };
+  const payLabel = payLabels[o.pay_type] || o.pay_type;
+
+  const actions = actionsHTML(o);
+
+  return `
+    <div class="order" data-id="${o.id}">
+      <div class="order-head">
+        ${o.status === 'new' ? '<span class="dot"></span>' : ''}
+        <div class="order-num">${o.order_num}</div>
+        <div class="order-meta">
+          <span><b>${escapeHtml(o.name)}</b></span>
+          <span>${escapeHtml(o.phone)}</span>
+          <span>${formatDate(o.created_at)}</span>
+        </div>
+        <div class="order-total">${fmt(o.total)}</div>
+        <span class="order-status status-${o.status}">${statusLabel}</span>
+        <svg class="order-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="order-body">
+
+        <div class="order-section">
+          <h4>Mijoz</h4>
+          <div class="info-grid">
+            <div class="info-item"><small>Ism</small><b>${escapeHtml(o.name)}</b></div>
+            <div class="info-item"><small>Telefon</small><b><a href="tel:${o.phone}">${escapeHtml(o.phone)}</a></b></div>
+            <div class="info-item"><small>Manzil</small><b>${escapeHtml(o.district || '')} ${escapeHtml(o.addr || '')} ${escapeHtml(o.house || '')}</b></div>
+            <div class="info-item"><small>Mo'ljal</small><b>${escapeHtml(o.landmark || '—')}</b></div>
+            <div class="info-item"><small>Vaqt</small><b>${timeLabel}</b></div>
+            <div class="info-item"><small>To'lov</small><b>${payLabel}</b></div>
+          </div>
+        </div>
+
+        <div class="order-section">
+          <h4>Mahsulotlar (${items.length})</h4>
+          <div class="items-list">${itemsHTML}</div>
+        </div>
+
+        <div class="order-section">
+          <h4>Summa</h4>
+          <div class="summary">
+            <div class="sum-row"><span>Mahsulotlar</span><b>${fmt(o.subtotal)}</b></div>
+            <div class="sum-row"><span>Yetkazib berish</span><b>${o.delivery ? fmt(o.delivery) : 'Bepul'}</b></div>
+            <div class="sum-row total"><span>Jami</span><b>${fmt(o.total)}</b></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          ${actions}
+          <a href="tel:${o.phone}" class="action-btn call">
+            <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></svg>
+            Qo'ng'iroq
+          </a>
+        </div>
+
+      </div>
+    </div>`;
+}
+
+function actionsHTML(o) {
+  const s = o.status;
+  const id = o.id;
+  const btns = [];
+
+  if (s === 'new') {
+    btns.push(`<button class="action-btn accept" onclick="changeStatus(${id},'accepted')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Qabul qilish</button>`);
+  }
+  if (s === 'new' || s === 'accepted') {
+    btns.push(`<button class="action-btn cook" onclick="changeStatus(${id},'cooking')"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg> Tayyorlash</button>`);
+  }
+  if (s === 'cooking') {
+    btns.push(`<button class="action-btn deliver" onclick="changeStatus(${id},'delivering')"><svg viewBox="0 0 24 24"><path d="M5 18H3V6h13v12H9"/><path d="M16 8h4l3 4v6h-3"/><circle cx="7.5" cy="18.5" r="1.5"/><circle cx="17.5" cy="18.5" r="1.5"/></svg> Yetkazishga</button>`);
+  }
+  if (s === 'delivering') {
+    btns.push(`<button class="action-btn done" onclick="changeStatus(${id},'done')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Yakunlash</button>`);
+  }
+  if (s !== 'done' && s !== 'cancelled') {
+    btns.push(`<button class="action-btn cancel" onclick="if(confirm('Bekor qilinsinmi?'))changeStatus(${id},'cancelled')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg> Bekor</button>`);
+  }
+  return btns.join('');
+}
+
+/* =========================================================
+   YORDAMCHI
+   ========================================================= */
+function fmt(n) {
+  return new Intl.NumberFormat('uz-UZ').format(Math.round(n || 0)) + ' so\'m';
+}
+function fmtShort(n) {
+  n = Math.round(n || 0);
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + ' mln';
+  if (n >= 1000) return (n / 1000).toFixed(0) + 'k';
+  return String(n);
+}
+function formatDate(str) {
+  if (!str) return '';
+  const d = new Date(str.replace(' ', 'T') + 'Z');
+  if (isNaN(d)) return str;
+  const now = new Date();
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return 'hozir';
+  if (diff < 3600) return Math.floor(diff / 60) + ' daq oldin';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' soat oldin';
+  return d.toLocaleDateString('uz-UZ') + ' ' + d.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+}
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[c]);
+}
+
+function toast(msg, type = 'success') {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  const icon = type === 'error'
+    ? '<path d="M18 6 6 18M6 6l12 12"/>'
+    : '<path d="m5 12 5 5L20 7"/>';
+  t.innerHTML = `<div class="t-ico"><svg viewBox="0 0 24 24">${icon}</svg></div>${msg}`;
+  wrap.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 400);
+  }, 2600);
+}
+
+/* =========================================================
+   FILTRLAR
+   ========================================================= */
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    STATE.filter = chip.dataset.status;
+    renderOrders();
+  });
+});
+
+/* =========================================================
+   ISHGA TUSHIRISH
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+  const token = getToken();
+  if (token) {
+    showDashboard('admin');
+  }
+});
+</script>
+</body>
+</html>
