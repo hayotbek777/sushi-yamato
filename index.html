@@ -376,7 +376,7 @@
 <aside class="drawer" id="cartDrawer">
   <div class="drawer-head">
     <h3>🛒 SAVAT</h3>
-    <button class="close" onclick="closeCart()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <button class="close" onclick="closeCart()" aria-label="Yopish"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="drawer-body" id="cartBody"></div>
   <div class="drawer-foot" id="cartFoot" style="display:none">
@@ -391,7 +391,7 @@
 <div class="modal" id="productModal">
   <div class="modal-bg" onclick="closeModal('productModal')"></div>
   <div class="modal-panel">
-    <button class="modal-close" onclick="closeModal('productModal')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <button class="modal-close" onclick="closeModal('productModal')" aria-label="Yopish"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     <div class="modal-scroll" id="productModalBody"></div>
   </div>
 </div>
@@ -401,8 +401,8 @@
   <div class="search-panel">
     <div class="search-head">
       <svg viewBox="0 0 24 24" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="text" id="searchInput" placeholder="Sushi, set yoki taom qidiring..." autocomplete="off">
-      <button onclick="closeModal('searchModal')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <input type="text" id="searchInput" placeholder="Sushi, set yoki taom qidiring..." autocomplete="off" aria-label="Qidirish">
+      <button onclick="closeModal('searchModal')" aria-label="Yopish"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
     <div class="search-body" id="searchBody"></div>
   </div>
@@ -411,7 +411,7 @@
 <div class="modal" id="checkoutModal">
   <div class="modal-bg" onclick="closeModal('checkoutModal')"></div>
   <div class="checkout-panel">
-    <button class="modal-close" onclick="closeModal('checkoutModal')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <button class="modal-close" onclick="closeModal('checkoutModal')" aria-label="Yopish"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     <div class="checkout-head">
       <h3>Buyurtmani rasmiylashtirish</h3>
       <p>Ma'lumotlaringizni to'ldiring va buyurtmani tasdiqlang.</p>
@@ -419,10 +419,10 @@
     <div class="checkout-body">
       <div class="step">
         <div class="step-title"><div class="num">1</div><h4>MANZIL</h4></div>
-        <div class="field"><label>Ism</label><input type="text" id="ckName" placeholder="Ismingiz"></div>
-        <div class="field"><label>Telefon</label><input type="tel" id="ckPhone" placeholder="+998 __ ___-__-__" oninput="maskPhone(this)"></div>
+        <div class="field"><label for="ckName">Ism</label><input type="text" id="ckName" placeholder="Ismingiz" autocomplete="name"></div>
+        <div class="field"><label for="ckPhone">Telefon</label><input type="tel" id="ckPhone" placeholder="+998 __ ___-__-__" oninput="maskPhone(this)" autocomplete="tel"></div>
         <div class="field-row">
-          <div class="field"><label>Tuman / Mahalla</label>
+          <div class="field"><label for="ckDistrict">Tuman / Mahalla</label>
             <select id="ckDistrict">
               <option>Al-Xorazmiy</option>
               <option>Amudaryo</option>
@@ -436,10 +436,10 @@
               <option>Urganch markaz</option>
             </select>
           </div>
-          <div class="field"><label>Uy / Kvartira</label><input type="text" id="ckHouse" placeholder="12, 45"></div>
+          <div class="field"><label for="ckHouse">Uy / Kvartira</label><input type="text" id="ckHouse" placeholder="12, 45"></div>
         </div>
-        <div class="field"><label>Manzil</label><input type="text" id="ckAddr" placeholder="Ko'cha nomi"></div>
-        <div class="field"><label>Mo'ljal</label><input type="text" id="ckLandmark" placeholder="Mo'ljal (ixtiyoriy)"></div>
+        <div class="field"><label for="ckAddr">Manzil</label><input type="text" id="ckAddr" placeholder="Ko'cha nomi" autocomplete="street-address"></div>
+        <div class="field"><label for="ckLandmark">Mo'ljal</label><input type="text" id="ckLandmark" placeholder="Mo'ljal (ixtiyoriy)"></div>
       </div>
       <div class="step">
         <div class="step-title"><div class="num">2</div><h4>YETKAZIB BERISH</h4></div>
@@ -468,7 +468,7 @@
 <div class="modal" id="trackModal">
   <div class="modal-bg" onclick="closeModal('trackModal')"></div>
   <div class="track-panel">
-    <button class="modal-close" onclick="closeModal('trackModal')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <button class="modal-close" onclick="closeModal('trackModal')" aria-label="Yopish"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     <div class="track-head" id="trackHead"></div>
     <div class="track-body" id="trackBody"></div>
   </div>
