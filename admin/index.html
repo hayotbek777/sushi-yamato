@@ -467,11 +467,11 @@ ul{list-style:none}
     <div class="login-error" id="loginError"></div>
     <form id="loginForm" onsubmit="doLogin(event)">
       <div class="field">
-        <label>Login</label>
+        <label for="loginUser">Login</label>
         <input type="text" id="loginUser" placeholder="Login" autocomplete="username" required>
       </div>
       <div class="field">
-        <label>Parol</label>
+        <label for="loginPass">Parol</label>
         <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" required>
       </div>
       <button type="submit" class="btn btn-primary" id="loginBtn">KIRISH →</button>
@@ -571,6 +571,20 @@ ul{list-style:none}
 const API = '/api';
 const TOKEN_KEY = 'yamato_admin_token';
 
+/* =========================================================
+   HOLAT (STATE) — MUHIM: bu yerda e'lon qilinadi
+   ========================================================= */
+let STATE = {
+  orders: [],
+  stats: null,
+  filter: 'all',
+  loading: false,
+  refreshInterval: null
+};
+
+/* =========================================================
+   TOKEN (sessionStorage — har kirganda login so'raladi)
+   ========================================================= */
 function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
 function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
@@ -578,10 +592,6 @@ function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
 /* =========================================================
    AUTH
    ========================================================= */
-function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
-function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
-function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
-
 async function doLogin(e) {
   e.preventDefault();
   const btn = document.getElementById('loginBtn');
