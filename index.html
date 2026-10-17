@@ -422,24 +422,21 @@
         <div class="field"><label for="ckName">Ism</label><input type="text" id="ckName" placeholder="Ismingiz" autocomplete="name"></div>
         <div class="field"><label for="ckPhone">Telefon</label><input type="tel" id="ckPhone" placeholder="+998 __ ___-__-__" oninput="maskPhone(this)" autocomplete="tel"></div>
         <div class="field-row">
-          <div class="field"><label for="ckDistrict">Tuman / Mahalla</label>
-            <select id="ckDistrict">
-              <option>Al-Xorazmiy</option>
-              <option>Amudaryo</option>
-              <option>Bog'ot</option>
-              <option>Gurlan</option>
-              <option>Xonqa</option>
-              <option>Xiva</option>
-              <option>Shovot</option>
-              <option>Yangiariq</option>
-              <option>Yangibozor</option>
-              <option>Urganch markaz</option>
+          <div class="field"><label for="ckCity">Shahar</label>
+            <select id="ckCity">
+              <option value="Urganch">Urganch shahri</option>
             </select>
           </div>
           <div class="field"><label for="ckHouse">Uy / Kvartira</label><input type="text" id="ckHouse" placeholder="12, 45"></div>
         </div>
-        <div class="field"><label for="ckAddr">Manzil</label><input type="text" id="ckAddr" placeholder="Ko'cha nomi" autocomplete="street-address"></div>
-        <div class="field"><label for="ckLandmark">Mo'ljal</label><input type="text" id="ckLandmark" placeholder="Mo'ljal (ixtiyoriy)"></div>
+        <div class="field"><label for="ckAddr">Ko'cha nomi</label><input type="text" id="ckAddr" placeholder="Ko'cha nomi" autocomplete="street-address"></div>
+        <div class="field">
+          <label for="ckLandmark">Mo'ljal (majburiy)</label>
+          <input type="text" id="ckLandmark" placeholder="Yaqin joylashgan ob'ekt" required>
+        </div>
+        <div class="field" style="background: rgba(220,31,38,0.05); padding: 10px; border-radius: 8px; font-size: 0.85rem; color: var(--muted);">
+          📍 Xaritada aniq joylashuv: <a href="https://yandex.uz/maps/10312/urganch/?ll=60.625196%2C41.556795&z=14" target="_blank" style="color:var(--red); font-weight:bold;">Xaritani ochish</a>
+        </div>
       </div>
       <div class="step">
         <div class="step-title"><div class="num">2</div><h4>YETKAZIB BERISH</h4></div>
@@ -451,10 +448,17 @@
       <div class="step">
         <div class="step-title"><div class="num">3</div><h4>TO'LOV</h4></div>
         <div class="pay-options">
-          <div class="pay-opt active" data-pay="cash" onclick="selectPay(this)">💵 Naqd</div>
-          <div class="pay-opt" data-pay="karta" onclick="selectPay(this)">💳 Karta</div>
-          <div class="pay-opt" data-pay="click" onclick="selectPay(this)">📱 Click</div>
-          <div class="pay-opt" data-pay="payme" onclick="selectPay(this)">📱 Payme</div>
+          <div class="pay-opt active" data-pay="cash" onclick="selectPay(this, 'cash')">💵 Naqd (kuryerga)</div>
+          <div class="pay-opt" data-pay="click" onclick="selectPay(this, 'online')">📱 Click</div>
+          <div class="pay-opt" data-pay="payme" onclick="selectPay(this, 'online')">📱 Payme</div>
+          <div class="pay-opt" data-pay="karta" onclick="selectPay(this, 'online')">💳 Karta</div>
+        </div>
+        <div class="field" id="receiptField" style="display:none; margin-top: 15px; background: #fff3cd; padding: 15px; border-radius: 12px;">
+          <label style="color: #856404;">📸 To'lov cheki (skrinshot)</label>
+          <p style="font-size: 0.75rem; color: #856404; margin-bottom: 10px;">
+            To'lov qilganingizdan so'ng, <b>chek skrinshotini yuklang!</b>
+          </p>
+          <input type="file" id="ckReceipt" accept="image/*" style="width: 100%; padding: 8px; border: 1px dashed #856404; border-radius: 8px;">
         </div>
       </div>
     </div>

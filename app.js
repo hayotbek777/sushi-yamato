@@ -423,15 +423,25 @@ function openCheckout() {
   updateCartUI();
   openModal('checkoutModal');
 }
+
 function selectTime(el) {
   $$('.time-opt').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   CHECKOUT.time = el.textContent.includes('Keyinroq') ? 'later' : 'now';
 }
-function selectPay(el) {
+
+/* YANGILANGAN: To'lov turi va chek oynasi */
+function selectPay(el, type) {
   $$('.pay-opt').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   CHECKOUT.pay = el.dataset.pay;
+
+  const receiptField = document.getElementById('receiptField');
+  if (type === 'online') {
+    receiptField.style.display = 'block'; // Click, Payme, Karta uchun chek so'raladi
+  } else {
+    receiptField.style.display = 'none';  // Naqd uchun yashiriladi
+  }
 }
 
 function maskPhone(inp) {
@@ -446,19 +456,44 @@ function maskPhone(inp) {
   inp.value = out;
 }
 
+/* YANGILANGAN: Buyurtma berish (Mo'ljal va Chek tekshiruvi bilan) */
 async function placeOrder() {
   const name = $('#ckName').value.trim();
   const phone = $('#ckPhone').value.trim();
-  const district = $('#ckDistrict').value;
+  const city = $('#ckCity').value; // Yangilangan ID
   const house = $('#ckHouse').value.trim();
   const addr = $('#ckAddr').value.trim();
   const landmark = $('#ckLandmark').value.trim();
+  const receiptInput = document.getElementById('ckReceipt');
 
+  // --- VALIDATSIYA ---
   if (!name || phone.replace(/\D/g, '').length < 12) {
     toast('Ism va telefon raqamini to\'ldiring');
     return;
   }
-  if (!addr) { toast('Manzilni kiriting'); return; }
+  if (!addr) { toast('Ko\'cha nomini kiriting'); return; }
+  
+  // Mo'ljal majburiyligi
+  if (!landmark) { 
+    toast('Iltimos, mo\'ljalni to\'liq kiriting (majburiy)'); 
+    return; 
+  }
+
+  // Chek tekshiruvi (agar naqd bo'lmasa)
+  let receiptBase64 = '';
+  if (CHECKOUT.pay !== 'cash') {
+    if (!receiptInput.files[0]) {
+      toast('Iltimos, to\'lov chekini (skrinshotni) yuklang!');
+      return;
+    }
+    // Rasmni Base64 matniga o'girish
+    const file = receiptInput.files[0];
+    receiptBase64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.readAsDataURL(file);
+    });
+  }
 
   const items = Object.entries(CART).map(([id, q]) => {
     const p = getP(id);
@@ -469,9 +504,12 @@ async function placeOrder() {
   const total = subtotal + delivery;
 
   const payload = {
-    name, phone, district, addr, house, landmark,
+    name, phone, 
+    district: city, 
+    addr, house, landmark,
     time: CHECKOUT.time,
     pay: CHECKOUT.pay,
+    receipt: receiptBase64, // Rasmni yuborish
     items, subtotal, delivery, total
   };
 
@@ -533,13 +571,13 @@ function openTracking(orderNum, payType) {
     head.style.display = '';
     head.innerHTML =
       '<h3>BUYURTMA QABUL QILINDI</h3>' +
-      '<div class="eta">To\'lovni tasdiqlash kerak</div>' +
+      '<div class="eta">To\'lov cheki tekshirilmoqda</div>' +
       '<div class="order-num">' + orderNum + '</div>';
     body.innerHTML =
       '<div style="text-align:center;padding:8px 4px 20px">' +
         '<div style="font-size:1.15rem;font-weight:800;line-height:1.4;margin-bottom:10px">To\'lov qabul qilindi</div>' +
         '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:22px">' +
-          "Buyurtmangiz tayyorlanmoqda. To'lovni tasdiqlash uchun operator siz bilan bog'lanadi." +
+          "Buyurtmangiz tayyorlanmoqda. Operatorimiz chekni tasdiqlash uchun siz bilan bog'lanadi." +
         '</p>' +
       '</div>';
   }

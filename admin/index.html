@@ -324,6 +324,19 @@ ul{list-style:none}
 .info-item small{display:block;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;font-weight:600}
 .info-item b{font-size:.88rem;font-weight:600;word-break:break-word}
 
+/* CHEK RASMI */
+.receipt-img {
+  max-width: 200px;
+  border-radius: 8px;
+  border: 2px solid var(--gold);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+.receipt-img:hover {
+  transform: scale(1.05);
+}
+
 .items-list{display:flex;flex-direction:column;gap:6px}
 .item-row{
   display:flex;align-items:center;gap:12px;
@@ -571,9 +584,6 @@ ul{list-style:none}
 const API = '/api';
 const TOKEN_KEY = 'yamato_admin_token';
 
-/* =========================================================
-   HOLAT (STATE) — MUHIM: bu yerda e'lon qilinadi
-   ========================================================= */
 let STATE = {
   orders: [],
   stats: null,
@@ -583,7 +593,7 @@ let STATE = {
 };
 
 /* =========================================================
-   TOKEN (sessionStorage — har kirganda login so'raladi)
+   TOKEN (sessionStorage)
    ========================================================= */
 function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
@@ -791,6 +801,17 @@ function orderHTML(o) {
 
   const actions = actionsHTML(o);
 
+  /* YANGILANGAN: Chekni ko'rsatish */
+  const receiptHTML = o.receipt 
+    ? `<div style="margin-top: 15px;">
+        <h4>To'lov cheki (Skrinshot)</h4>
+        <a href="${o.receipt}" target="_blank">
+          <img src="${o.receipt}" alt="To'lov cheki" class="receipt-img">
+        </a>
+        <p style="font-size: 0.7rem; color: var(--muted); margin-top: 5px;">Kattalashtirish uchun rasmni bosing</p>
+       </div>` 
+    : (o.pay_type === 'cash' ? `<p style="color: var(--muted); font-size: 0.85rem; margin-top: 10px;">💵 Naqd to'lov (chek talab qilinmaydi)</p>` : '');
+
   return `
     <div class="order" data-id="${o.id}">
       <div class="order-head">
@@ -808,15 +829,16 @@ function orderHTML(o) {
       <div class="order-body">
 
         <div class="order-section">
-          <h4>Mijoz</h4>
+          <h4>Mijoz va Manzil</h4>
           <div class="info-grid">
             <div class="info-item"><small>Ism</small><b>${escapeHtml(o.name)}</b></div>
             <div class="info-item"><small>Telefon</small><b><a href="tel:${o.phone}">${escapeHtml(o.phone)}</a></b></div>
-            <div class="info-item"><small>Manzil</small><b>${escapeHtml(o.district || '')} ${escapeHtml(o.addr || '')} ${escapeHtml(o.house || '')}</b></div>
+            <div class="info-item"><small>Shahar / Manzil</small><b>${escapeHtml(o.district || '')}, ${escapeHtml(o.addr || '')} ${escapeHtml(o.house || '')}</b></div>
             <div class="info-item"><small>Mo'ljal</small><b>${escapeHtml(o.landmark || '—')}</b></div>
             <div class="info-item"><small>Vaqt</small><b>${timeLabel}</b></div>
-            <div class="info-item"><small>To'lov</small><b>${payLabel}</b></div>
+            <div class="info-item"><small>To'lov turi</small><b>${payLabel}</b></div>
           </div>
+          ${receiptHTML} <!-- CHEK SHU YERGA CHIQADI -->
         </div>
 
         <div class="order-section">
