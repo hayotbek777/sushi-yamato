@@ -392,6 +392,9 @@ ul{list-style:none}
 .action-btn.cancel:hover{border-color:var(--red);color:var(--red)}
 .action-btn.call{background:var(--ink);color:#fff}
 .action-btn.call:hover{background:var(--red)}
+/* YANGI: O'chirish tugmasi */
+.action-btn.delete{background:transparent;border-color:var(--red);color:var(--red)}
+.action-btn.delete:hover{background:var(--red);color:#fff}
 
 /* =========================================================
    EMPTY & LOADING
@@ -418,7 +421,7 @@ ul{list-style:none}
 }
 
 /* =========================================================
-   TOAST
+   TOAST & MODAL (YANGI)
    ========================================================= */
 .toast-wrap{
   position:fixed;top:84px;right:20px;z-index:400;
@@ -443,6 +446,34 @@ ul{list-style:none}
 .toast.success .t-ico{background:var(--matcha)}
 .toast.error .t-ico{background:var(--red)}
 .toast .t-ico svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+
+/* Modal Oyna */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(14,14,16,0.6); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: auto; }
+.modal-box {
+  background: var(--white); border-radius: 16px;
+  padding: 24px; width: 100%; max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  transform: scale(0.95); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-align: center;
+}
+.modal-overlay.show .modal-box { transform: scale(1); }
+.modal-box h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; }
+.modal-box p { font-size: 0.9rem; color: var(--muted); margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; justify-content: center; }
+.modal-actions button {
+  padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.modal-actions .btn-cancel { background: var(--washi-2); color: var(--ink); }
+.modal-actions .btn-cancel:hover { background: #e0d8c8; }
+.modal-actions .btn-confirm { background: var(--red); color: #fff; }
+.modal-actions .btn-confirm:hover { background: var(--red-dark); }
 
 /* =========================================================
    RESPONSIVE
@@ -577,6 +608,18 @@ ul{list-style:none}
 
 <div class="toast-wrap" id="toastWrap"></div>
 
+<!-- YANGI: Maxsus Modal Oyna -->
+<div class="modal-overlay" id="customModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Tasdiqlash</h3>
+    <p id="modalDesc">Haqiqatan ham bu amalni bajarmoqchimisiz?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCustomModal()">Bekor qilish</button>
+      <button class="btn-confirm" id="modalConfirmBtn">Ha, davom etish</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =========================================================
    KONFIGURATSIYA
@@ -591,6 +634,28 @@ let STATE = {
   loading: false,
   refreshInterval: null
 };
+
+let modalCallback = null; // Modal uchun
+
+/* =========================================================
+   MAXSUS MODAL (ALERT/CONFIRM O'RNIGA)
+   ========================================================= */
+function customConfirm(title, desc, callback) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('customModal').classList.add('show');
+  modalCallback = callback;
+}
+
+function closeCustomModal() {
+  document.getElementById('customModal').classList.remove('show');
+  modalCallback = null;
+}
+
+document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+  if (modalCallback) modalCallback();
+  closeCustomModal();
+});
 
 /* =========================================================
    TOKEN (sessionStorage)
@@ -639,19 +704,11 @@ async function doLogin(e) {
 
 function doLogout() {
   clearToken();
-  localStorage.removeItem('yamato_old_orders'); // Yangi qo'shildi
+  localStorage.removeItem('yamato_seen_orders'); // Ovoz xotirasini tozalash
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
   document.getElementById('dashboard').classList.remove('show');
   document.getElementById('loginScreen').classList.remove('hide');
   document.getElementById('loginForm').reset();
-  function doLogout() {
-  clearToken();
-  localStorage.removeItem('yamato_seen_orders'); // BU QATORNI QO'SHING
-  if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
-  document.getElementById('dashboard').classList.remove('show');
-  document.getElementById('loginScreen').classList.remove('hide');
-  document.getElementById('loginForm').reset();
-}
 }
 
 function showDashboard(user) {
@@ -660,7 +717,6 @@ function showDashboard(user) {
   if (user) document.getElementById('userName').textContent = user;
   loadOrders(true);
 
-  // OVOZNI YOQISH UCHUN MAXSUS TUGMA
   if (!document.getElementById('enableSoundBtn')) {
     const btn = document.createElement('button');
     btn.id = 'enableSoundBtn';
@@ -683,16 +739,15 @@ function showDashboard(user) {
           osc.start();
           osc.stop(audioCtx.currentTime + 0.5);
           btn.style.display = 'none';
-          toast('Ovoz yoqildi (fayl topilmadi, tizim ovozi ishlatiladi).', 'success');
-        } catch(e) {
-          alert('Ovozni yoqib bo\'lmadi: ' + err.message);
-        }
+          toast('Ovoz yoqildi.', 'success');
+        } catch(e) {}
       });
     };
     document.body.appendChild(btn);
   }
 
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
+  // 5 sekundlik yangilanish
   STATE.refreshInterval = setInterval(() => loadOrders(false), 500);
 }
 
@@ -738,38 +793,26 @@ async function loadOrders(showLoading = false) {
     if (ordersData.success) {
       const newOrders = ordersData.orders || [];
       
-      // --- OVOZ MANTIQI (FAQAT HAQIQIY YANGI BUYURTMADA) ---
+      // 1 MARTALIK OVOZ MANTIQI
       let savedIdsStr = localStorage.getItem('yamato_seen_orders');
       let savedIds = [];
 
       if (savedIdsStr) {
-        // Agar xotira mavjud bo'lsa (bu birinchi yuklanish emas)
         savedIds = JSON.parse(savedIdsStr);
         let hasNew = false;
 
         newOrders.forEach(o => {
-          // Agar buyurtma ID'si xotirada bo'lmasa va u "new" bo'lsa
           if (!savedIds.includes(o.id)) {
-            savedIds.push(o.id); // Xotiraga qo'shamiz
-            if (o.status === 'new') {
-              hasNew = true;
-            }
+            savedIds.push(o.id);
+            if (o.status === 'new') hasNew = true;
           }
         });
 
-        // Agar haqiqiy yangi buyurtma topilsa, ovoz chalinadi
-        if (hasNew) {
-          playSound();
-        }
+        if (hasNew) playSound();
       } else {
-        // Agar bu BIRINCHI yuklanish bo'lsa (xotira bo'sh bo'lsa)
-        // Hech qanday ovoz chalinmaydi, faqat hozirgi ID'larni xotiraga yozamiz
-        savedIds = newOrders.map(o => o.id);
+        savedIds = newOrders.map(o => o.id); // Birinchi marta kirganda ovoz chiqmaydi
       }
-
-      // Xotirani yangilab qo'yamiz
       localStorage.setItem('yamato_seen_orders', JSON.stringify(savedIds));
-      // -----------------------------------------------------
       
       STATE.orders = newOrders;
     }
@@ -790,9 +833,7 @@ function playSound() {
   try {
     const audio = new Audio('/admin/ding.mp3'); 
     audio.play().catch(e => console.log("Ovoz bloklandi. Sahifani bir marta bosing.", e));
-  } catch (e) {
-    console.log("Audio xatosi:", e);
-  }
+  } catch (e) {}
 }
 
 async function changeStatus(id, status) {
@@ -803,6 +844,23 @@ async function changeStatus(id, status) {
     });
     if (data.success) {
       toast('Holat yangilandi', 'success');
+      loadOrders(false);
+    } else {
+      toast(data.error || 'Xatolik', 'error');
+    }
+  } catch (e) {
+    toast('Server bilan aloqa yo\'q', 'error');
+  }
+}
+
+async function deleteOrder(id) {
+  try {
+    const data = await apiFetch('/update', {
+      method: 'POST',
+      body: JSON.stringify({ id, status: 'delete' }) // Status delete deb yuboramiz
+    });
+    if (data.success) {
+      toast('Buyurtma o\'chirildi', 'success');
       loadOrders(false);
     } else {
       toast(data.error || 'Xatolik', 'error');
@@ -840,7 +898,6 @@ function renderOrders() {
 
   let list = STATE.orders;
   
-  // "Barchasi" bo'limida bekor qilinganlarni yashirish
   if (STATE.filter === 'all') {
     list = list.filter(o => o.status !== 'cancelled');
   } else if (STATE.filter !== 'cancelled') {
@@ -979,8 +1036,14 @@ function actionsHTML(o) {
     btns.push(`<button class="action-btn done" onclick="changeStatus(${id},'done')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Yakunlash</button>`);
   }
   if (s !== 'done' && s !== 'cancelled') {
-    btns.push(`<button class="action-btn cancel" onclick="if(confirm('Bekor qilinsinmi?'))changeStatus(${id},'cancelled')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg> Bekor</button>`);
+    btns.push(`<button class="action-btn cancel" onclick="customConfirm('Bekor qilish', 'Haqiqatan ham bu buyurtmani bekor qilmoqchimisiz?', () => changeStatus(${id},'cancelled'))"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg> Bekor</button>`);
   }
+  
+  // YANGI: O'chirish tugmasi (Faqat bekor qilinganlar uchun)
+  if (s === 'cancelled') {
+    btns.push(`<button class="action-btn delete" onclick="customConfirm('Butunlay o\\'chirish', 'Bu buyurtma bazadan butunlay o\\'chib ketadi. Davom etasizmi?', () => deleteOrder(${id}))"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> O'chirish</button>`);
+  }
+  
   return btns.join('');
 }
 
