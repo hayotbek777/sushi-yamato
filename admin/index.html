@@ -922,13 +922,33 @@ function renderOrders() {
     return;
   }
 
+  // Hozirgi ochiq turgan buyurtma ID sini eslab qolamiz
+  const currentlyOpen = container.querySelector('.order.open')?.dataset.id || null;
+
   container.innerHTML = list.map(orderHTML).join('');
 
+  // Yangi HTML qo'shilgandan keyin event listener'larni biriktiramiz
   container.querySelectorAll('.order-head').forEach(head => {
-    head.addEventListener('click', () => {
-      head.parentElement.classList.toggle('open');
+    head.addEventListener('click', (e) => {
+      e.stopPropagation(); // Boshqa eventlarga xalaqit bermasin
+      const clickedOrder = head.parentElement;
+      
+      // Agar bosilgan buyurtma allaqachon ochiq bo'lsa, uni yopamiz
+      if (clickedOrder.classList.contains('open')) {
+        clickedOrder.classList.remove('open');
+      } else {
+        // Aks holda, hamma ochiq buyurtmalarni yopib, faqat bosilganini ochamiz
+        container.querySelectorAll('.order').forEach(o => o.classList.remove('open'));
+        clickedOrder.classList.add('open');
+      }
     });
   });
+
+  // Agar oldin ochiq buyurtma bo'lsa, uni qayta ochib qo'yamiz
+  if (currentlyOpen) {
+    const openEl = container.querySelector(`.order[data-id="${currentlyOpen}"]`);
+    if (openEl) openEl.classList.add('open');
+  }
 }
 
 function orderHTML(o) {
