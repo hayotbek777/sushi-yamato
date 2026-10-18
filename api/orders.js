@@ -42,6 +42,7 @@ export default async function handler(req, res) {
       // Barcha buyurtmalarni olamiz
       const allOrders = await getOrders({ status: 'all', limit: 10000 });
       
+      // Bugungi sanani olish (YYYY-MM-DD formatida)
       const todayStr = new Date().toISOString().slice(0, 10);
       
       let totalOrders = 0;
@@ -51,17 +52,20 @@ export default async function handler(req, res) {
       const byStatus = {};
       
       allOrders.forEach(o => {
-        // Filtr (chip) lar uchun jami hisoblaymiz (bekor qilinganlar ham kiradi)
+        // 1. Filtrlar (tugmalar) uchun hamma buyurtma sonini hisoblaymiz
         byStatus[o.status] = (byStatus[o.status] || 0) + 1;
 
-        // Summalarga faqat BEKOR QILINMAGANLARNI qo'shamiz
+        // 2. Summalarga faqat bekor qilinmaganlarni qo'shamiz
         if (o.status !== 'cancelled') {
           totalOrders++;
-          totalSum += o.total;
           
+          // MUHIM: Number() orqali qat'iy raqamga o'giramiz, xato bo'lmasligi uchun
+          totalSum += Number(o.total) || 0; 
+          
+          // Bugungi summani hisoblash
           if (o.created_at && o.created_at.startsWith(todayStr)) {
             todayOrders++;
-            todaySum += o.total;
+            todaySum += Number(o.total) || 0;
           }
         }
       });
