@@ -645,26 +645,44 @@ function doLogout() {
   document.getElementById('loginScreen').classList.remove('hide');
   document.getElementById('loginForm').reset();
 }
-
 function showDashboard(user) {
   document.getElementById('loginScreen').classList.add('hide');
   document.getElementById('dashboard').classList.add('show');
   if (user) document.getElementById('userName').textContent = user;
   loadOrders(true);
 
+  // OVOZNI YOQISH UCHUN MAXSUS TUGMA (Ekranning o'ng pastida chiqadi)
+  if (!document.getElementById('enableSoundBtn')) {
+    const btn = document.createElement('button');
+    btn.id = 'enableSoundBtn';
+    btn.innerHTML = '🔔 Ovozni yoqish';
+    btn.style.cssText = 'position:fixed; bottom:20px; right:20px; z-index:999; padding:12px 20px; background:#2FBF71; color:white; border-radius:10px; font-weight:bold; cursor:pointer; border:none; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+    btn.onclick = () => {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 880;
+        gain.gain.value = 0.5;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+        
+        btn.style.display = 'none'; // Tugmani yashirish
+        toast('Ovoz muvaffaqiyatli yoqildi! Endi yangi buyurtmalarda signal chalinadi.', 'success');
+      } catch(e) {
+        alert('Ovozni yoqishda xatolik: ' + e.message);
+      }
+    };
+    document.body.appendChild(btn);
+  }
+
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
   STATE.refreshInterval = setInterval(() => loadOrders(false), 30000);
 }
-  // Sahifaga birinchi bosilganda ovozni "ruxsatli" holatga keltirish
-  document.body.addEventListener('click', function unlockAudio() {
-    const audio = new Audio('/admin/ding.mp3');
-    audio.volume = 0.01; // Eshitilmaydigan darajada
-    audio.play().then(() => {
-      audio.pause();
-      audio.currentTime = 0;
-    }).catch(() => {});
-    document.body.removeEventListener('click', unlockAudio);
-  }, { once: true });
 
 /* =========================================================
    API CHAQIRUVLAR
@@ -734,17 +752,28 @@ async function loadOrders(showLoading = false) {
 
 function playSound() {
   try {
-    // Bizning shaxsiy ovoz faylimiz
-    const audio = new Audio('/admin/ding.mp3'); 
-    audio.volume = 1.0;
-    audio.play().catch(e => {
-      console.log("Ovoz chiqarish bloklandi. Sahifani bosing.", e);
-    });
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume(); // Agar bloklangan bo'lsa, ochish
+    
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.15);
+    
+    gain.gain.setValueAtTime(1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.6);
   } catch (e) {
-    console.log("Audio xatosi:", e);
+    console.log("Ovoz xatosi:", e);
   }
 }
-
 async function changeStatus(id, status) {
   try {
     const data = await apiFetch('/update', {
