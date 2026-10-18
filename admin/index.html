@@ -897,13 +897,15 @@ function renderOrders() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
 
   let list = STATE.orders;
-  
+
+  // 1. XATO TUZATILDI: "Bekor" bo'limida faqat bekor qilinganlar chiqadi
   if (STATE.filter === 'all') {
     list = list.filter(o => o.status !== 'cancelled');
-  } else if (STATE.filter !== 'cancelled') {
+  } else {
     list = list.filter(o => o.status === STATE.filter);
   }
 
+  // Qidiruv
   if (q) {
     list = list.filter(o =>
       (o.order_num || '').toLowerCase().includes(q) ||
@@ -922,31 +924,31 @@ function renderOrders() {
     return;
   }
 
-  // Hozirgi ochiq turgan buyurtma ID sini eslab qolamiz
-  const currentlyOpen = container.querySelector('.order.open')?.dataset.id || null;
+  // 2. XATO TUZATILDI: Ochiq turgan buyurtma ID sini eslab qolamiz
+  const currentlyOpenId = container.querySelector('.order.open')?.dataset.id || null;
 
   container.innerHTML = list.map(orderHTML).join('');
 
-  // Yangi HTML qo'shilgandan keyin event listener'larni biriktiramiz
+  // Event listener'larni biriktiramiz
   container.querySelectorAll('.order-head').forEach(head => {
     head.addEventListener('click', (e) => {
-      e.stopPropagation(); // Boshqa eventlarga xalaqit bermasin
-      const clickedOrder = head.parentElement;
+      e.stopPropagation();
+      const orderEl = head.parentElement;
       
-      // Agar bosilgan buyurtma allaqachon ochiq bo'lsa, uni yopamiz
-      if (clickedOrder.classList.contains('open')) {
-        clickedOrder.classList.remove('open');
+      // Agar shu o'zi bosilgan bo'lsa - yopamiz
+      if (orderEl.classList.contains('open')) {
+        orderEl.classList.remove('open');
       } else {
-        // Aks holda, hamma ochiq buyurtmalarni yopib, faqat bosilganini ochamiz
+        // Boshqasi ochiq bo'lsa - ularni yopib, shuni ochamiz
         container.querySelectorAll('.order').forEach(o => o.classList.remove('open'));
-        clickedOrder.classList.add('open');
+        orderEl.classList.add('open');
       }
     });
   });
 
-  // Agar oldin ochiq buyurtma bo'lsa, uni qayta ochib qo'yamiz
-  if (currentlyOpen) {
-    const openEl = container.querySelector(`.order[data-id="${currentlyOpen}"]`);
+  // Agar oldin ochiq turgan buyurtma bo'lsa va hali ham ro'yxatda bo'lsa - uni qayta ochib qo'yamiz
+  if (currentlyOpenId) {
+    const openEl = container.querySelector(`.order[data-id="${currentlyOpenId}"]`);
     if (openEl) openEl.classList.add('open');
   }
 }
