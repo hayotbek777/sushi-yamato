@@ -879,8 +879,16 @@ function renderOrders() {
   const container = document.getElementById('ordersContainer');
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
 
-  // XATO TUZATILDI: Har bir buyurtma o'zining bo'limida chiqadi
-  let list = STATE.orders.filter(o => o.status === STATE.filter);
+  let list = STATE.orders;
+  
+  // AYNAN SHU YER O'ZGARDI
+  if (STATE.filter === 'all') {
+    // Barchasi tanlansa, bekor qilinganlardan tashqari hammasi chiqadi
+    list = list.filter(o => o.status !== 'cancelled');
+  } else {
+    // Boshqa bo'limlar tanlansa, faqat o'sha holatdagilar chiqadi
+    list = list.filter(o => o.status === STATE.filter);
+  }
 
   // Qidiruv
   if (q) {
