@@ -644,6 +644,14 @@ function doLogout() {
   document.getElementById('dashboard').classList.remove('show');
   document.getElementById('loginScreen').classList.remove('hide');
   document.getElementById('loginForm').reset();
+  function doLogout() {
+  clearToken();
+  localStorage.removeItem('yamato_seen_orders'); // BU QATORNI QO'SHING
+  if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
+  document.getElementById('dashboard').classList.remove('show');
+  document.getElementById('loginScreen').classList.remove('hide');
+  document.getElementById('loginForm').reset();
+}
 }
 
 function showDashboard(user) {
@@ -730,20 +738,21 @@ async function loadOrders(showLoading = false) {
     if (ordersData.success) {
       const newOrders = ordersData.orders || [];
       
-      // OVOZ MANTIQI: Faqat so'nggi 1 daqiqada kelgan va "new" bo'lgan buyurtmani tekshiramiz
-      // Bu usul brauzer xotirasiga (localStorage) bog'liq emas, shuning uchun refresh ham ta'sir qilmaydi.
-      const now = new Date().getTime();
-      const hasVeryNewOrder = newOrders.some(o => {
-        if (o.status !== 'new') return false;
-        // Vaqtni millisekundga o'girish (SQLite formatidan)
-        const orderTime = new Date(o.created_at.replace(' ', 'T') + 'Z').getTime();
-        // Agar buyurtma so'nggi 2 daqiqa ichida kelgan bo'lsa (120000 ms)
-        return (now - orderTime) < 120000; 
-      });
+      // OVOZ MANTIQI (Xotira orqali)
+      // Brauzer xotirasidan eski ko'rilgan buyurtmalar ID sini olamiz
+      let seenIds = JSON.parse(localStorage.getItem('yamato_seen_orders') || '[]');
 
-      if (hasVeryNewOrder) {
-        playSound();
+      // Agar xotira bo'sh bo'lmasa (ya'ni birinchi marta kirilgan bo'lmasa)
+      if (seenIds.length > 0) {
+        // Yangi kelgan buyurtmalar orasida "new" holatida bo'lgan va ID si xotirada yo'q buyurtmani qidiramiz
+        const hasTrulyNew = newOrders.some(o => !seenIds.includes(o.id) && o.status === 'new');
+        if (hasTrulyNew) {
+          playSound();
+        }
       }
+
+      // Hozirgi barcha buyurtmalar ID sini xotiraga yozamiz
+      localStorage.setItem('yamato_seen_orders', JSON.stringify(newOrders.map(o => o.id)));
       
       STATE.orders = newOrders;
     }
