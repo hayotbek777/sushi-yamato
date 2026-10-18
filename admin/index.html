@@ -751,7 +751,14 @@ function renderOrders() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
 
   let list = STATE.orders;
-  if (STATE.filter !== 'all') list = list.filter(o => o.status === STATE.filter);
+  
+  // "Barchasi" bo'limida bekor qilinganlarni yashirish
+  if (STATE.filter === 'all') {
+    list = list.filter(o => o.status !== 'cancelled');
+  } else if (STATE.filter !== 'cancelled') {
+    list = list.filter(o => o.status === STATE.filter);
+  }
+
   if (q) {
     list = list.filter(o =>
       (o.order_num || '').toLowerCase().includes(q) ||
