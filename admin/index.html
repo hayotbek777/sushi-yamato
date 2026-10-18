@@ -586,7 +586,6 @@ const TOKEN_KEY = 'yamato_admin_token';
 
 let STATE = {
   orders: [],
-  oldOrderIds: [], // Ovoz uchun
   stats: null,
   filter: 'all',
   loading: false,
@@ -640,6 +639,7 @@ async function doLogin(e) {
 
 function doLogout() {
   clearToken();
+  localStorage.removeItem('yamato_old_orders'); // Yangi qo'shildi
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
   document.getElementById('dashboard').classList.remove('show');
   document.getElementById('loginScreen').classList.remove('hide');
@@ -652,7 +652,7 @@ function showDashboard(user) {
   if (user) document.getElementById('userName').textContent = user;
   loadOrders(true);
 
-  // OVOZNI YOQISH UCHUN MAXSUS TUGMA (Ekranning o'ng pastida chiqadi)
+  // OVOZNI YOQISH UCHUN MAXSUS TUGMA
   if (!document.getElementById('enableSoundBtn')) {
     const btn = document.createElement('button');
     btn.id = 'enableSoundBtn';
@@ -660,15 +660,12 @@ function showDashboard(user) {
     btn.style.cssText = 'position:fixed; bottom:20px; right:20px; z-index:999; padding:12px 20px; background:#2FBF71; color:white; border-radius:10px; font-weight:bold; cursor:pointer; border:none; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
     
     btn.onclick = () => {
-      // Ovozni sinab ko'rish
       const audio = new Audio('/admin/ding.mp3');
       audio.volume = 1.0;
-      
       audio.play().then(() => {
         btn.style.display = 'none'; 
         toast('Ovoz muvaffaqiyatli yoqildi! Endi yangi buyurtmalarda signal chalinadi.', 'success');
       }).catch(err => {
-        // Agar mp3 topilmasa, brauzer o'zi ovoz chiqaradi
         try {
           const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
           const osc = audioCtx.createOscillator();
@@ -677,7 +674,6 @@ function showDashboard(user) {
           gain.connect(audioCtx.destination);
           osc.start();
           osc.stop(audioCtx.currentTime + 0.5);
-          
           btn.style.display = 'none';
           toast('Ovoz yoqildi (fayl topilmadi, tizim ovozi ishlatiladi).', 'success');
         } catch(e) {
@@ -691,7 +687,6 @@ function showDashboard(user) {
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
   STATE.refreshInterval = setInterval(() => loadOrders(false), 30000);
 }
-
 
 /* =========================================================
    API CHAQIRUVLAR
@@ -735,15 +730,13 @@ async function loadOrders(showLoading = false) {
     if (ordersData.success) {
       const newOrders = ordersData.orders || [];
       
-      // OVOZ CHIQARISH MANTIQI
-      if (STATE.oldOrderIds && STATE.oldOrderIds.length > 0) {
-        const hasNew = newOrders.some(o => !STATE.oldOrderIds.includes(o.id) && o.status === 'new');
-        if (hasNew) {
-          playSound();
-        }
+      // OVOZ MANTIQI (localStorage orqali - refresh bo'lsa ham saqlanadi)
+      let savedIds = JSON.parse(localStorage.getItem('yamato_old_orders') || '[]');
+      if (savedIds.length > 0) {
+        const hasNew = newOrders.some(o => !savedIds.includes(o.id) && o.status === 'new');
+        if (hasNew) playSound();
       }
-      
-      STATE.oldOrderIds = newOrders.map(o => o.id);
+      localStorage.setItem('yamato_old_orders', JSON.stringify(newOrders.map(o => o.id)));
       STATE.orders = newOrders;
     }
     
@@ -761,7 +754,6 @@ async function loadOrders(showLoading = false) {
 
 function playSound() {
   try {
-    // Bizning shaxsiy mp3 faylimiz
     const audio = new Audio('/admin/ding.mp3'); 
     audio.play().catch(e => console.log("Ovoz bloklandi. Sahifani bir marta bosing.", e));
   } catch (e) {
@@ -870,7 +862,6 @@ function orderHTML(o) {
 
   const actions = actionsHTML(o);
 
-  /* Chekni ko'rsatish */
   const receiptHTML = o.receipt 
     ? `<div style="margin-top: 15px;">
         <h4>To'lov cheki (Skrinshot)</h4>
