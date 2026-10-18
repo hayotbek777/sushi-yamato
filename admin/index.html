@@ -730,13 +730,21 @@ async function loadOrders(showLoading = false) {
     if (ordersData.success) {
       const newOrders = ordersData.orders || [];
       
-      // OVOZ MANTIQI (localStorage orqali - refresh bo'lsa ham saqlanadi)
-      let savedIds = JSON.parse(localStorage.getItem('yamato_old_orders') || '[]');
-      if (savedIds.length > 0) {
-        const hasNew = newOrders.some(o => !savedIds.includes(o.id) && o.status === 'new');
-        if (hasNew) playSound();
+      // OVOZ MANTIQI: Faqat so'nggi 1 daqiqada kelgan va "new" bo'lgan buyurtmani tekshiramiz
+      // Bu usul brauzer xotirasiga (localStorage) bog'liq emas, shuning uchun refresh ham ta'sir qilmaydi.
+      const now = new Date().getTime();
+      const hasVeryNewOrder = newOrders.some(o => {
+        if (o.status !== 'new') return false;
+        // Vaqtni millisekundga o'girish (SQLite formatidan)
+        const orderTime = new Date(o.created_at.replace(' ', 'T') + 'Z').getTime();
+        // Agar buyurtma so'nggi 2 daqiqa ichida kelgan bo'lsa (120000 ms)
+        return (now - orderTime) < 120000; 
+      });
+
+      if (hasVeryNewOrder) {
+        playSound();
       }
-      localStorage.setItem('yamato_old_orders', JSON.stringify(newOrders.map(o => o.id)));
+      
       STATE.orders = newOrders;
     }
     
