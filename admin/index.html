@@ -645,6 +645,7 @@ function doLogout() {
   document.getElementById('loginScreen').classList.remove('hide');
   document.getElementById('loginForm').reset();
 }
+
 function showDashboard(user) {
   document.getElementById('loginScreen').classList.add('hide');
   document.getElementById('dashboard').classList.add('show');
@@ -657,25 +658,32 @@ function showDashboard(user) {
     btn.id = 'enableSoundBtn';
     btn.innerHTML = '🔔 Ovozni yoqish';
     btn.style.cssText = 'position:fixed; bottom:20px; right:20px; z-index:999; padding:12px 20px; background:#2FBF71; color:white; border-radius:10px; font-weight:bold; cursor:pointer; border:none; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+    
     btn.onclick = () => {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = 880;
-        gain.gain.value = 0.5;
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.2);
-        
-        btn.style.display = 'none'; // Tugmani yashirish
+      // Ovozni sinab ko'rish
+      const audio = new Audio('/admin/ding.mp3');
+      audio.volume = 1.0;
+      
+      audio.play().then(() => {
+        btn.style.display = 'none'; 
         toast('Ovoz muvaffaqiyatli yoqildi! Endi yangi buyurtmalarda signal chalinadi.', 'success');
-      } catch(e) {
-        alert('Ovozni yoqishda xatolik: ' + e.message);
-      }
+      }).catch(err => {
+        // Agar mp3 topilmasa, brauzer o'zi ovoz chiqaradi
+        try {
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.5);
+          
+          btn.style.display = 'none';
+          toast('Ovoz yoqildi (fayl topilmadi, tizim ovozi ishlatiladi).', 'success');
+        } catch(e) {
+          alert('Ovozni yoqib bo\'lmadi: ' + err.message);
+        }
+      });
     };
     document.body.appendChild(btn);
   }
@@ -683,6 +691,7 @@ function showDashboard(user) {
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
   STATE.refreshInterval = setInterval(() => loadOrders(false), 30000);
 }
+
 
 /* =========================================================
    API CHAQIRUVLAR
@@ -752,28 +761,14 @@ async function loadOrders(showLoading = false) {
 
 function playSound() {
   try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume(); // Agar bloklangan bo'lsa, ochish
-    
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-    osc.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.15);
-    
-    gain.gain.setValueAtTime(1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-    
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.6);
+    // Bizning shaxsiy mp3 faylimiz
+    const audio = new Audio('/admin/ding.mp3'); 
+    audio.play().catch(e => console.log("Ovoz bloklandi. Sahifani bir marta bosing.", e));
   } catch (e) {
-    console.log("Ovoz xatosi:", e);
+    console.log("Audio xatosi:", e);
   }
 }
+
 async function changeStatus(id, status) {
   try {
     const data = await apiFetch('/update', {
