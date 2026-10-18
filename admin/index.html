@@ -738,21 +738,38 @@ async function loadOrders(showLoading = false) {
     if (ordersData.success) {
       const newOrders = ordersData.orders || [];
       
-      // OVOZ MANTIQI (Xotira orqali)
-      // Brauzer xotirasidan eski ko'rilgan buyurtmalar ID sini olamiz
-      let seenIds = JSON.parse(localStorage.getItem('yamato_seen_orders') || '[]');
+      // --- OVOZ MANTIQI (FAQAT HAQIQIY YANGI BUYURTMADA) ---
+      let savedIdsStr = localStorage.getItem('yamato_seen_orders');
+      let savedIds = [];
 
-      // Agar xotira bo'sh bo'lmasa (ya'ni birinchi marta kirilgan bo'lmasa)
-      if (seenIds.length > 0) {
-        // Yangi kelgan buyurtmalar orasida "new" holatida bo'lgan va ID si xotirada yo'q buyurtmani qidiramiz
-        const hasTrulyNew = newOrders.some(o => !seenIds.includes(o.id) && o.status === 'new');
-        if (hasTrulyNew) {
+      if (savedIdsStr) {
+        // Agar xotira mavjud bo'lsa (bu birinchi yuklanish emas)
+        savedIds = JSON.parse(savedIdsStr);
+        let hasNew = false;
+
+        newOrders.forEach(o => {
+          // Agar buyurtma ID'si xotirada bo'lmasa va u "new" bo'lsa
+          if (!savedIds.includes(o.id)) {
+            savedIds.push(o.id); // Xotiraga qo'shamiz
+            if (o.status === 'new') {
+              hasNew = true;
+            }
+          }
+        });
+
+        // Agar haqiqiy yangi buyurtma topilsa, ovoz chalinadi
+        if (hasNew) {
           playSound();
         }
+      } else {
+        // Agar bu BIRINCHI yuklanish bo'lsa (xotira bo'sh bo'lsa)
+        // Hech qanday ovoz chalinmaydi, faqat hozirgi ID'larni xotiraga yozamiz
+        savedIds = newOrders.map(o => o.id);
       }
 
-      // Hozirgi barcha buyurtmalar ID sini xotiraga yozamiz
-      localStorage.setItem('yamato_seen_orders', JSON.stringify(newOrders.map(o => o.id)));
+      // Xotirani yangilab qo'yamiz
+      localStorage.setItem('yamato_seen_orders', JSON.stringify(savedIds));
+      // -----------------------------------------------------
       
       STATE.orders = newOrders;
     }
