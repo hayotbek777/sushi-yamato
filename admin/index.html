@@ -167,14 +167,14 @@ ul{list-style:none}
 .wrap{max-width:1400px;margin:0 auto;padding:28px 24px 60px}
 
 /* =========================================================
-   STATS
+   STATS (3 ta karta)
    ========================================================= */
 .stats{
   display:grid;gap:14px;
-  grid-template-columns:repeat(2,1fr);
+  grid-template-columns:repeat(3,1fr);
   margin-bottom:28px;
 }
-@media(min-width:768px){.stats{grid-template-columns:repeat(4,1fr);gap:18px}}
+@media(max-width:640px){.stats{grid-template-columns:1fr}}
 .stat{
   background:var(--white);border-radius:var(--radius);
   padding:20px;border:1px solid var(--line);
@@ -188,7 +188,6 @@ ul{list-style:none}
   margin-bottom:14px;
 }
 .stat .ico svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.stat.c1 .ico{background:linear-gradient(135deg,var(--red),var(--red-dark))}
 .stat.c2 .ico{background:linear-gradient(135deg,var(--matcha),#1a9e57)}
 .stat.c3 .ico{background:linear-gradient(135deg,var(--gold),var(--orange))}
 .stat.c4 .ico{background:linear-gradient(135deg,var(--purple),#6D28D9)}
@@ -333,9 +332,7 @@ ul{list-style:none}
   transition: transform 0.2s;
   cursor: pointer;
 }
-.receipt-img:hover {
-  transform: scale(1.05);
-}
+.receipt-img:hover { transform: scale(1.05); }
 
 .items-list{display:flex;flex-direction:column;gap:6px}
 .item-row{
@@ -392,21 +389,14 @@ ul{list-style:none}
 .action-btn.cancel:hover{border-color:var(--red);color:var(--red)}
 .action-btn.call{background:var(--ink);color:#fff}
 .action-btn.call:hover{background:var(--red)}
-/* YANGI: O'chirish tugmasi */
 .action-btn.delete{background:transparent;border-color:var(--red);color:var(--red)}
 .action-btn.delete:hover{background:var(--red);color:#fff}
 
 /* =========================================================
    EMPTY & LOADING
    ========================================================= */
-.empty{
-  text-align:center;padding:80px 20px;
-  color:var(--muted);
-}
-.empty svg{
-  width:72px;height:72px;stroke:currentColor;fill:none;
-  stroke-width:1.2;margin:0 auto 20px;opacity:.35;
-}
+.empty{ text-align:center;padding:80px 20px; color:var(--muted); }
+.empty svg{ width:72px;height:72px;stroke:currentColor;fill:none; stroke-width:1.2;margin:0 auto 20px;opacity:.35; }
 .empty h3{font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:6px}
 .empty p{font-size:.9rem}
 
@@ -421,7 +411,7 @@ ul{list-style:none}
 }
 
 /* =========================================================
-   TOAST & MODAL (YANGI)
+   TOAST & MODAL
    ========================================================= */
 .toast-wrap{
   position:fixed;top:84px;right:20px;z-index:400;
@@ -550,11 +540,6 @@ ul{list-style:none}
 
     <!-- STATS -->
     <div class="stats">
-      <div class="stat c1">
-        <div class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-        <div class="label">Bugun</div>
-        <div class="value" id="statToday">0</div>
-      </div>
       <div class="stat c2">
         <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
         <div class="label">Bugungi summa</div>
@@ -608,7 +593,7 @@ ul{list-style:none}
 
 <div class="toast-wrap" id="toastWrap"></div>
 
-<!-- YANGI: Maxsus Modal Oyna -->
+<!-- Modal Oyna -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-box">
     <h3 id="modalTitle">Tasdiqlash</h3>
@@ -635,10 +620,10 @@ let STATE = {
   refreshInterval: null
 };
 
-let modalCallback = null; // Modal uchun
+let modalCallback = null;
 
 /* =========================================================
-   MAXSUS MODAL (ALERT/CONFIRM O'RNIGA)
+   MODAL
    ========================================================= */
 function customConfirm(title, desc, callback) {
   document.getElementById('modalTitle').textContent = title;
@@ -704,7 +689,7 @@ async function doLogin(e) {
 
 function doLogout() {
   clearToken();
-  localStorage.removeItem('yamato_seen_orders'); // Ovoz xotirasini tozalash
+  localStorage.removeItem('yamato_seen_orders');
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
   document.getElementById('dashboard').classList.remove('show');
   document.getElementById('loginScreen').classList.remove('hide');
@@ -728,7 +713,7 @@ function showDashboard(user) {
       audio.volume = 1.0;
       audio.play().then(() => {
         btn.style.display = 'none'; 
-        toast('Ovoz muvaffaqiyatli yoqildi! Endi yangi buyurtmalarda signal chalinadi.', 'success');
+        toast('Ovoz muvaffaqiyatli yoqildi!', 'success');
       }).catch(err => {
         try {
           const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -747,8 +732,8 @@ function showDashboard(user) {
   }
 
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
-  // 5 sekundlik yangilanish
-  STATE.refreshInterval = setInterval(() => loadOrders(false), 500);
+  // YANGILANISH 15 SEKUND
+  STATE.refreshInterval = setInterval(() => loadOrders(false), 15000);
 }
 
 /* =========================================================
@@ -793,7 +778,6 @@ async function loadOrders(showLoading = false) {
     if (ordersData.success) {
       const newOrders = ordersData.orders || [];
       
-      // 1 MARTALIK OVOZ MANTIQI
       let savedIdsStr = localStorage.getItem('yamato_seen_orders');
       let savedIds = [];
 
@@ -810,7 +794,7 @@ async function loadOrders(showLoading = false) {
 
         if (hasNew) playSound();
       } else {
-        savedIds = newOrders.map(o => o.id); // Birinchi marta kirganda ovoz chiqmaydi
+        savedIds = newOrders.map(o => o.id);
       }
       localStorage.setItem('yamato_seen_orders', JSON.stringify(savedIds));
       
@@ -832,7 +816,7 @@ async function loadOrders(showLoading = false) {
 function playSound() {
   try {
     const audio = new Audio('/admin/ding.mp3'); 
-    audio.play().catch(e => console.log("Ovoz bloklandi. Sahifani bir marta bosing.", e));
+    audio.play().catch(e => console.log("Ovoz bloklandi.", e));
   } catch (e) {}
 }
 
@@ -857,7 +841,7 @@ async function deleteOrder(id) {
   try {
     const data = await apiFetch('/update', {
       method: 'POST',
-      body: JSON.stringify({ id, status: 'delete' }) // Status delete deb yuboramiz
+      body: JSON.stringify({ id, status: 'delete' })
     });
     if (data.success) {
       toast('Buyurtma o\'chirildi', 'success');
@@ -875,7 +859,6 @@ async function deleteOrder(id) {
    ========================================================= */
 function renderStats() {
   const s = STATE.stats || {};
-  document.getElementById('statToday').textContent = s.todayOrders || 0;
   document.getElementById('statTodaySum').textContent = fmtShort(s.todaySum || 0);
   document.getElementById('statTotal').textContent = s.totalOrders || 0;
   document.getElementById('statTotalSum').textContent = fmtShort(s.totalSum || 0);
@@ -897,15 +880,13 @@ function renderOrders() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
 
   let list = STATE.orders;
-
-  // 1. XATO TUZATILDI: "Bekor" bo'limida faqat bekor qilinganlar chiqadi
+  
   if (STATE.filter === 'all') {
     list = list.filter(o => o.status !== 'cancelled');
   } else {
     list = list.filter(o => o.status === STATE.filter);
   }
 
-  // Qidiruv
   if (q) {
     list = list.filter(o =>
       (o.order_num || '').toLowerCase().includes(q) ||
@@ -924,29 +905,25 @@ function renderOrders() {
     return;
   }
 
-  // 2. XATO TUZATILDI: Ochiq turgan buyurtma ID sini eslab qolamiz
+  // Akkordeon uchun ochiq ID ni saqlab qolish
   const currentlyOpenId = container.querySelector('.order.open')?.dataset.id || null;
 
   container.innerHTML = list.map(orderHTML).join('');
 
-  // Event listener'larni biriktiramiz
   container.querySelectorAll('.order-head').forEach(head => {
     head.addEventListener('click', (e) => {
       e.stopPropagation();
       const orderEl = head.parentElement;
       
-      // Agar shu o'zi bosilgan bo'lsa - yopamiz
       if (orderEl.classList.contains('open')) {
         orderEl.classList.remove('open');
       } else {
-        // Boshqasi ochiq bo'lsa - ularni yopib, shuni ochamiz
         container.querySelectorAll('.order').forEach(o => o.classList.remove('open'));
         orderEl.classList.add('open');
       }
     });
   });
 
-  // Agar oldin ochiq turgan buyurtma bo'lsa va hali ham ro'yxatda bo'lsa - uni qayta ochib qo'yamiz
   if (currentlyOpenId) {
     const openEl = container.querySelector(`.order[data-id="${currentlyOpenId}"]`);
     if (openEl) openEl.classList.add('open');
@@ -1061,7 +1038,6 @@ function actionsHTML(o) {
     btns.push(`<button class="action-btn cancel" onclick="customConfirm('Bekor qilish', 'Haqiqatan ham bu buyurtmani bekor qilmoqchimisiz?', () => changeStatus(${id},'cancelled'))"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg> Bekor</button>`);
   }
   
-  // YANGI: O'chirish tugmasi (Faqat bekor qilinganlar uchun)
   if (s === 'cancelled') {
     btns.push(`<button class="action-btn delete" onclick="customConfirm('Butunlay o\\'chirish', 'Bu buyurtma bazadan butunlay o\\'chib ketadi. Davom etasizmi?', () => deleteOrder(${id}))"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> O'chirish</button>`);
   }

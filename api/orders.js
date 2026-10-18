@@ -1,8 +1,8 @@
 /* =========================================================
-   GET /api/orders — Buyurtmalar ro'yxati (admin)
+   GET /api/orders — Buyurtmalar ro'yxati va Statistika
    ========================================================= */
 import jwt from 'jsonwebtoken';
-import { getOrders, getStats } from '../lib/db.js';
+import { getOrders } from '../lib/db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'yamato-super-secret-key-2026';
 
@@ -39,8 +39,37 @@ export default async function handler(req, res) {
     const stats = req.query.stats === '1';
 
     if (stats) {
-      const data = await getStats();
-      return res.status(200).json({ success: true, stats: data });
+      // Barcha buyurtmalarni olamiz
+      const allOrders = await getOrders({ status: 'all', limit: 10000 });
+      
+      const todayStr = new Date().toISOString().slice(0, 10);
+      
+      let totalOrders = 0;
+      let totalSum = 0;
+      let todayOrders = 0;
+      let todaySum = 0;
+      const byStatus = {};
+      
+      allOrders.forEach(o => {
+        // Filtr (chip) lar uchun jami hisoblaymiz (bekor qilinganlar ham kiradi)
+        byStatus[o.status] = (byStatus[o.status] || 0) + 1;
+
+        // Summalarga faqat BEKOR QILINMAGANLARNI qo'shamiz
+        if (o.status !== 'cancelled') {
+          totalOrders++;
+          totalSum += o.total;
+          
+          if (o.created_at && o.created_at.startsWith(todayStr)) {
+            todayOrders++;
+            todaySum += o.total;
+          }
+        }
+      });
+
+      return res.status(200).json({ 
+        success: true, 
+        stats: { totalOrders, totalSum, todayOrders, todaySum, byStatus } 
+      });
     }
 
     const orders = await getOrders({ status, limit: 200 });
