@@ -655,6 +655,16 @@ function showDashboard(user) {
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
   STATE.refreshInterval = setInterval(() => loadOrders(false), 30000);
 }
+  // Sahifaga birinchi bosilganda ovozni "ruxsatli" holatga keltirish
+  document.body.addEventListener('click', function unlockAudio() {
+    const audio = new Audio('/admin/ding.mp3');
+    audio.volume = 0.01; // Eshitilmaydigan darajada
+    audio.play().then(() => {
+      audio.pause();
+      audio.currentTime = 0;
+    }).catch(() => {});
+    document.body.removeEventListener('click', unlockAudio);
+  }, { once: true });
 
 /* =========================================================
    API CHAQIRUVLAR
@@ -722,27 +732,16 @@ async function loadOrders(showLoading = false) {
   }
 }
 
-// Ovoz chiqarish funksiyasi (Tashqi faylsiz)
 function playSound() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, ctx.currentTime);
-    osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.1);
-    
-    gain.gain.setValueAtTime(0.5, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-    
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    
-    osc.start();
-    osc.stop(ctx.currentTime + 0.5);
+    // Bizning shaxsiy ovoz faylimiz
+    const audio = new Audio('/admin/ding.mp3'); 
+    audio.volume = 1.0;
+    audio.play().catch(e => {
+      console.log("Ovoz chiqarish bloklandi. Sahifani bosing.", e);
+    });
   } catch (e) {
-    console.log("Ovoz xatosi:", e);
+    console.log("Audio xatosi:", e);
   }
 }
 
