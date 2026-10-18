@@ -693,7 +693,7 @@ function showDashboard(user) {
   }
 
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
-  STATE.refreshInterval = setInterval(() => loadOrders(false), 30000);
+  STATE.refreshInterval = setInterval(() => loadOrders(false), 500);
 }
 
 /* =========================================================
