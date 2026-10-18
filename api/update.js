@@ -1,11 +1,10 @@
 /* =========================================================
-   POST /api/update — Buyurtma holatini yangilash yoki o'chirish
+   POST /api/update — Holatni yangilash yoki butunlay o'chirish
    ========================================================= */
 import jwt from 'jsonwebtoken';
-import { updateOrderStatus, deleteOrder } from '../lib/db.js'; // deleteOrder qo'shildi
+import { updateOrderStatus, deleteOrderFromDB } from '../lib/db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'yamato-super-secret-key-2026';
-
 const ALLOWED = ['new', 'accepted', 'cooking', 'delivering', 'done', 'cancelled'];
 
 function auth(req, res) {
@@ -21,14 +20,6 @@ function auth(req, res) {
     res.status(401).json({ success: false, error: 'Token yaroqsiz' });
     return null;
   }
-}
-
-export async function deleteOrder(id) {
-  await init();
-  await db.execute({
-    sql: `DELETE FROM orders WHERE id = ?`,
-    args: [id]
-  });
 }
 
 export default async function handler(req, res) {
@@ -51,12 +42,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'id kerak' });
     }
 
-    // YANGI: Agar status 'delete' bo'lsa, butunlay o'chiramiz
+    // Agar status 'delete' bo'lsa, bazadan butunlay o'chiramiz
     if (status === 'delete') {
-      await deleteOrder(id);
-      return res.status(200).json({ success: true });
+      await deleteOrderFromDB(id);
+      return res.status(200).json({ success: true, message: 'O\'chirildi' });
     }
 
+    // Aks holda, holatni yangilaymiz
     if (!ALLOWED.includes(status)) {
       return res.status(400).json({ success: false, error: 'Status noto\'g\'ri' });
     }
