@@ -586,6 +586,7 @@ const TOKEN_KEY = 'yamato_admin_token';
 
 let STATE = {
   orders: [],
+  oldOrderIds: [], // Ovoz uchun
   stats: null,
   filter: 'all',
   loading: false,
@@ -694,7 +695,21 @@ async function loadOrders(showLoading = false) {
       apiFetch('/orders?stats=1')
     ]);
 
-    if (ordersData.success) STATE.orders = ordersData.orders || [];
+    if (ordersData.success) {
+      const newOrders = ordersData.orders || [];
+      
+      // OVOZ CHIQARISH MANTIQI
+      if (STATE.oldOrderIds && STATE.oldOrderIds.length > 0) {
+        const hasNew = newOrders.some(o => !STATE.oldOrderIds.includes(o.id) && o.status === 'new');
+        if (hasNew) {
+          playSound();
+        }
+      }
+      
+      STATE.oldOrderIds = newOrders.map(o => o.id);
+      STATE.orders = newOrders;
+    }
+    
     if (statsData.success) STATE.stats = statsData.stats;
 
     renderStats();
@@ -704,6 +719,30 @@ async function loadOrders(showLoading = false) {
   } finally {
     STATE.loading = false;
     btn.classList.remove('spinning');
+  }
+}
+
+// Ovoz chiqarish funksiyasi (Tashqi faylsiz)
+function playSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, ctx.currentTime);
+    osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.1);
+    
+    gain.gain.setValueAtTime(0.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+  } catch (e) {
+    console.log("Ovoz xatosi:", e);
   }
 }
 
@@ -808,7 +847,7 @@ function orderHTML(o) {
 
   const actions = actionsHTML(o);
 
-  /* YANGILANGAN: Chekni ko'rsatish */
+  /* Chekni ko'rsatish */
   const receiptHTML = o.receipt 
     ? `<div style="margin-top: 15px;">
         <h4>To'lov cheki (Skrinshot)</h4>
@@ -845,7 +884,7 @@ function orderHTML(o) {
             <div class="info-item"><small>Vaqt</small><b>${timeLabel}</b></div>
             <div class="info-item"><small>To'lov turi</small><b>${payLabel}</b></div>
           </div>
-          ${receiptHTML} <!-- CHEK SHU YERGA CHIQADI -->
+          ${receiptHTML}
         </div>
 
         <div class="order-section">
