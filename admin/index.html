@@ -879,14 +879,10 @@ function renderOrders() {
   const container = document.getElementById('ordersContainer');
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
 
-  let list = STATE.orders;
-  
-  if (STATE.filter === 'all') {
-    list = list.filter(o => o.status !== 'cancelled');
-  } else {
-    list = list.filter(o => o.status === STATE.filter);
-  }
+  // XATO TUZATILDI: Har bir buyurtma o'zining bo'limida chiqadi
+  let list = STATE.orders.filter(o => o.status === STATE.filter);
 
+  // Qidiruv
   if (q) {
     list = list.filter(o =>
       (o.order_num || '').toLowerCase().includes(q) ||
@@ -900,16 +896,17 @@ function renderOrders() {
       <div class="empty">
         <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <h3>Buyurtma topilmadi</h3>
-        <p>${q ? 'Qidiruv bo\'yicha hech narsa yo\'q' : 'Hozircha buyurtmalar yo\'q'}</p>
+        <p>${q ? 'Qidiruv bo\'yicha hech narsa yo\'q' : 'Hozircha bu bo\'limda buyurtmalar yo\'q'}</p>
       </div>`;
     return;
   }
 
-  // Akkordeon uchun ochiq ID ni saqlab qolish
+  // Akkordeon uchun ochiq turgan buyurtma ID sini eslab qolish
   const currentlyOpenId = container.querySelector('.order.open')?.dataset.id || null;
 
   container.innerHTML = list.map(orderHTML).join('');
 
+  // Akkordeon ishlashi uchun event listener
   container.querySelectorAll('.order-head').forEach(head => {
     head.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -924,6 +921,7 @@ function renderOrders() {
     });
   });
 
+  // Avval ochiq turgan oynani qayta ochish (15 sekundlik yangilanishda yopilib qolmasligi uchun)
   if (currentlyOpenId) {
     const openEl = container.querySelector(`.order[data-id="${currentlyOpenId}"]`);
     if (openEl) openEl.classList.add('open');
