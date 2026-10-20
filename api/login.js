@@ -1,6 +1,3 @@
-/* =========================================================
-   POST /api/login — Admin kirishi (JWT)
-   ========================================================= */
 import jwt from 'jsonwebtoken';
 
 const ADMIN_USER = process.env.ADMIN_USER || 'sushiyamatoadmin2026';
@@ -10,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'yamato-super-secret-key-2026';
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') {

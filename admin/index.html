@@ -167,7 +167,7 @@ ul{list-style:none}
 .wrap{max-width:1400px;margin:0 auto;padding:28px 24px 60px}
 
 /* =========================================================
-   STATS (3 ta karta)
+   STATS
    ========================================================= */
 .stats{
   display:grid;gap:14px;
@@ -323,7 +323,6 @@ ul{list-style:none}
 .info-item small{display:block;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;font-weight:600}
 .info-item b{font-size:.88rem;font-weight:600;word-break:break-word}
 
-/* CHEK RASMI */
 .receipt-img {
   max-width: 200px;
   border-radius: 8px;
@@ -437,7 +436,6 @@ ul{list-style:none}
 .toast.error .t-ico{background:var(--red)}
 .toast .t-ico svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 
-/* Modal Oyna */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 500;
   background: rgba(14,14,16,0.6); backdrop-filter: blur(4px);
@@ -529,6 +527,17 @@ ul{list-style:none}
           <div class="av">A</div>
           <span id="userName">admin</span>
         </div>
+        
+        <!-- YANGI: KALENDAR ICONKASI -->
+        <button class="icon-btn" onclick="openCalendar()" title="Sanani tanlash">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </button>
+        
         <button class="icon-btn" onclick="doLogout()" title="Chiqish">
           <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
         </button>
@@ -593,7 +602,8 @@ ul{list-style:none}
 
 <div class="toast-wrap" id="toastWrap"></div>
 
-<!-- Modal Oyna -->
+<!-- ================= MODALS ================= -->
+<!-- 1. Maxsus Confirm Modal (Bekor qilish va O'chirish uchun) -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-box">
     <h3 id="modalTitle">Tasdiqlash</h3>
@@ -601,6 +611,21 @@ ul{list-style:none}
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeCustomModal()">Bekor qilish</button>
       <button class="btn-confirm" id="modalConfirmBtn">Ha, davom etish</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Kalendar Modal (Sana tanlash uchun - YANGI) -->
+<div class="modal-overlay" id="calendarModal">
+  <div class="modal-box">
+    <h3>Sana bo'yicha filtrlash</h3>
+    <p>Buyurtmalarni ko'rish uchun sanani tanlang.</p>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+      <input type="date" id="filterDate" style="padding: 10px; border-radius: 8px; border: 1px solid var(--line-2); font-family: inherit; width: 100%; outline: none;">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCalendar()">Bekor qilish</button>
+      <button class="btn-confirm" style="background: var(--blue);" onclick="applyDateFilter()">Ko'rish</button>
     </div>
   </div>
 </div>
@@ -621,9 +646,10 @@ let STATE = {
 };
 
 let modalCallback = null;
+let SELECTED_DATE = null; // Kalendar uchun tanlangan sana
 
 /* =========================================================
-   MODAL
+   MODAL VA KALENDAR FUNKSIYALARI
    ========================================================= */
 function customConfirm(title, desc, callback) {
   document.getElementById('modalTitle').textContent = title;
@@ -641,6 +667,29 @@ document.getElementById('modalConfirmBtn').addEventListener('click', () => {
   if (modalCallback) modalCallback();
   closeCustomModal();
 });
+
+function openCalendar() {
+  // Agar oldin sana tanlangan bo'lsa, uni inputga yozib qo'yamiz
+  if (SELECTED_DATE) {
+    document.getElementById('filterDate').value = SELECTED_DATE;
+  }
+  document.getElementById('calendarModal').classList.add('show');
+}
+
+function closeCalendar() {
+  document.getElementById('calendarModal').classList.remove('show');
+}
+
+function applyDateFilter() {
+  const dateVal = document.getElementById('filterDate').value;
+  if (!dateVal) return;
+  
+  SELECTED_DATE = dateVal;
+  closeCalendar();
+  renderOrders();
+  
+  toast(`${SELECTED_DATE} sanasidagi buyurtmalar ko'rsatilmoqda`, 'success');
+}
 
 /* =========================================================
    TOKEN (sessionStorage)
@@ -881,16 +930,14 @@ function renderOrders() {
 
   let list = STATE.orders;
   
-  // AYNAN SHU YER O'ZGARDI
+  // 1. Status bo'yicha filtr
   if (STATE.filter === 'all') {
-    // Barchasi tanlansa, bekor qilinganlardan tashqari hammasi chiqadi
     list = list.filter(o => o.status !== 'cancelled');
   } else {
-    // Boshqa bo'limlar tanlansa, faqat o'sha holatdagilar chiqadi
     list = list.filter(o => o.status === STATE.filter);
   }
 
-  // Qidiruv
+  // 2. Qidiruv bo'yicha filtr
   if (q) {
     list = list.filter(o =>
       (o.order_num || '').toLowerCase().includes(q) ||
@@ -899,22 +946,26 @@ function renderOrders() {
     );
   }
 
+  // 3. Sana bo'yicha filtr (YANGI)
+  if (SELECTED_DATE) {
+    list = list.filter(o => o.created_at && o.created_at.startsWith(SELECTED_DATE));
+  }
+
   if (!list.length) {
     container.innerHTML = `
       <div class="empty">
         <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <h3>Buyurtma topilmadi</h3>
-        <p>${q ? 'Qidiruv bo\'yicha hech narsa yo\'q' : 'Hozircha bu bo\'limda buyurtmalar yo\'q'}</p>
+        <p>${q ? 'Qidiruv bo\'yicha hech narsa yo\'q' : 'Hozircha buyurtmalar yo\'q'}</p>
       </div>`;
     return;
   }
 
-  // Akkordeon uchun ochiq turgan buyurtma ID sini eslab qolish
+  // Akkordeon uchun ochiq ID ni saqlab qolish
   const currentlyOpenId = container.querySelector('.order.open')?.dataset.id || null;
 
   container.innerHTML = list.map(orderHTML).join('');
 
-  // Akkordeon ishlashi uchun event listener
   container.querySelectorAll('.order-head').forEach(head => {
     head.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -929,7 +980,6 @@ function renderOrders() {
     });
   });
 
-  // Avval ochiq turgan oynani qayta ochish (15 sekundlik yangilanishda yopilib qolmasligi uchun)
   if (currentlyOpenId) {
     const openEl = container.querySelector(`.order[data-id="${currentlyOpenId}"]`);
     if (openEl) openEl.classList.add('open');
@@ -1105,6 +1155,10 @@ document.querySelectorAll('.chip').forEach(chip => {
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     STATE.filter = chip.dataset.status;
+    
+    // YANGI: Status o'zgarganda sana filtrini tozalaymiz
+    SELECTED_DATE = null;
+    
     renderOrders();
   });
 });
