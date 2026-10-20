@@ -551,7 +551,6 @@ ul{list-style:none}
 
     <!-- STATS (4 ta karta) -->
     <div class="stats">
-      <!-- YANGI: Bugungi buyurtmalar -->
       <div class="stat c1">
         <div class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
         <div class="label">Bugungi buyurtmalar</div>
@@ -694,11 +693,15 @@ function applyDateFilter() {
   SELECTED_DATE = dateVal;
   closeCalendar();
   renderOrders();
-  
-  // Statistikani tanlangan sanaga qarab qayta hisoblash
   updateStatsForDate(dateVal);
-  
   toast(`${SELECTED_DATE} sanasidagi ma'lumotlar`, 'success');
+}
+
+// Sana tozalanganda (Удалить bosilganda) bugungi holatga qaytish
+function clearDateFilter() {
+  SELECTED_DATE = null;
+  renderOrders(); // Hamma buyurtmalarni qaytarish
+  renderStats();  // Bugungi haqiqiy statistikaga qaytish
 }
 
 // Tanlangan sana bo'yicha statistikani hisoblash
@@ -713,10 +716,8 @@ function updateStatsForDate(dateStr) {
     }
   });
 
-  // Faqat "Bugungi buyurtmalar" va "Bugungi summa" o'zgaradi.
   document.getElementById('statTodayOrders').textContent = dayCount;
   document.getElementById('statTodaySum').textContent = fmtShort(daySum);
-  
   // "Jami buyurtma" (statTotal) va "Jami summa" (statTotalSum) ga TEGMAYMIZ!
 }
 
@@ -1200,6 +1201,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const token = getToken();
   if (token) {
     showDashboard('admin');
+  }
+  
+  // YANGI: Kalendardagi sana o'chirilganda (Удалить bosilganda) bugungi holatga qaytish
+  const dateInput = document.getElementById('filterDate');
+  if (dateInput) {
+    dateInput.addEventListener('change', (e) => {
+      if (e.target.value === '') {
+        clearDateFilter();
+      }
+    });
   }
 });
 </script>
