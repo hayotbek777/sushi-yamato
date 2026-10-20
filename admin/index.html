@@ -528,7 +528,7 @@ ul{list-style:none}
           <span id="userName">admin</span>
         </div>
         
-        <!-- YANGI: KALENDAR ICONKASI -->
+        <!-- KALENDAR ICONKASI -->
         <button class="icon-btn" onclick="openCalendar()" title="Sanani tanlash">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -603,7 +603,6 @@ ul{list-style:none}
 <div class="toast-wrap" id="toastWrap"></div>
 
 <!-- ================= MODALS ================= -->
-<!-- 1. Maxsus Confirm Modal (Bekor qilish va O'chirish uchun) -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-box">
     <h3 id="modalTitle">Tasdiqlash</h3>
@@ -615,7 +614,7 @@ ul{list-style:none}
   </div>
 </div>
 
-<!-- 2. Kalendar Modal (Sana tanlash uchun - YANGI) -->
+<!-- Kalendar Modal -->
 <div class="modal-overlay" id="calendarModal">
   <div class="modal-box">
     <h3>Sana bo'yicha filtrlash</h3>
@@ -669,7 +668,6 @@ document.getElementById('modalConfirmBtn').addEventListener('click', () => {
 });
 
 function openCalendar() {
-  // Agar oldin sana tanlangan bo'lsa, uni inputga yozib qo'yamiz
   if (SELECTED_DATE) {
     document.getElementById('filterDate').value = SELECTED_DATE;
   }
@@ -688,7 +686,27 @@ function applyDateFilter() {
   closeCalendar();
   renderOrders();
   
-  toast(`${SELECTED_DATE} sanasidagi buyurtmalar ko'rsatilmoqda`, 'success');
+  // Statistikani tanlangan sanaga qarab qayta hisoblash
+  updateStatsForDate(dateVal);
+  
+  toast(`${SELECTED_DATE} sanasidagi ma'lumotlar`, 'success');
+}
+
+// Tanlangan sana bo'yicha statistikani hisoblash
+function updateStatsForDate(dateStr) {
+  let daySum = 0;
+  let dayCount = 0;
+
+  STATE.orders.forEach(o => {
+    if (o.created_at && o.created_at.startsWith(dateStr) && o.status !== 'cancelled') {
+      dayCount++;
+      daySum += Number(o.total) || 0;
+    }
+  });
+
+  document.getElementById('statTodaySum').textContent = fmtShort(daySum);
+  document.getElementById('statTotal').textContent = dayCount;
+  // "Jami summa" (statTotalSum) ga tegmaymiz, u o'zgarmasligi kerak
 }
 
 /* =========================================================
@@ -781,7 +799,6 @@ function showDashboard(user) {
   }
 
   if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
-  // YANGILANISH 15 SEKUND
   STATE.refreshInterval = setInterval(() => loadOrders(false), 15000);
 }
 
@@ -930,14 +947,12 @@ function renderOrders() {
 
   let list = STATE.orders;
   
-  // 1. Status bo'yicha filtr
   if (STATE.filter === 'all') {
     list = list.filter(o => o.status !== 'cancelled');
   } else {
     list = list.filter(o => o.status === STATE.filter);
   }
 
-  // 2. Qidiruv bo'yicha filtr
   if (q) {
     list = list.filter(o =>
       (o.order_num || '').toLowerCase().includes(q) ||
@@ -946,7 +961,6 @@ function renderOrders() {
     );
   }
 
-  // 3. Sana bo'yicha filtr (YANGI)
   if (SELECTED_DATE) {
     list = list.filter(o => o.created_at && o.created_at.startsWith(SELECTED_DATE));
   }
@@ -961,7 +975,6 @@ function renderOrders() {
     return;
   }
 
-  // Akkordeon uchun ochiq ID ni saqlab qolish
   const currentlyOpenId = container.querySelector('.order.open')?.dataset.id || null;
 
   container.innerHTML = list.map(orderHTML).join('');
@@ -1148,7 +1161,7 @@ function toast(msg, type = 'success') {
 }
 
 /* =========================================================
-   FILTRLAR
+   FILTRLAR (YANGILANGAN)
    ========================================================= */
 document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
@@ -1156,10 +1169,12 @@ document.querySelectorAll('.chip').forEach(chip => {
     chip.classList.add('active');
     STATE.filter = chip.dataset.status;
     
-    // YANGI: Status o'zgarganda sana filtrini tozalaymiz
+    // Sana filtrini tozalaymiz
     SELECTED_DATE = null;
+    document.getElementById('filterDate').value = ''; // Kalendarni tozalash
     
     renderOrders();
+    renderStats(); // ASL STATISTIKAGA QAYTISH
   });
 });
 
