@@ -167,13 +167,14 @@ ul{list-style:none}
 .wrap{max-width:1400px;margin:0 auto;padding:28px 24px 60px}
 
 /* =========================================================
-   STATS
+   STATS (4 ta karta)
    ========================================================= */
 .stats{
   display:grid;gap:14px;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   margin-bottom:28px;
 }
+@media(max-width:960px){.stats{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:640px){.stats{grid-template-columns:1fr}}
 .stat{
   background:var(--white);border-radius:var(--radius);
@@ -188,6 +189,7 @@ ul{list-style:none}
   margin-bottom:14px;
 }
 .stat .ico svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.stat.c1 .ico{background:linear-gradient(135deg,var(--red),var(--red-dark))}
 .stat.c2 .ico{background:linear-gradient(135deg,var(--matcha),#1a9e57)}
 .stat.c3 .ico{background:linear-gradient(135deg,var(--gold),var(--orange))}
 .stat.c4 .ico{background:linear-gradient(135deg,var(--purple),#6D28D9)}
@@ -547,8 +549,15 @@ ul{list-style:none}
 
   <div class="wrap">
 
-    <!-- STATS -->
+    <!-- STATS (4 ta karta) -->
     <div class="stats">
+      <!-- YANGI: Bugungi buyurtmalar -->
+      <div class="stat c1">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+        <div class="label">Bugungi buyurtmalar</div>
+        <div class="value" id="statTodayOrders">0</div>
+      </div>
+      
       <div class="stat c2">
         <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
         <div class="label">Bugungi summa</div>
@@ -704,6 +713,7 @@ function updateStatsForDate(dateStr) {
     }
   });
 
+  document.getElementById('statTodayOrders').textContent = dayCount;
   document.getElementById('statTodaySum').textContent = fmtShort(daySum);
   document.getElementById('statTotal').textContent = dayCount;
   // "Jami summa" (statTotalSum) ga tegmaymiz, u o'zgarmasligi kerak
@@ -928,6 +938,7 @@ async function deleteOrder(id) {
    ========================================================= */
 function renderStats() {
   const s = STATE.stats || {};
+  document.getElementById('statTodayOrders').textContent = s.todayOrders || 0;
   document.getElementById('statTodaySum').textContent = fmtShort(s.todaySum || 0);
   document.getElementById('statTotal').textContent = s.totalOrders || 0;
   document.getElementById('statTotalSum').textContent = fmtShort(s.totalSum || 0);
