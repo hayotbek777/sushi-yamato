@@ -869,7 +869,10 @@ async function loadOrders(showLoading = false) {
     
     if (statsData.success) STATE.stats = statsData.stats;
 
-    renderStats();
+    // AGAR KALENDARDAN SANA TANLANGAN BO'LSA, STATISTIKANI O'ZGARTIRMAYMIZ
+    if (!SELECTED_DATE) {
+      renderStats(); 
+    }
     renderOrders();
   } catch (e) {
     console.warn(e);
@@ -1161,7 +1164,7 @@ function toast(msg, type = 'success') {
 }
 
 /* =========================================================
-   FILTRLAR (YANGILANGAN)
+   FILTRLAR
    ========================================================= */
 document.querySelectorAll('.chip').forEach(chip => {
   chip.addEventListener('click', () => {
