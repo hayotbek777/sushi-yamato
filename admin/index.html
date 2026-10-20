@@ -465,6 +465,14 @@ ul{list-style:none}
 .modal-actions .btn-confirm { background: var(--red); color: #fff; }
 .modal-actions .btn-confirm:hover { background: var(--red-dark); }
 
+/* Menyu Dropdown */
+#dotsMenu button {
+  display: flex; align-items: center; gap: 8px;
+}
+#dotsMenu button:hover {
+  background: var(--washi);
+}
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
@@ -540,6 +548,18 @@ ul{list-style:none}
           </svg>
         </button>
         
+        <!-- 3 NUQTA MENYUSI -->
+        <div style="position: relative;">
+          <button class="icon-btn" onclick="toggleDotsMenu()" title="Qo'shimcha">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+          </button>
+          
+          <div id="dotsMenu" style="display:none; position:absolute; top:100%; right:0; background:var(--white); border-radius:12px; box-shadow:var(--shadow-md); border:1px solid var(--line); padding:8px; width:220px; z-index:100; margin-top:8px;">
+            <button onclick="openAddProductModal()" style="width:100%; text-align:left; padding:12px 14px; border-radius:8px; font-weight:600; font-size:0.9rem; transition:background 0.2s;" onmouseover="this.style.background='var(--washi)'" onmouseout="this.style.background='transparent'">➕ Mahsulot qo'shish</button>
+            <button onclick="openPromoModal()" style="width:100%; text-align:left; padding:12px 14px; border-radius:8px; font-weight:600; font-size:0.9rem; transition:background 0.2s;" onmouseover="this.style.background='var(--washi)'" onmouseout="this.style.background='transparent'">🔥 Aksiya qo'shish</button>
+          </div>
+        </div>
+        
         <button class="icon-btn" onclick="doLogout()" title="Chiqish">
           <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
         </button>
@@ -611,6 +631,7 @@ ul{list-style:none}
 <div class="toast-wrap" id="toastWrap"></div>
 
 <!-- ================= MODALS ================= -->
+<!-- 1. Tasdiqlash (Confirm) -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-box">
     <h3 id="modalTitle">Tasdiqlash</h3>
@@ -622,7 +643,7 @@ ul{list-style:none}
   </div>
 </div>
 
-<!-- Kalendar Modal -->
+<!-- 2. Kalendar -->
 <div class="modal-overlay" id="calendarModal">
   <div class="modal-box">
     <h3>Sana bo'yicha filtrlash</h3>
@@ -633,6 +654,44 @@ ul{list-style:none}
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeCalendar()">Bekor qilish</button>
       <button class="btn-confirm" style="background: var(--blue);" onclick="applyDateFilter()">Ko'rish</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Yangi Mahsulot Qo'shish -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal-box" style="text-align: left;">
+    <h3 style="text-align:center;">Yangi mahsulot</h3>
+    <div class="field"><label>Nomi (Rus tilida)</label><input type="text" id="npName" placeholder="Masalan: Ролл Филадельфия"></div>
+    <div class="field"><label>Masalliqlar (Tavsif)</label><input type="text" id="npDesc" placeholder="Рис, Лосось..."></div>
+    <div class="field-row">
+      <div class="field"><label>Narxi</label><input type="number" id="npPrice" placeholder="75000"></div>
+      <div class="field"><label>Rasm nomi</label><input type="text" id="npImg" placeholder="images/83.png"></div>
+    </div>
+    <div class="field">
+      <label>Kategoriyasi</label>
+      <select id="npCat" style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid var(--line-2); background:var(--white); font-size:.94rem; outline:none;">
+        <option value="klassik">Klassik</option>
+        <option value="pishirilgan">Pishirilgan</option>
+        <option value="qovurilgan">Qovurilgan</option>
+        <option value="setlar">Setlar</option>
+        <option value="ichimliklar">Ichimliklar</option>
+      </select>
+    </div>
+    <div class="modal-actions" style="margin-top:20px;">
+      <button class="btn-cancel" onclick="closeModalBox('addProductModal')">Bekor</button>
+      <button class="btn-confirm" style="background:var(--matcha);" onclick="saveNewProduct()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Aksiya Qo'shish -->
+<div class="modal-overlay" id="promoModal">
+  <div class="modal-box">
+    <h3>Aksiya qo'shish</h3>
+    <p>Bu bo'lim tez orada ishga tushadi.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModalBox('promoModal')">Yopish</button>
     </div>
   </div>
 </div>
@@ -653,10 +712,10 @@ let STATE = {
 };
 
 let modalCallback = null;
-let SELECTED_DATE = null; // Kalendar uchun tanlangan sana
+let SELECTED_DATE = null;
 
 /* =========================================================
-   MODAL VA KALENDAR FUNKSIYALARI
+   MODAL, KALENDAR VA MENYU FUNKSIYALARI
    ========================================================= */
 function customConfirm(title, desc, callback) {
   document.getElementById('modalTitle').textContent = title;
@@ -697,14 +756,12 @@ function applyDateFilter() {
   toast(`${SELECTED_DATE} sanasidagi ma'lumotlar`, 'success');
 }
 
-// Sana tozalanganda (Удалить bosilganda) bugungi holatga qaytish
 function clearDateFilter() {
   SELECTED_DATE = null;
-  renderOrders(); // Hamma buyurtmalarni qaytarish
-  renderStats();  // Bugungi haqiqiy statistikaga qaytish
+  renderOrders(); 
+  renderStats(); 
 }
 
-// Tanlangan sana bo'yicha statistikani hisoblash
 function updateStatsForDate(dateStr) {
   let daySum = 0;
   let dayCount = 0;
@@ -718,7 +775,66 @@ function updateStatsForDate(dateStr) {
 
   document.getElementById('statTodayOrders').textContent = dayCount;
   document.getElementById('statTodaySum').textContent = fmtShort(daySum);
-  // "Jami buyurtma" (statTotal) va "Jami summa" (statTotalSum) ga TEGMAYMIZ!
+}
+
+/* --- 3 NUQTA MENYUSI --- */
+function toggleDotsMenu() {
+  const menu = document.getElementById('dotsMenu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('dotsMenu');
+  if (menu && !e.target.closest('#dotsMenu') && !e.target.closest('.icon-btn')) {
+    menu.style.display = 'none';
+  }
+});
+
+function openAddProductModal() {
+  document.getElementById('dotsMenu').style.display = 'none';
+  document.getElementById('addProductModal').classList.add('show');
+}
+
+function openPromoModal() {
+  document.getElementById('dotsMenu').style.display = 'none';
+  document.getElementById('promoModal').classList.add('show');
+}
+
+function closeModalBox(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function saveNewProduct() {
+  const name = document.getElementById('npName').value.trim();
+  const desc = document.getElementById('npDesc').value.trim();
+  const price = document.getElementById('npPrice').value;
+  const img = document.getElementById('npImg').value.trim();
+  const cat = document.getElementById('npCat').value;
+
+  if (!name || !price || !img) {
+    toast('Barcha majburiy joylarni to\'ldiring!', 'error');
+    return;
+  }
+
+  const newProduct = {
+    id: "prod-" + Date.now(),
+    name: name,
+    desc: desc,
+    price: Number(price),
+    pieces: 0,
+    cat: [cat, "yangi"],
+    badge: "new",
+    img: img
+  };
+
+  console.log("Yangi mahsulot:", newProduct);
+  toast('Mahsulot qabul qilindi! (Hozircha faqat konsolda)', 'success');
+  closeModalBox('addProductModal');
+  
+  document.getElementById('npName').value = '';
+  document.getElementById('npDesc').value = '';
+  document.getElementById('npPrice').value = '';
+  document.getElementById('npImg').value = '';
 }
 
 /* =========================================================
@@ -881,7 +997,6 @@ async function loadOrders(showLoading = false) {
     
     if (statsData.success) STATE.stats = statsData.stats;
 
-    // AGAR KALENDARDAN SANA TANLANGAN BO'LSA, STATISTIKANI O'ZGARTIRMAYMIZ
     if (!SELECTED_DATE) {
       renderStats(); 
     }
@@ -1185,12 +1300,11 @@ document.querySelectorAll('.chip').forEach(chip => {
     chip.classList.add('active');
     STATE.filter = chip.dataset.status;
     
-    // Sana filtrini tozalaymiz
     SELECTED_DATE = null;
-    document.getElementById('filterDate').value = ''; // Kalendarni tozalash
+    document.getElementById('filterDate').value = '';
     
     renderOrders();
-    renderStats(); // ASL STATISTIKAGA QAYTISH
+    renderStats();
   });
 });
 
@@ -1203,7 +1317,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showDashboard('admin');
   }
   
-  // YANGI: Kalendardagi sana o'chirilganda (Удалить bosilganda) bugungi holatga qaytish
   const dateInput = document.getElementById('filterDate');
   if (dateInput) {
     dateInput.addEventListener('change', (e) => {
