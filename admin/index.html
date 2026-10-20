@@ -713,10 +713,11 @@ function updateStatsForDate(dateStr) {
     }
   });
 
+  // Faqat "Bugungi buyurtmalar" va "Bugungi summa" o'zgaradi.
   document.getElementById('statTodayOrders').textContent = dayCount;
   document.getElementById('statTodaySum').textContent = fmtShort(daySum);
-  document.getElementById('statTotal').textContent = dayCount;
-  // "Jami summa" (statTotalSum) ga tegmaymiz, u o'zgarmasligi kerak
+  
+  // "Jami buyurtma" (statTotal) va "Jami summa" (statTotalSum) ga TEGMAYMIZ!
 }
 
 /* =========================================================
