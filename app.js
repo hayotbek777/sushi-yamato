@@ -116,7 +116,7 @@ const getP = id => PRODUCTS.find(p => p.id === id);
    ========================================================= */
 let CART = JSON.parse(localStorage.getItem('ym_cart') || '{}');
 let ACTIVE_FILTER = 'all';
-let PRODUCTS = []; // Bu baza va zaxiradan to'ldiriladi
+let PRODUCTS = []; 
 
 const saveCart = () => localStorage.setItem('ym_cart', JSON.stringify(CART));
 const cartCount = () => Object.values(CART).reduce((a, b) => a + b, 0);
@@ -127,17 +127,25 @@ const cartSubtotal = () => Object.entries(CART).reduce((s, [id, q]) => {
 const cartDelivery = () => cartSubtotal() > 0 ? 15000 : 0;
 
 /* =========================================================
-   KARTALAR
+   KARTALAR (YANGILANGAN: CHEGIRMA BILAN)
    ========================================================= */
 function cardHTML(p) {
   const badge = p.badge === 'hit' ? '<span class="badge hit">Xit</span>' :
     p.badge === 'new' ? '<span class="badge new">Yangi</span>' :
       p.badge === 'top' ? '<span class="badge top">Top</span>' : '';
   const pieces = p.pieces ? `${p.pieces} dona` : '';
+  
+  // Agar chegirma bo'lsa, eski narxni chizib ko'rsatamiz
+  const priceHTML = (p.old_price && p.old_price > 0) 
+    ? `<div class="p-price"><span style="text-decoration:line-through;color:var(--muted);font-size:0.75rem;display:block;font-weight:500;">${fmt(p.old_price)}</span>${fmt(p.price)}</div>` 
+    : `<div class="p-price">${fmt(p.price)}</div>`;
+
+  const discountBadge = (p.old_price && p.old_price > 0) ? '<span class="badge" style="background:var(--orange);color:#fff">Aksiya</span>' : '';
+
   return `
     <div class="p-card" data-id="${p.id}">
       <div class="p-media" onclick="openProduct('${p.id}')">
-        <div class="p-badges">${badge}</div>
+        <div class="p-badges">${badge} ${discountBadge}</div>
         <button class="fav" onclick="toggleFav(event,'${p.id}')" aria-label="Sevimli">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.5 1-1a5.5 5.5 0 0 0 0-7.9Z"/></svg>
         </button>
@@ -148,7 +156,7 @@ function cardHTML(p) {
         <div class="p-desc">${p.desc}</div>
         ${pieces ? `<div class="p-meta">${pieces}</div>` : ''}
         <div class="p-foot">
-          <div class="p-price">${fmt(p.price)}</div>
+          ${priceHTML}
           <button class="p-add" onclick="addToCart('${p.id}',1,event)" aria-label="Qo'shish">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
           </button>
@@ -319,11 +327,16 @@ function closeAll() {
 }
 
 /* =========================================================
-   MAHSULOT MODAL
+   MAHSULOT MODAL (YANGILANGAN: CHEGIRMA BILAN)
    ========================================================= */
 function openProduct(id) {
   const p = getP(id);
   if (!p) return;
+  
+  const priceHTML = (p.old_price && p.old_price > 0) 
+    ? `<span style="text-decoration:line-through;font-size:0.8em;opacity:0.7;margin-right:5px;">${fmt(p.old_price)}</span>${fmt(p.price)}` 
+    : fmt(p.price);
+
   const body = $('#productModalBody');
   body.innerHTML = `
     <div class="pd">
@@ -346,7 +359,7 @@ function openProduct(id) {
             <span id="pdQtyVal">1</span>
             <button onclick="pdQty(1)">+</button>
           </div>
-          <button class="btn btn-red btn-lg" onclick="pdAdd('${p.id}')">Savatga qo'shish · ${fmt(p.price)}</button>
+          <button class="btn btn-red btn-lg" onclick="pdAdd('${p.id}')">Savatga qo'shish · ${priceHTML}</button>
         </div>
       </div>
     </div>`;
@@ -664,9 +677,8 @@ function toggleFav(e, id) {
    ISHGA TUSHIRISH
    ========================================================= */
 document.addEventListener('DOMContentLoaded', async () => {
-  PRODUCTS = [...DEFAULT_PRODUCTS]; // Standart ro'yxatni yuklaymiz
+  PRODUCTS = [...DEFAULT_PRODUCTS]; 
 
-  // Bazadan yangi mahsulotlarni yuklash va qo'shish
   try {
     const res = await fetch('/api/products');
     const data = await res.json();
@@ -675,10 +687,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       data.products.forEach(newP => {
         const idx = PRODUCTS.findIndex(p => p.id === newP.id);
         if (idx !== -1) {
-          PRODUCTS[idx] = newP;
+          PRODUCTS[idx] = newP; // Narxi yoki rasmi o'zgargan bo'lsa yangilaymiz
         } else {
-          // YANGI MAHSULOTNI RO'YXATNING ENG OXIRIGA QO'SHAMIZ (unshift o'rniga push)
-          PRODUCTS.push(newP); 
+          PRODUCTS.push(newP); // Yangi mahsulotni oxiriga qo'shamiz
         }
       });
     }
@@ -686,7 +697,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log("Bazadan yuklashda xato (Zaxira ishlatilmoqda):", e);
   }
 
-  // Sahifani chizish
   renderBest();
   renderSets();
   renderMenu();
