@@ -631,7 +631,6 @@ ul{list-style:none}
 <div class="toast-wrap" id="toastWrap"></div>
 
 <!-- ================= MODALS ================= -->
-<!-- 1. Tasdiqlash (Confirm) -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-box">
     <h3 id="modalTitle">Tasdiqlash</h3>
@@ -643,7 +642,6 @@ ul{list-style:none}
   </div>
 </div>
 
-<!-- 2. Kalendar -->
 <div class="modal-overlay" id="calendarModal">
   <div class="modal-box">
     <h3>Sana bo'yicha filtrlash</h3>
@@ -658,7 +656,6 @@ ul{list-style:none}
   </div>
 </div>
 
-<!-- 3. Yangi Mahsulot Qo'shish -->
 <div class="modal-overlay" id="addProductModal">
   <div class="modal-box" style="text-align: left;">
     <h3 style="text-align:center;">Yangi mahsulot</h3>
@@ -685,7 +682,6 @@ ul{list-style:none}
   </div>
 </div>
 
-<!-- 4. Aksiya Qo'shish -->
 <div class="modal-overlay" id="promoModal">
   <div class="modal-box">
     <h3>Aksiya qo'shish</h3>
@@ -713,6 +709,13 @@ let STATE = {
 
 let modalCallback = null;
 let SELECTED_DATE = null;
+
+/* =========================================================
+   TOKEN FUNKSIYALARI (JOYIDA!)
+   ========================================================= */
+function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
+function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
+function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
 
 /* =========================================================
    MODAL, KALENDAR VA MENYU FUNKSIYALARI
@@ -817,7 +820,7 @@ async function saveNewProduct() {
   }
 
   const newProduct = {
-    id: "prod-" + Date.now(), // Unikal ID
+    id: "prod-" + Date.now(),
     name: name,
     desc: desc,
     price: Number(price),
@@ -828,7 +831,6 @@ async function saveNewProduct() {
   };
 
   try {
-    // API ga yuborish
     const res = await apiFetch('/products', {
       method: 'POST',
       body: JSON.stringify(newProduct)
@@ -837,8 +839,6 @@ async function saveNewProduct() {
     if (res.success) {
       toast('Mahsulot muvaffaqiyatli saqlandi!', 'success');
       closeModalBox('addProductModal');
-      
-      // Formani tozalash
       document.getElementById('npName').value = '';
       document.getElementById('npDesc').value = '';
       document.getElementById('npPrice').value = '';
@@ -1309,7 +1309,7 @@ document.querySelectorAll('.chip').forEach(chip => {
     STATE.filter = chip.dataset.status;
     
     SELECTED_DATE = null;
-    document.getElementById('filterDate').value = '';
+    document.getElementById('filterDate').value = ''; 
     
     renderOrders();
     renderStats();
