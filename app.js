@@ -4,10 +4,9 @@
 const API_URL = '/api';
 
 /* =========================================================
-   MAHSULOTLAR
+   MAHSULOTLAR (ZAXIRA / FALLBACK)
    ========================================================= */
-const PRODUCTS = [
-  // --- KLASSIK ROLLAR ---
+let PRODUCTS = [
   { "id": "philadelphia", "name": "Ролл Филадельфия", "desc": "Рис, Сыр творожный, Огурец, Лосось", "price": 75000, "pieces": 0, "cat": ["klassik"], "badge": "hit", "img": "images/1.png" },
   { "id": "phil-eel", "name": "Ролл Филадельфия с угрем", "desc": "Рис, Сыр творожный, Огурец, Авокадо, Угорь унаги, Кунжут", "price": 76000, "pieces": 0, "cat": ["klassik"], "badge": "hit", "img": "images/2.png" },
   { "id": "avocado-roll", "name": "Ролл с Авокадо", "desc": "Рис, Сыр творожный, Лосось, Авокадо", "price": 65000, "pieces": 0, "cat": ["klassik"], "img": "images/3.png" },
@@ -20,8 +19,6 @@ const PRODUCTS = [
   { "id": "ebi-lux", "name": "Ролл Эби люкс", "desc": "Рис, Нори, Икра масаго, Авокадо, Креветка, Соус унаги, Сыр творожный", "price": 68000, "pieces": 0, "cat": ["klassik", "yangi"], "badge": "new", "img": "images/10.png" },
   { "id": "chukka-salmon", "name": "Ролл с чучкой и лососем", "desc": "Рис, Нори, Лосось, Огурец, Салат чучка, Ореховый соус, Сыр творожный, Икра масаго", "price": 73000, "pieces": 0, "cat": ["klassik", "yangi"], "badge": "new", "img": "images/11.png" },
   { "id": "phil-light", "name": "Ролл Филадельфия лайт", "desc": "Рис, Сыр творожный, Огурец, Лосось", "price": 65000, "pieces": 0, "cat": ["klassik"], "img": "images/12.png" },
-
-  // --- MAKI VA SUSHI ---
   { "id": "maki-cucumber", "name": "Маки с огурцом", "desc": "Рис, Огурец", "price": 35000, "pieces": 0, "cat": ["maki", "vegetarian"], "img": "images/13.png" },
   { "id": "maki-eel", "name": "Маки с угрем", "desc": "Рис, Унаги угорь", "price": 50000, "pieces": 0, "cat": ["maki"], "img": "images/14.png" },
   { "id": "maki-salmon", "name": "Маки с лососем", "desc": "Рис, Лосось", "price": 50000, "pieces": 0, "cat": ["maki"], "img": "images/15.png" },
@@ -31,15 +28,11 @@ const PRODUCTS = [
   { "id": "sushi-eel", "name": "Суши с угрем", "desc": "3 шт", "price": 69000, "pieces": 3, "cat": ["maki", "yangi"], "badge": "new", "img": "images/19.png" },
   { "id": "sushi-shrimp", "name": "Суши с креветками", "desc": "3 шт", "price": 69000, "pieces": 3, "cat": ["maki", "yangi"], "badge": "new", "img": "images/20.png" },
   { "id": "sweet-roll", "name": "Сладкий ролл с фруктами", "desc": "Спринг тесто, Сладкий сыр, Киви, Персик, Ананас, Сироп малиновый", "price": 56000, "pieces": 0, "cat": ["maki", "yangi", "vegetarian"], "badge": "new", "img": "images/21.png" },
-
-  // --- OPALENNIE (KUYDIRILGAN) ---
   { "id": "burnt-salmon", "name": "Опаленный ролл с лососем", "desc": "Рис, Сыр творожный, Огурец, Авокадо, Лосось, С/с унаги", "price": 76000, "pieces": 0, "cat": ["opalyon"], "img": "images/22.png" },
   { "id": "sake-avocado", "name": "Ролл Саке-Авокадо", "desc": "Рис, Нори, Сыр творожный, Авокадо, Лосось, Соус фирменный, Лук зеленый", "price": 68000, "pieces": 0, "cat": ["opalyon", "yangi"], "badge": "new", "img": "images/23.png" },
   { "id": "ebi-avocado", "name": "Ролл Эби-Авокадо", "desc": "Рис, Нори, Сыр творожный, Авокадо, Эби креветка, Икра масаго, Соус Унаги, Соус фирменный, Лук зеленый", "price": 70000, "pieces": 0, "cat": ["opalyon", "yangi"], "badge": "new", "img": "images/24.png" },
   { "id": "burnt-sushi", "name": "Опаленный суши с лососем", "desc": "3 шт", "price": 69000, "pieces": 3, "cat": ["opalyon", "yangi"], "badge": "new", "img": "images/25.png" },
   { "id": "spicy-eel", "name": "Ролл спайси угорь", "desc": "Рис, Нори, Огурец, Сыр творожный, Соус ширачи, Угорь, Соус спайси, Соус унаги, Кунжут", "price": 73000, "pieces": 0, "cat": ["opalyon", "yangi", "achchiq"], "badge": "new", "img": "images/26.png" },
-
-  // --- QOVURILGAN (JARENIY) ---
   { "id": "fried-crab", "name": "Жареный ролл с крабом", "desc": "Рис, Сыр творожный, Огурец, Лосось жареный, Замес краб, Икра масаго, Соус Ширачи айоли", "price": 74000, "pieces": 0, "cat": ["qovurilgan"], "img": "images/27.png" },
   { "id": "sand-chicken", "name": "Жареный сендвич с курицей", "desc": "Рис, Нори, Огурец, Сыр Чеддер, Помидор, Курица, Соус фирменный, Айсберг, Кляр, Сухарик, Соус Унаги, Кунжут микс", "price": 69000, "pieces": 0, "cat": ["qovurilgan", "yangi"], "badge": "new", "img": "images/28.png" },
   { "id": "fried-shrimp", "name": "Жареный ролл с креветками", "desc": "Рис, Сыр творожный, Огурец, Тигровые креветки, С/с ореховый, Арахис", "price": 73000, "pieces": 0, "cat": ["qovurilgan"], "img": "images/29.png" },
@@ -49,16 +42,12 @@ const PRODUCTS = [
   { "id": "sand-salmon", "name": "Жареный сендвич с лососем", "desc": "Рис, Нори, Огурец, Сыр Чеддер, Помидор, Лосось, Соус фирменный, Айсберг, Кляр, Сухарик, Соус Унаги, Кунжут микс", "price": 70000, "pieces": 0, "cat": ["qovurilgan", "yangi"], "badge": "new", "img": "images/33.png" },
   { "id": "fried-veg", "name": "Жареный овощной ролл", "desc": "Рис, Нори, Айсберг, Огурец, Болгарский, Салат чучка, Авокадо, Унаги соус", "price": 65000, "pieces": 0, "cat": ["qovurilgan", "yangi", "vegetarian"], "badge": "new", "img": "images/34.png" },
   { "id": "shrimp-tempura", "name": "Креветки в темпуре", "desc": "Тигровые креветки, Соль, Перец, Сухарик, Кляр, Унаги соус, Кунжут, Фирменный соус", "price": 72000, "pieces": 0, "cat": ["qovurilgan", "yangi"], "badge": "new", "img": "images/35.png" },
-
-  // --- WOK VA POKE ---
   { "id": "wok-chicken", "name": "Вок с курицей", "desc": "Лапша удон, Курица, Кабачки, Морковь, Перец болгарский, Соус на выбор, (теряки | удон), Лук зелёный, Кунжут", "price": 66000, "pieces": 0, "cat": ["wok", "yangi"], "badge": "new", "img": "images/36.png" },
   { "id": "wok-shrimp", "name": "Вок с креветками", "desc": "Лапша удон, Креветки, Кабачки, Морковь, Перец болгарский, Соус на выбор, (теряки | удон), Лук зелёный, Кунжут", "price": 72000, "pieces": 0, "cat": ["wok", "yangi"], "badge": "new", "img": "images/37.png" },
   { "id": "wok-veg", "name": "Вок с овощами", "desc": "Лапша удон, Кабачки, Морковь, Перец болгарский, Баклажан, Соус на выбор, (теряки | удон), Лук зелёный, Кунжут", "price": 60000, "pieces": 0, "cat": ["wok", "yangi", "vegetarian"], "badge": "new", "img": "images/38.png" },
   { "id": "poke-shrimp", "name": "Поке с креветками", "desc": "Рис, Авокадо, Огурец, Помидор, Креветки, Снек нори, Соус фирменный, Салат чучка, Микс кунжут", "price": 79000, "pieces": 0, "cat": ["wok", "yangi"], "badge": "new", "img": "images/39.png" },
   { "id": "poke-salmon", "name": "Поке с лососем", "desc": "Рис, Авокадо, Огурец, Помидор, Лосось, Снек нори, Соус фирменный, Салат чучка, Микс кунжут", "price": 72000, "pieces": 0, "cat": ["wok", "yangi"], "badge": "new", "img": "images/40.png" },
   { "id": "poke-chicken", "name": "Поке с курицей", "desc": "Рис, Авокадо, Огурец, Помидор, Курица, Снек нори, Соус фирменный, Салат чучка, Микс кунжут", "price": 65000, "pieces": 0, "cat": ["wok", "yangi"], "badge": "new", "img": "images/41.png" },
-
-  // --- ZAPECHENNIE (PISHIRILGAN) ---
   { "id": "bk-chicken", "name": "Запечённый ролл с курицей", "desc": "Рис, Сыр творожный, Огурец, Айсберг, Курица, Соус сырный, Унаги соус, Кунжут", "price": 66000, "pieces": 0, "cat": ["pishirilgan"], "img": "images/42.png" },
   { "id": "bk-chicken-spicy", "name": "Запечённый ролл с курицей (острый)", "desc": "Рис, Сыр творожный, Огурец, Курица, Спайси соус, Унаги соус, Кунжут", "price": 70000, "pieces": 0, "cat": ["pishirilgan", "achchiq"], "img": "images/43.png" },
   { "id": "bk-double", "name": "Запечённый ролл «Дабл Чикен»", "desc": "Рис, Сыр творожный, Огурец, Курица 2х, Соус сырный, Соус унаги, Кунжут, Лук зеленый", "price": 77000, "pieces": 0, "cat": ["pishirilgan"], "img": "images/44.png" },
@@ -73,8 +62,6 @@ const PRODUCTS = [
   { "id": "bk-double-sesame", "name": "Запечённый ролл (Дабл Чикен) с кунжутом", "desc": "Рис, Нори, Сыр творожный, Огурец, Курица, Соус фирменный, Лук зеленый, Соус Унаги, Микс кунжут", "price": 75000, "pieces": 0, "cat": ["pishirilgan"], "img": "images/54.png" },
   { "id": "bk-mini-chicken", "name": "Мини запечённый ролл с курицей", "desc": "Рис, Нори, Курица, Сыр творожный, Спайси соус, Унаги соус", "price": 50000, "pieces": 0, "cat": ["pishirilgan", "achchiq"], "img": "images/55.png" },
   { "id": "bk-mini-salmon", "name": "Мини запечённый ролл с лососем", "desc": "Рис, Нори, Лосось, Сыр творожный, Спайси соус, Унаги соус", "price": 55000, "pieces": 0, "cat": ["pishirilgan", "achchiq"], "img": "images/56.png" },
-
-  // --- SETLAR ---
   { "id": "set-trio", "name": "Chicken Trio", "desc": "Запеченный ролл с курицей, Запеченный ролл чикен люкс, Жареный сендвич с курицей", "price": 175000, "pieces": 20, "cat": ["setlar"], "badge": "hit", "img": "images/57.png" },
   { "id": "set-deluxe", "name": "Set Deluxe", "desc": "Запеченный ролл (Дабл Чикен) с кунжутом, Жареный ролл с курицей, Филадельфия с креветками", "price": 179000, "pieces": 24, "cat": ["setlar"], "badge": "hit", "img": "images/58.png" },
   { "id": "set-yamato", "name": "Сет “Yamato”", "desc": "Жареный ролл с лососем, Ролл Филадельфия угорь лосось, Запеченный дабл чикен ролл", "price": 205000, "pieces": 30, "cat": ["setlar"], "badge": "hit", "img": "images/59.png" },
@@ -83,8 +70,6 @@ const PRODUCTS = [
   { "id": "set-guest", "name": "Сет “Гостевой”", "desc": "Ролл Филадельфия, Ролл саки маки, Жареный ролл с курицей, Запеченный ролл с курицей", "price": 241000, "pieces": 0, "cat": ["setlar"], "badge": "hit", "img": "images/62.png" },
   { "id": "set-grand", "name": "Grand Set", "desc": "Ролл Филадельфия, Ролл Филадельфия с угрем, Запеченный ролл с угрем в соусе спайси, Ролл калифорния с икрой", "price": 249000, "pieces": 0, "cat": ["setlar", "yangi"], "badge": "new", "img": "images/63.png" },
   { "id": "set-mega", "name": "Мега празник", "desc": "Мини запеченный с курицей, Мини запеченный с лосось, Жареный сендвич с лососем, Сладкий ролл с фруктами, Жареный овощной ролл, Ролл Филадельфия лайт, Вок с курицей, Вок с креветками, кола 1л", "price": 444000, "pieces": 0, "cat": ["setlar", "yangi"], "badge": "new", "img": "images/64.png" },
-
-  // --- ICHIMLIKLAR ---
   { "id": "fanta-glass", "name": "Фанта 0,25 (стекло)", "desc": "", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/65.png" },
   { "id": "cola-glass", "name": "Кола 0,25 (стекло)", "desc": "", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/66.png" },
   { "id": "cola-05", "name": "Кола 0,5", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/67.png" },
@@ -102,8 +87,6 @@ const PRODUCTS = [
   { "id": "hydrolife", "name": "Гидролайф 0,5", "desc": "", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/79.png" },
   { "id": "cola-1", "name": "Кола 1л", "desc": "", "price": 15000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/80.png" },
   { "id": "cola-15", "name": "Кола 1,5л", "desc": "", "price": 20000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/81.png" },
-
-  // --- CHOY ---
   { "id": "tarxun-choy-065", "name": "Тархун чой", "desc": "0.65 л", "price": 25000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
   { "id": "tarxun-choy-08", "name": "Тархун чой", "desc": "0.8 л", "price": 30000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
   { "id": "gul-choy-065", "name": "Гул чой", "desc": "0.65 л", "price": 20000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
@@ -136,7 +119,10 @@ let ACTIVE_FILTER = 'all';
 
 const saveCart = () => localStorage.setItem('ym_cart', JSON.stringify(CART));
 const cartCount = () => Object.values(CART).reduce((a, b) => a + b, 0);
-const cartSubtotal = () => Object.entries(CART).reduce((s, [id, q]) => s + getP(id).price * q, 0);
+const cartSubtotal = () => Object.entries(CART).reduce((s, [id, q]) => {
+  const p = getP(id);
+  return s + (p ? p.price * q : 0);
+}, 0);
 const cartDelivery = () => cartSubtotal() > 0 ? 15000 : 0;
 
 /* =========================================================
@@ -447,7 +433,6 @@ function selectTime(el) {
   CHECKOUT.time = el.textContent.includes('Keyinroq') ? 'later' : 'now';
 }
 
-/* YANGILANGAN: To'lov turi va chek oynasi */
 function selectPay(el, type) {
   $$('.pay-opt').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
@@ -455,9 +440,9 @@ function selectPay(el, type) {
 
   const receiptField = document.getElementById('receiptField');
   if (type === 'online') {
-    receiptField.style.display = 'block'; // Click, Payme, Karta uchun chek so'raladi
+    receiptField.style.display = 'block'; 
   } else {
-    receiptField.style.display = 'none';  // Naqd uchun yashiriladi
+    receiptField.style.display = 'none';  
   }
 }
 
@@ -473,37 +458,32 @@ function maskPhone(inp) {
   inp.value = out;
 }
 
-/* YANGILANGAN: Buyurtma berish (Mo'ljal va Chek tekshiruvi bilan) */
 async function placeOrder() {
   const name = $('#ckName').value.trim();
   const phone = $('#ckPhone').value.trim();
-  const city = $('#ckCity').value; // Yangilangan ID
+  const city = $('#ckCity').value; 
   const house = $('#ckHouse').value.trim();
   const addr = $('#ckAddr').value.trim();
   const landmark = $('#ckLandmark').value.trim();
   const receiptInput = document.getElementById('ckReceipt');
 
-  // --- VALIDATSIYA ---
   if (!name || phone.replace(/\D/g, '').length < 12) {
     toast('Ism va telefon raqamini to\'ldiring');
     return;
   }
   if (!addr) { toast('Ko\'cha nomini kiriting'); return; }
   
-  // Mo'ljal majburiyligi
   if (!landmark) { 
     toast('Iltimos, mo\'ljalni to\'liq kiriting (majburiy)'); 
     return; 
   }
 
-  // Chek tekshiruvi (agar naqd bo'lmasa)
   let receiptBase64 = '';
   if (CHECKOUT.pay !== 'cash') {
     if (!receiptInput.files[0]) {
       toast('Iltimos, to\'lov chekini (skrinshotni) yuklang!');
       return;
     }
-    // Rasmni Base64 matniga o'girish
     const file = receiptInput.files[0];
     receiptBase64 = await new Promise((resolve) => {
       const reader = new FileReader();
@@ -526,7 +506,7 @@ async function placeOrder() {
     addr, house, landmark,
     time: CHECKOUT.time,
     pay: CHECKOUT.pay,
-    receipt: receiptBase64, // Rasmni yuborish
+    receipt: receiptBase64, 
     items, subtotal, delivery, total
   };
 
@@ -682,7 +662,21 @@ function toggleFav(e, id) {
 /* =========================================================
    ISHGA TUSHIRISH
    ========================================================= */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Bazadan mahsulotlarni yuklash
+  try {
+    const res = await fetch('/api/products');
+    const data = await res.json();
+    
+    // Agar bazada mahsulotlar bo'lsa, ularni ishlatamiz
+    if (data.success && data.products && data.products.length > 0) {
+      PRODUCTS = data.products; 
+    }
+  } catch (e) {
+    console.log("Bazadan yuklashda xato (Fallback ishlatiladi):", e);
+  }
+
+  // 2. Sahifani chizish
   renderBest();
   renderSets();
   renderMenu();

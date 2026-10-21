@@ -804,7 +804,7 @@ function closeModalBox(id) {
   document.getElementById(id).classList.remove('show');
 }
 
-function saveNewProduct() {
+async function saveNewProduct() {
   const name = document.getElementById('npName').value.trim();
   const desc = document.getElementById('npDesc').value.trim();
   const price = document.getElementById('npPrice').value;
@@ -817,7 +817,7 @@ function saveNewProduct() {
   }
 
   const newProduct = {
-    id: "prod-" + Date.now(),
+    id: "prod-" + Date.now(), // Unikal ID
     name: name,
     desc: desc,
     price: Number(price),
@@ -827,22 +827,30 @@ function saveNewProduct() {
     img: img
   };
 
-  console.log("Yangi mahsulot:", newProduct);
-  toast('Mahsulot qabul qilindi! (Hozircha faqat konsolda)', 'success');
-  closeModalBox('addProductModal');
-  
-  document.getElementById('npName').value = '';
-  document.getElementById('npDesc').value = '';
-  document.getElementById('npPrice').value = '';
-  document.getElementById('npImg').value = '';
+  try {
+    // API ga yuborish
+    const res = await apiFetch('/products', {
+      method: 'POST',
+      body: JSON.stringify(newProduct)
+    });
+    
+    if (res.success) {
+      toast('Mahsulot muvaffaqiyatli saqlandi!', 'success');
+      closeModalBox('addProductModal');
+      
+      // Formani tozalash
+      document.getElementById('npName').value = '';
+      document.getElementById('npDesc').value = '';
+      document.getElementById('npPrice').value = '';
+      document.getElementById('npImg').value = '';
+      document.getElementById('npCat').value = 'klassik';
+    } else {
+      toast(res.error || 'Xatolik yuz berdi', 'error');
+    }
+  } catch (e) {
+    toast('Server bilan aloqa yo\'q', 'error');
+  }
 }
-
-/* =========================================================
-   TOKEN (sessionStorage)
-   ========================================================= */
-function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
-function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
-function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
 
 /* =========================================================
    AUTH
