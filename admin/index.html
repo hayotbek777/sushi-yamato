@@ -894,14 +894,14 @@ async function deleteProduct(id) {
       
       if (res.success) {
         toast('Mahsulot o\'chirildi', 'success');
-        openProductsListModal();
+        openProductsListModal(); 
       } else {
         toast(res.error || 'Xatolik', 'error');
       }
     } catch (e) {
       toast('Server bilan aloqa yo\'q', 'error');
     }
-  });
+  }); 
 }
 
 /* =========================================================
