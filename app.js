@@ -4,9 +4,9 @@
 const API_URL = '/api';
 
 /* =========================================================
-   MAHSULOTLAR (ZAXIRA / FALLBACK)
+   MAHSULOTLAR (ASOSIY ZAXIRA RO'YXATI)
    ========================================================= */
-let PRODUCTS = [
+let DEFAULT_PRODUCTS = [
   { "id": "philadelphia", "name": "Ролл Филадельфия", "desc": "Рис, Сыр творожный, Огурец, Лосось", "price": 75000, "pieces": 0, "cat": ["klassik"], "badge": "hit", "img": "images/1.png" },
   { "id": "phil-eel", "name": "Ролл Филадельфия с угрем", "desc": "Рис, Сыр творожный, Огурец, Авокадо, Угорь унаги, Кунжут", "price": 76000, "pieces": 0, "cat": ["klassik"], "badge": "hit", "img": "images/2.png" },
   { "id": "avocado-roll", "name": "Ролл с Авокадо", "desc": "Рис, Сыр творожный, Лосось, Авокадо", "price": 65000, "pieces": 0, "cat": ["klassik"], "img": "images/3.png" },
@@ -116,6 +116,7 @@ const getP = id => PRODUCTS.find(p => p.id === id);
    ========================================================= */
 let CART = JSON.parse(localStorage.getItem('ym_cart') || '{}');
 let ACTIVE_FILTER = 'all';
+let PRODUCTS = []; // Bu baza va zaxiradan to'ldiriladi
 
 const saveCart = () => localStorage.setItem('ym_cart', JSON.stringify(CART));
 const cartCount = () => Object.values(CART).reduce((a, b) => a + b, 0);
@@ -663,20 +664,33 @@ function toggleFav(e, id) {
    ISHGA TUSHIRISH
    ========================================================= */
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Bazadan mahsulotlarni yuklash
+  // 1. Eng avvalo 100 ta eski mahsulotni yuklaymiz (zaxira)
+  PRODUCTS = [...DEFAULT_PRODUCTS];
+
   try {
+    // 2. Bazadan ma'lumotlarni so'raymiz
     const res = await fetch('/api/products');
     const data = await res.json();
     
-    // Agar bazada mahsulotlar bo'lsa, ularni ishlatamiz
     if (data.success && data.products && data.products.length > 0) {
-      PRODUCTS = data.products; 
+      // Bazadagi har bir mahsulotni tekshiramiz
+      data.products.forEach(newP => {
+        const existingIndex = PRODUCTS.findIndex(p => p.id === newP.id);
+        
+        if (existingIndex !== -1) {
+          // Agar ID mos kelsa (masalan, narxi o'zgargan bo'lsa), uni yangilaymiz
+          PRODUCTS[existingIndex] = newP;
+        } else {
+          // Agar bu butunlay yangi mahsulot bo'lsa, uni eng tepaga qo'shamiz
+          PRODUCTS.unshift(newP);
+        }
+      });
     }
   } catch (e) {
-    console.log("Bazadan yuklashda xato (Fallback ishlatiladi):", e);
+    console.log("Baza bilan aloqa yo'q, faqat eski mahsulotlar ko'rsatiladi.");
   }
 
-  // 2. Sahifani chizish
+  // 3. Sahifani chizish
   renderBest();
   renderSets();
   renderMenu();
