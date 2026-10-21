@@ -28,45 +28,42 @@ export default async function handler(req, res) {
   try {
     const status = req.query.status || 'all';
     const stats = req.query.stats === '1';
-
-    // Bazadan kassa holatini olamiz
     const isKassaClosed = await getKassaStatus();
 
-    if (stats) {
-      const allOrders = await getOrders({ status: 'all', limit: 5000 });
-      
-      const now = new Date();
-      let businessDate = now.toISOString().slice(0, 10);
-      
-      // Agar kassa yopilgan bo'lsa -> ertangi kun
-      if (isKassaClosed) {
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        businessDate = tomorrow.toISOString().slice(0, 10);
-      } 
-      // Agar kassa ochiq va soat 06:00 gacha bo'lsa -> kechagi kun
-      else if (now.getHours() < 6) {
-        const yesterday = new Date(now);
-        yesterday.setDate(yesterday.getDate() - 1);
-        businessDate = yesterday.toISOString().slice(0, 10);
-      }
+    // Hozirgi biznes kunini aniqlash
+    const now = new Date();
+    let businessDate = now.toISOString().slice(0, 10);
+    
+    if (isKassaClosed) {
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      businessDate = tomorrow.toISOString().slice(0, 10);
+    } else if (now.getHours() < 6) {
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      businessDate = yesterday.toISOString().slice(0, 10);
+    }
 
+    const allOrders = await getOrders({ status: 'all', limit: 5000 });
+    
+    // FAQAT SHU KUNGA TEGISHLI BUYURTMALARNI FILTRLAYMIZ
+    const todayOrdersList = allOrders.filter(o => {
+      if (o.status === 'cancelled') return false;
+      const orderDate = o.business_date || o.created_at;
+      return orderDate && orderDate.startsWith(businessDate);
+    });
+
+    if (stats) {
       let totalOrders = 0, totalSum = 0, todayOrders = 0, todaySum = 0;
       const byStatus = {};
       
-      allOrders.forEach(o => {
+      // Statistikani faqat shu kungi buyurtmalar bo'yicha hisoblaymiz
+      todayOrdersList.forEach(o => {
         byStatus[o.status] = (byStatus[o.status] || 0) + 1;
-        if (o.status !== 'cancelled') {
-          totalOrders++;
-          totalSum += Number(o.total) || 0;
-          
-          // Faqat tanlangan biznes kuniga tegishli buyurtmalarni hisoblaymiz
-          const orderDate = o.business_date || o.created_at;
-          if (orderDate && orderDate.startsWith(businessDate)) {
-            todayOrders++;
-            todaySum += Number(o.total) || 0;
-          }
-        }
+        totalOrders++;
+        totalSum += Number(o.total) || 0;
+        todayOrders++;
+        todaySum += Number(o.total) || 0;
       });
 
       return res.status(200).json({ 
@@ -75,23 +72,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const orders = await getOrders({ status, limit: 200 });
-    
-    // Agar kassa yopilgan bo'lsa, faqat ertangi kunga tegishli buyurtmalarni qaytaramiz 
-    // (Hozircha yangi buyurtmalar yo'q, shuning uchun bo'sh qaytadi)
-    let filteredOrders = orders;
-    if (isKassaClosed) {
-      const now = new Date();
-      const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const nextBusinessDate = tomorrow.toISOString().slice(0, 10);
-      filteredOrders = orders.filter(o => {
-        const date = o.business_date || o.created_at;
-        return date && date.startsWith(nextBusinessDate);
-      });
-    }
-
-    return res.status(200).json({ success: true, orders: filteredOrders });
+    return res.status(200).json({ success: true, orders: todayOrdersList });
 
   } catch (err) {
     console.error('Orders error:', err);
