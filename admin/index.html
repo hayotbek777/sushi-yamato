@@ -887,23 +887,26 @@ async function openProductsListModal() {
 }
 
 async function deleteProduct(id) {
-  customConfirm('Mahsulotni o\'chirish', 'Haqiqatan ham bu mahsulotni butunlay o\'chirmoqchimisiz?', async () => {
-    try {
-      const res = await apiFetch('/products', {
-        method: 'DELETE',
-        body: JSON.stringify({ id })
-      });
-      
-      if (res.success) {
-        toast('Mahsulot o\'chirildi', 'success');
-        openProductsListModal(); 
-      } else {
-        toast(res.error || 'Xatolik', 'error');
-      }
-    } catch (e) {
-      toast('Server bilan aloqa yo\'q', 'error');
+  // Brauzerning o'zining tasdiqlash oynasi (har doim o'rtada va eng ustida chiqadi)
+  const isConfirmed = confirm("Haqiqatan ham bu mahsulotni butunlay o'chirmoqchimisiz?");
+  
+  if (!isConfirmed) return; // Agar "Bekor qilish" bosilsa, hech narsa qilmaymiz
+
+  try {
+    const res = await apiFetch('/products', {
+      method: 'DELETE',
+      body: JSON.stringify({ id })
+    });
+    
+    if (res.success) {
+      toast('Mahsulot o\'chirildi', 'success');
+      openProductsListModal(); // Ro'yxatni yangilash
+    } else {
+      toast(res.error || 'Xatolik', 'error');
     }
-  }); 
+  } catch (e) {
+    toast('Server bilan aloqa yo\'q', 'error');
+  }
 }
 
 /* =========================================================
