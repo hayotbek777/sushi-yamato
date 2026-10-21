@@ -625,18 +625,6 @@ ul{list-style:none}
 
 <div class="toast-wrap" id="toastWrap"></div>
 
-<!-- ================= MODALS ================= -->
-<div class="modal-overlay" id="customModal">
-  <div class="modal-box">
-    <h3 id="modalTitle">Tasdiqlash</h3>
-    <p id="modalDesc">Haqiqatan ham bu amalni bajarmoqchimisiz?</p>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeCustomModal()">Bekor qilish</button>
-      <button class="btn-confirm" id="modalConfirmBtn">Ha, davom etish</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-overlay" id="calendarModal">
   <div class="modal-box">
     <h3>Sana bo'yicha filtrlash</h3>
@@ -689,6 +677,18 @@ ul{list-style:none}
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModalBox('productsListModal')">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+<div class="modal-overlay" id="customModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Tasdiqlash</h3>
+    <p id="modalDesc">Haqiqatan ham bu amalni bajarmoqchimisiz?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCustomModal()">Bekor qilish</button>
+      <button class="btn-confirm" id="modalConfirmBtn">Ha, davom etish</button>
     </div>
   </div>
 </div>
@@ -897,7 +897,6 @@ async function deleteProduct(id) {
     'Mahsulotni o\'chirish', 
     'Haqiqatan ham bu mahsulotni butunlay o\'chirmoqchimisiz?', 
     async () => {
-      // Agar "Ha" bosilsa, shu kod ishlaydi
       try {
         const res = await apiFetch('/products', {
           method: 'DELETE',
@@ -906,9 +905,6 @@ async function deleteProduct(id) {
         
         if (res.success) {
           toast('Mahsulot o\'chirildi', 'success');
-          // O'chirilgandan keyin ro'yxatni qayta ochish shart emas, 
-          // shunchaki yangi ro'yxatni ko'rsatish uchun qayta ochamiz
-          openProductsListModal(); 
         } else {
           toast(res.error || 'Xatolik', 'error');
         }
