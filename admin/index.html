@@ -663,7 +663,10 @@ ul{list-style:none}
     <div class="field"><label>Masalliqlar (Tavsif)</label><input type="text" id="npDesc" placeholder="Рис, Лосось..."></div>
     <div class="field-row">
       <div class="field"><label>Narxi</label><input type="number" id="npPrice" placeholder="75000"></div>
-      <div class="field"><label>Rasm nomi</label><input type="text" id="npImg" placeholder="images/83.png"></div>
+      <div class="field">
+        <label>Rasm (Fayl tanlang)</label>
+        <input type="file" id="npImgFile" accept="image/*" style="padding: 10px; background: var(--washi); border: 1px dashed var(--line-2); border-radius: 8px;">
+      </div>
     </div>
     <div class="field">
       <label>Kategoriyasi</label>
@@ -711,7 +714,7 @@ let modalCallback = null;
 let SELECTED_DATE = null;
 
 /* =========================================================
-   TOKEN FUNKSIYALARI (JOYIDA!)
+   TOKEN FUNKSIYALARI
    ========================================================= */
 function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
@@ -811,45 +814,54 @@ async function saveNewProduct() {
   const name = document.getElementById('npName').value.trim();
   const desc = document.getElementById('npDesc').value.trim();
   const price = document.getElementById('npPrice').value;
-  const img = document.getElementById('npImg').value.trim();
   const cat = document.getElementById('npCat').value;
+  const fileInput = document.getElementById('npImgFile');
 
-  if (!name || !price || !img) {
-    toast('Barcha majburiy joylarni to\'ldiring!', 'error');
+  if (!name || !price || !fileInput.files[0]) {
+    toast('Nomi, narxi va rasmni tanlang!', 'error');
     return;
   }
 
-  const newProduct = {
-    id: "prod-" + Date.now(),
-    name: name,
-    desc: desc,
-    price: Number(price),
-    pieces: 0,
-    cat: [cat, "yangi"],
-    badge: "new",
-    img: img
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+
+  reader.onload = async function(e) {
+    const base64Image = e.target.result;
+
+    const newProduct = {
+      id: "prod-" + Date.now(),
+      name: name,
+      desc: desc,
+      price: Number(price),
+      pieces: 0,
+      cat: [cat, "yangi"],
+      badge: "new",
+      img: base64Image
+    };
+
+    try {
+      const res = await apiFetch('/products', {
+        method: 'POST',
+        body: JSON.stringify(newProduct)
+      });
+      
+      if (res.success) {
+        toast('Mahsulot muvaffaqiyatli saqlandi!', 'success');
+        closeModalBox('addProductModal');
+        document.getElementById('npName').value = '';
+        document.getElementById('npDesc').value = '';
+        document.getElementById('npPrice').value = '';
+        document.getElementById('npImgFile').value = '';
+        document.getElementById('npCat').value = 'klassik';
+      } else {
+        toast(res.error || 'Xatolik yuz berdi', 'error');
+      }
+    } catch (err) {
+      toast('Server bilan aloqa yo\'q', 'error');
+    }
   };
 
-  try {
-    const res = await apiFetch('/products', {
-      method: 'POST',
-      body: JSON.stringify(newProduct)
-    });
-    
-    if (res.success) {
-      toast('Mahsulot muvaffaqiyatli saqlandi!', 'success');
-      closeModalBox('addProductModal');
-      document.getElementById('npName').value = '';
-      document.getElementById('npDesc').value = '';
-      document.getElementById('npPrice').value = '';
-      document.getElementById('npImg').value = '';
-      document.getElementById('npCat').value = 'klassik';
-    } else {
-      toast(res.error || 'Xatolik yuz berdi', 'error');
-    }
-  } catch (e) {
-    toast('Server bilan aloqa yo\'q', 'error');
-  }
+  reader.readAsDataURL(file);
 }
 
 /* =========================================================
@@ -952,12 +964,19 @@ async function apiFetch(path, options = {}) {
     }
   });
 
-  if (res.status === 401) {
-    doLogout();
-    toast('Sessiya tugadi. Qayta kiring.', 'error');
-    throw new Error('Unauthorized');
+  const text = await res.text();
+  try {
+    const json = JSON.parse(text);
+    if (res.status === 401) {
+      doLogout();
+      toast('Sessiya tugadi. Qayta kiring.', 'error');
+      throw new Error('Unauthorized');
+    }
+    return json;
+  } catch (e) {
+    console.error("API xatosi:", text);
+    return { success: false, error: "Server xatosi" };
   }
-  return res.json();
 }
 
 async function loadOrders(showLoading = false) {
