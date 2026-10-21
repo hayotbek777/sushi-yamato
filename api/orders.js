@@ -44,18 +44,17 @@ export default async function handler(req, res) {
       businessDate = yesterday.toISOString().slice(0, 10);
     }
 
-    // 2. Bazadan barcha buyurtmalarni olamiz
+    // 2. Barcha buyurtmalarni olamiz
     const allOrders = await getOrders({ status: 'all', limit: 5000 });
     
-    // 3. "Bugungi" ro'yxatni filtrlaymiz (Kassa yopilgan bo'lsa, bu ro'yxat bo'sh bo'ladi)
+    // 3. FAQAT business_date ga qarab filtrlaymiz (Eski buyurtmalarni chetlab o'tamiz)
     const todayOrdersList = allOrders.filter(o => {
       if (o.status === 'cancelled') return false;
-      const orderDate = o.business_date || o.created_at;
-      return orderDate && orderDate.startsWith(businessDate);
+      return o.business_date === businessDate; 
     });
 
     if (stats) {
-      // --- JAMI HISOBLASH (Kassa holatidan qat'i nazar hamma vaqt hisoblanadi) ---
+      // JAMI (Barcha vaqtlardagi barcha buyurtmalar)
       let totalOrders = 0, totalSum = 0;
       allOrders.forEach(o => {
         if (o.status !== 'cancelled') {
@@ -64,10 +63,9 @@ export default async function handler(req, res) {
         }
       });
 
-      // --- BUGUNGI HISOBLASH (Faqat shu kunga tegishli) ---
+      // BUGUNGI (Faqat shu ish kuniga tegishli)
       let todayOrders = 0, todaySum = 0;
       const byStatus = {};
-
       todayOrdersList.forEach(o => {
         byStatus[o.status] = (byStatus[o.status] || 0) + 1;
         todayOrders++;
@@ -80,8 +78,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // --- RO'YXATNI QAYTARISH ---
-    // Agar "Barchasi" (all) bo'lsa, faqat bugungi buyurtmalarni qaytaramiz (kassa yopilsa bo'sh bo'ladi)
+    // Ro'yxatni qaytarish (faqat shu kunga tegishli buyurtmalar)
     return res.status(200).json({ success: true, orders: todayOrdersList });
 
   } catch (err) {
