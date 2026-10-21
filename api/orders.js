@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     const stats = req.query.stats === '1';
     const isKassaClosed = await getKassaStatus();
 
-    // Hozirgi biznes kunini aniqlash
+    // 1. Hozirgi biznes kunini aniqlash
     const now = new Date();
     let businessDate = now.toISOString().slice(0, 10);
     
@@ -44,9 +44,10 @@ export default async function handler(req, res) {
       businessDate = yesterday.toISOString().slice(0, 10);
     }
 
+    // 2. Bazadan barcha buyurtmalarni olamiz
     const allOrders = await getOrders({ status: 'all', limit: 5000 });
     
-    // FAQAT SHU KUNGA TEGISHLI BUYURTMALARNI FILTRLAYMIZ
+    // 3. "Bugungi" ro'yxatni filtrlaymiz (Kassa yopilgan bo'lsa, bu ro'yxat bo'sh bo'ladi)
     const todayOrdersList = allOrders.filter(o => {
       if (o.status === 'cancelled') return false;
       const orderDate = o.business_date || o.created_at;
@@ -54,24 +55,33 @@ export default async function handler(req, res) {
     });
 
     if (stats) {
-      let totalOrders = 0, totalSum = 0, todayOrders = 0, todaySum = 0;
+      // --- JAMI HISOBLASH (Kassa holatidan qat'i nazar hamma vaqt hisoblanadi) ---
+      let totalOrders = 0, totalSum = 0;
+      allOrders.forEach(o => {
+        if (o.status !== 'cancelled') {
+          totalOrders++;
+          totalSum += Number(o.total) || 0;
+        }
+      });
+
+      // --- BUGUNGI HISOBLASH (Faqat shu kunga tegishli) ---
+      let todayOrders = 0, todaySum = 0;
       const byStatus = {};
-      
-      // Statistikani faqat shu kungi buyurtmalar bo'yicha hisoblaymiz
+
       todayOrdersList.forEach(o => {
         byStatus[o.status] = (byStatus[o.status] || 0) + 1;
-        totalOrders++;
-        totalSum += Number(o.total) || 0;
         todayOrders++;
         todaySum += Number(o.total) || 0;
       });
 
       return res.status(200).json({ 
         success: true, 
-        stats: { totalOrders, totalSum, todayOrders, todaySum, byStatus, kassaClosed: isKassaClosed, businessDate } 
+        stats: { totalOrders, totalSum, todayOrders, todaySum, byStatus, kassaClosed: isKassaClosed } 
       });
     }
 
+    // --- RO'YXATNI QAYTARISH ---
+    // Agar "Barchasi" (all) bo'lsa, faqat bugungi buyurtmalarni qaytaramiz (kassa yopilsa bo'sh bo'ladi)
     return res.status(200).json({ success: true, orders: todayOrdersList });
 
   } catch (err) {
