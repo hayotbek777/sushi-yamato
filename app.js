@@ -664,33 +664,29 @@ function toggleFav(e, id) {
    ISHGA TUSHIRISH
    ========================================================= */
 document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Eng avvalo 100 ta eski mahsulotni yuklaymiz (zaxira)
-  PRODUCTS = [...DEFAULT_PRODUCTS];
+  PRODUCTS = [...DEFAULT_PRODUCTS]; // Standart ro'yxatni yuklaymiz
 
+  // Bazadan yangi mahsulotlarni yuklash va qo'shish
   try {
-    // 2. Bazadan ma'lumotlarni so'raymiz
     const res = await fetch('/api/products');
     const data = await res.json();
     
-    if (data.success && data.products && data.products.length > 0) {
-      // Bazadagi har bir mahsulotni tekshiramiz
+    if (data.success && data.products) {
       data.products.forEach(newP => {
-        const existingIndex = PRODUCTS.findIndex(p => p.id === newP.id);
-        
-        if (existingIndex !== -1) {
-          // Agar ID mos kelsa (masalan, narxi o'zgargan bo'lsa), uni yangilaymiz
-          PRODUCTS[existingIndex] = newP;
+        const idx = PRODUCTS.findIndex(p => p.id === newP.id);
+        if (idx !== -1) {
+          PRODUCTS[idx] = newP;
         } else {
-          // Agar bu butunlay yangi mahsulot bo'lsa, uni eng tepaga qo'shamiz
-          PRODUCTS.unshift(newP);
+          // YANGI MAHSULOTNI RO'YXATNING ENG OXIRIGA QO'SHAMIZ (unshift o'rniga push)
+          PRODUCTS.push(newP); 
         }
       });
     }
   } catch (e) {
-    console.log("Baza bilan aloqa yo'q, faqat eski mahsulotlar ko'rsatiladi.");
+    console.log("Bazadan yuklashda xato (Zaxira ishlatilmoqda):", e);
   }
 
-  // 3. Sahifani chizish
+  // Sahifani chizish
   renderBest();
   renderSets();
   renderMenu();
