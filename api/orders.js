@@ -2,7 +2,7 @@
    GET /api/orders — Buyurtmalar va Statistika (Kassa bilan)
    ========================================================= */
 import jwt from 'jsonwebtoken';
-import { getOrders, getKassaStatus } from '../lib/db.js';
+import { getOrders } from '../lib/db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'yamato-super-secret-key-2026';
 
@@ -30,18 +30,13 @@ export default async function handler(req, res) {
     const stats = req.query.stats === '1';
 
     if (stats) {
-      const allOrders = await getOrders({ status: 'all', limit: 10000 });
-      const isClosed = await getKassaStatus();
+      const allOrders = await getOrders({ status: 'all', limit: 5000 });
       
       const now = new Date();
-      let businessDate = now.toISOString().slice(0, 10);
+      let businessDate = now.toISOString().slice(0, 10); // Bugungi sana
       
-      // Kassa yopilgan bo'lsa ertangi, ochiq bo'lsa va soat 06:00 gacha bo'lsa kechagi kun
-      if (isClosed) {
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        businessDate = tomorrow.toISOString().slice(0, 10);
-      } else if (now.getHours() < 6) {
+      // Agar soat 06:00 gacha bo'lsa, kechagi sanani olamiz
+      if (now.getHours() < 6) {
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
         businessDate = yesterday.toISOString().slice(0, 10);
@@ -56,7 +51,9 @@ export default async function handler(req, res) {
           totalOrders++;
           totalSum += Number(o.total) || 0;
           
-          if (o.business_date === businessDate) {
+          // Sana bo'yicha tekshirish (business_date yoki created_at)
+          const orderDate = o.business_date || o.created_at;
+          if (orderDate && orderDate.startsWith(businessDate)) {
             todayOrders++;
             todaySum += Number(o.total) || 0;
           }
@@ -65,7 +62,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({ 
         success: true, 
-        stats: { totalOrders, totalSum, todayOrders, todaySum, byStatus, kassaClosed: isClosed, businessDate } 
+        stats: { totalOrders, totalSum, todayOrders, todaySum, byStatus } 
       });
     }
 
