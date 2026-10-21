@@ -440,10 +440,12 @@ ul{list-style:none}
 
 .modal-overlay {
   position: fixed; inset: 0; z-index: 500;
-  background: rgba(14,14,16,0.6); backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  /* ... qolgan kodlar ... */
 }
+
+/* YANGI QATOR: Tasdiqlash oynasi har doim eng ustida turishi uchun */
+#customModal { z-index: 1000 !important; }
+
 .modal-overlay.show { opacity: 1; pointer-events: auto; }
 .modal-box {
   background: var(--white); border-radius: 16px;
