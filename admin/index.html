@@ -490,6 +490,10 @@ ul{list-style:none}
   .toast-wrap{top:74px;left:16px;right:16px}
   .toast{max-width:100%}
 }
+
+/* Tasdiqlash oynasi har doim eng ustida turishi uchun */
+#customModal { z-index: 9999 !important; }
+
 </style>
 </head>
 <body>
@@ -885,26 +889,34 @@ async function openProductsListModal() {
 }
 
 async function deleteProduct(id) {
-  // Brauzerning o'zining tasdiqlash oynasi (har doim o'rtada va eng ustida chiqadi)
-  const isConfirmed = confirm("Haqiqatan ham bu mahsulotni butunlay o'chirmoqchimisiz?");
+  // 1. Mahsulotlar ro'yxati oynasini yopamiz
+  closeModalBox('productsListModal');
   
-  if (!isConfirmed) return; // Agar "Bekor qilish" bosilsa, hech narsa qilmaymiz
-
-  try {
-    const res = await apiFetch('/products', {
-      method: 'DELETE',
-      body: JSON.stringify({ id })
-    });
-    
-    if (res.success) {
-      toast('Mahsulot o\'chirildi', 'success');
-      openProductsListModal(); // Ro'yxatni yangilash
-    } else {
-      toast(res.error || 'Xatolik', 'error');
+  // 2. Tasdiqlash oynasini ochamiz
+  customConfirm(
+    'Mahsulotni o\'chirish', 
+    'Haqiqatan ham bu mahsulotni butunlay o\'chirmoqchimisiz?', 
+    async () => {
+      // Agar "Ha" bosilsa, shu kod ishlaydi
+      try {
+        const res = await apiFetch('/products', {
+          method: 'DELETE',
+          body: JSON.stringify({ id })
+        });
+        
+        if (res.success) {
+          toast('Mahsulot o\'chirildi', 'success');
+          // O'chirilgandan keyin ro'yxatni qayta ochish shart emas, 
+          // shunchaki yangi ro'yxatni ko'rsatish uchun qayta ochamiz
+          openProductsListModal(); 
+        } else {
+          toast(res.error || 'Xatolik', 'error');
+        }
+      } catch (e) {
+        toast('Server bilan aloqa yo\'q', 'error');
+      }
     }
-  } catch (e) {
-    toast('Server bilan aloqa yo\'q', 'error');
-  }
+  );
 }
 
 /* =========================================================
