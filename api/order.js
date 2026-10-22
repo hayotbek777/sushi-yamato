@@ -1,7 +1,7 @@
 /* =========================================================
    POST /api/order — Yangi buyurtma qabul qilish
    ========================================================= */
-import { createOrder, generateOrderNum } from '../lib/db.js';
+import { createOrder, generateOrderNum, getActiveCashSession } from '../lib/db.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

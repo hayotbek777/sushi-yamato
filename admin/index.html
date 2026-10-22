@@ -74,6 +74,7 @@ ul{list-style:none}
 @media(max-width:960px){.stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:640px){.stats{grid-template-columns:1fr}}
 .stat{background:var(--white);border-radius:var(--radius);padding:20px;border:1px solid var(--line);position:relative;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.stat:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
 .stat .ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;margin-bottom:14px}
 .stat .ico svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .stat.c1 .ico{background:linear-gradient(135deg,var(--red),var(--red-dark))}
@@ -87,6 +88,7 @@ ul{list-style:none}
 .filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
 .chip{flex-shrink:0;padding:9px 16px;border-radius:999px;background:var(--white);border:1px solid var(--line);font-size:.84rem;font-weight:600;white-space:nowrap;transition:all .25s var(--ease);display:flex;align-items:center;gap:6px}
+.chip:hover{border-color:var(--ink)}
 .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 .chip .count{background:rgba(255,255,255,.18);padding:1px 7px;border-radius:999px;font-size:.7rem;font-weight:700}
 .chip:not(.active) .count{background:var(--washi-2);color:var(--muted)}
@@ -180,6 +182,9 @@ ul{list-style:none}
 
 @media(max-width:640px){
   .header-inner{padding:0 16px;height:62px}
+  .header .logo small{display:none}
+  .header-user span{display:none}
+  .header-user{padding:5px}
   .wrap{padding:20px 16px 50px}
   .order-head{padding:14px 16px;gap:10px}
   .order-body{padding:0 16px 16px}
@@ -225,7 +230,7 @@ ul{list-style:none}
       <div class="header-actions">
         <div class="header-user"><div class="av">A</div><span id="userName">admin</span></div>
         
-        <!-- KALENDAR TUGMASI (Kassa olib tashlandi, faqat shu qoldi) -->
+        <!-- KALENDAR (Faqat shu qoldi) -->
         <button class="icon-btn" onclick="openCalendar()" title="Sanani tanlash">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -358,13 +363,21 @@ const API = '/api';
 const TOKEN_KEY = 'yamato_admin_token';
 let STATE = { orders: [], stats: null, filter: 'all', loading: false, refreshInterval: null };
 let modalCallback = null;
-let SELECTED_DATE = null; // Kalendar uchun
+let SELECTED_DATE = null; 
 
 function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
 function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
 
-// ================= KALENDAR FUNKSIYALARI =================
+// OVOZ FUNKSIYASI (Sizda bo'lgan holatga qaytarildi)
+function playSound() { 
+  try { 
+    const audio = new Audio('/admin/ding.mp3'); 
+    audio.play().catch(e => console.log("Ovoz bloklandi.", e)); 
+  } catch (e) {} 
+}
+
+// ================= KALENDAR =================
 function openCalendar() { 
   if (SELECTED_DATE) document.getElementById('filterDate').value = SELECTED_DATE; 
   document.getElementById('calendarModal').classList.add('show'); 
@@ -399,7 +412,7 @@ function updateStatsForDate(dateStr) {
   document.getElementById('statTodayOrders').textContent = dayCount;
   document.getElementById('statTodaySum').textContent = fmtShort(daySum);
 }
-// ==========================================================
+// ============================================
 
 function customConfirm(title, desc, callback) {
   document.getElementById('modalTitle').textContent = title;
@@ -527,6 +540,16 @@ async function loadOrders(showLoading = false) {
     
     if (ordersData.success) {
       const newOrders = ordersData.orders || [];
+      // OVOZ BILDIRISHNOMASI MANTIQI (Avvalgi holatga qaytarildi)
+      let savedIdsStr = localStorage.getItem('yamato_seen_orders');
+      let savedIds = [];
+      if (savedIdsStr) {
+        savedIds = JSON.parse(savedIdsStr); let hasNew = false;
+        newOrders.forEach(o => { if (!savedIds.includes(o.id)) { savedIds.push(o.id); if (o.status === 'new') hasNew = true; } });
+        if (hasNew) playSound();
+      } else { savedIds = newOrders.map(o => o.id); }
+      localStorage.setItem('yamato_seen_orders', JSON.stringify(savedIds));
+
       const cancelledOrders = (cancelledData && cancelledData.orders) || [];
       STATE.orders = [...newOrders, ...cancelledOrders];
     }
@@ -583,7 +606,6 @@ function renderOrders() {
   
   if (q) list = list.filter(o => (o.order_num || '').toLowerCase().includes(q) || (o.name || '').toLowerCase().includes(q) || (o.phone || '').toLowerCase().includes(q));
   
-  // KALENDAR FILTRI (100% ishlaydi)
   if (SELECTED_DATE) {
     list = list.filter(o => o.created_at && o.created_at.startsWith(SELECTED_DATE));
   }
