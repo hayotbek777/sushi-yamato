@@ -398,13 +398,16 @@ function clearDateFilter() {
   SELECTED_DATE = null; 
   closeCalendar();
   renderOrders(); 
-  renderStats(); 
+  renderStats(); // Bu funksiya joriy (bugungi) statistikani qaytaradi
   toast('Barcha buyurtmalar ko\'rsatilmoqda', 'success');
 }
 function updateStatsForDate(dateStr) {
   let daySum = 0, dayCount = 0;
+  // Faqatgina yuklangan buyurtmalar orasidan emas, balki barcha yuklangan buyurtmalardan sanaga qarab filtrlaymiz
   STATE.orders.forEach(o => {
-    if (o.created_at && o.created_at.startsWith(dateStr) && o.status !== 'cancelled') { 
+    // Sanani tekshirish (created_at yoki business_date bo'lishi mumkin)
+    const orderDate = (o.created_at || o.business_date || '').slice(0, 10);
+    if (orderDate === dateStr && o.status !== 'cancelled') { 
       dayCount++; 
       daySum += Number(o.total) || 0; 
     }
