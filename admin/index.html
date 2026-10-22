@@ -403,17 +403,33 @@ function clearDateFilter() {
 }
 function updateStatsForDate(dateStr) {
   let daySum = 0, dayCount = 0;
-  // Faqatgina yuklangan buyurtmalar orasidan emas, balki barcha yuklangan buyurtmalardan sanaga qarab filtrlaymiz
-  STATE.orders.forEach(o => {
-    // Sanani tekshirish (created_at yoki business_date bo'lishi mumkin)
+  const byStatus = {};
+  
+  // Tanlangan sana bo'yicha buyurtmalarni filtrlaymiz
+  const filteredOrders = STATE.orders.filter(o => {
     const orderDate = (o.created_at || o.business_date || '').slice(0, 10);
-    if (orderDate === dateStr && o.status !== 'cancelled') { 
+    return orderDate === dateStr;
+  });
+
+  // Statistikani hisoblaymiz
+  filteredOrders.forEach(o => {
+    if (o.status !== 'cancelled') {
       dayCount++; 
       daySum += Number(o.total) || 0; 
     }
+    // Filtr tugmalari uchun sonlarni hisoblash
+    byStatus[o.status] = (byStatus[o.status] || 0) + 1;
   });
+
+  // Tepadagi kartalarni yangilash
   document.getElementById('statTodayOrders').textContent = dayCount;
   document.getElementById('statTodaySum').textContent = fmtShort(daySum);
+  
+  // Filtr tugmalaridagi sonlarni yangilash (muammo shu yerda hal bo'ladi)
+  const all = Object.values(byStatus).reduce((a, b) => a + b, 0);
+  setCount('c-all', all);
+  ['new', 'accepted', 'cooking', 'delivering', 'done'].forEach(st => setCount('c-' + st, byStatus[st] || 0));
+  setCount('c-cancelled', byStatus['cancelled'] || 0);
 }
 // ============================================
 
