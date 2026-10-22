@@ -1,6 +1,3 @@
-/* =========================================================
-   GET /api/orders — Buyurtmalar va Statistika (Kassa bilan)
-   ========================================================= */
 import jwt from 'jsonwebtoken';
 import { getOrders, getKassaStatus } from '../lib/db.js';
 
@@ -28,40 +25,34 @@ export default async function handler(req, res) {
   try {
     const status = req.query.status || 'all';
     const stats = req.query.stats === '1';
-    const isKassaClosed = await getKassaStatus();
-
-    // 1. Hozirgi biznes kunini aniqlash
-    const now = new Date();
-    let businessDate = now.toISOString().slice(0, 10);
+    const kassa = await getKassaStatus();
     
-    if (isKassaClosed) {
-      const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      businessDate = tomorrow.toISOString().slice(0, 10);
-    } else if (now.getHours() < 6) {
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-      businessDate = yesterday.toISOString().slice(0, 10);
-    }
-
-    // 2. Barcha buyurtmalarni olamiz
     const allOrders = await getOrders({ status: 'all', limit: 5000 });
     
-    // 3. FAQAT business_date ga qarab filtrlaymiz (Eski buyurtmalarni chetlab o'tamiz)
-    const todayOrdersList = allOrders.filter(o => {
-      if (o.status === 'cancelled') return false;
-      return o.business_date === businessDate; 
-    });
-
-    // 4. "Bekor" tab uchun — bekor qilinganlarni alohida qaytarish
-    if (status === 'cancelled') {
-      const cancelled = allOrders.filter(o => o.status === 'cancelled');
-      return res.status(200).json({ success: true, orders: cancelled });
+    // Agar kassa yopilgan bo'lsa, eng oxirgi yopilgan vaqtdan keyingi buyurtmalarni olamiz.
+    // Agar kassa ochiq bo'lsa, eng oxirgi ochilgan vaqtdan keyingilarini olamiz.
+    let sessionStartTime = null;
+    if (kassa) {
+      if (kassa.is_closed) {
+        sessionStartTime = kassa.last_closed_at;
+      } else {
+        sessionStartTime = kassa.last_opened_at;
+      }
     }
 
+    // Joriy smenadagi buyurtmalar
+    const currentSessionOrders = allOrders.filter(o => {
+      if (o.status === 'cancelled') return false;
+      if (!sessionStartTime) return true; // Smena vaqti noma'lum bo'lsa hammasini ko'rsatamiz
+      return new Date(o.created_at) >= new Date(sessionStartTime);
+    });
+
+    // Statistika
     if (stats) {
-      // JAMI (Barcha vaqtlardagi barcha buyurtmalar)
       let totalOrders = 0, totalSum = 0;
+      let todayOrders = 0, todaySum = 0;
+      const byStatus = {};
+
       allOrders.forEach(o => {
         if (o.status !== 'cancelled') {
           totalOrders++;
@@ -69,10 +60,7 @@ export default async function handler(req, res) {
         }
       });
 
-      // BUGUNGI (Faqat shu ish kuniga tegishli)
-      let todayOrders = 0, todaySum = 0;
-      const byStatus = {};
-      todayOrdersList.forEach(o => {
+      currentSessionOrders.forEach(o => {
         byStatus[o.status] = (byStatus[o.status] || 0) + 1;
         todayOrders++;
         todaySum += Number(o.total) || 0;
@@ -80,12 +68,17 @@ export default async function handler(req, res) {
 
       return res.status(200).json({ 
         success: true, 
-        stats: { totalOrders, totalSum, todayOrders, todaySum, byStatus, kassaClosed: isKassaClosed } 
+        stats: { totalOrders, totalSum, todayOrders, todaySum, byStatus, kassa } 
       });
     }
 
-    // Ro'yxatni qaytarish (faqat shu kunga tegishli buyurtmalar)
-    return res.status(200).json({ success: true, orders: todayOrdersList });
+    // Ro'yxatni qaytarish
+    if (status === 'cancelled') {
+      const cancelled = allOrders.filter(o => o.status === 'cancelled' && (!sessionStartTime || new Date(o.created_at) >= new Date(sessionStartTime)));
+      return res.status(200).json({ success: true, orders: cancelled });
+    }
+
+    return res.status(200).json({ success: true, orders: currentSessionOrders });
 
   } catch (err) {
     console.error('Orders error:', err);

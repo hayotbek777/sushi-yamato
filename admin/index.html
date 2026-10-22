@@ -275,9 +275,11 @@ ul{list-style:none}
   </header>
 
   <div class="wrap">
+    <!-- 4 TA KARTA -->
     <div class="stats">
       <div class="stat c1"><div class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><div class="label">Bugungi buyurtmalar</div><div class="value" id="statTodayOrders">0</div></div>
       <div class="stat c2"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="label">Bugungi summa</div><div class="value" id="statTodaySum">0</div></div>
+      
       <div class="stat c3"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div class="label">Jami buyurtma</div><div class="value" id="statTotal">0</div></div>
       <div class="stat c4"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div><div class="label">Jami summa</div><div class="value" id="statTotalSum">0</div></div>
     </div>
@@ -322,20 +324,6 @@ ul{list-style:none}
   </div>
 </div>
 
-<div class="modal-overlay" id="calendarModal">
-  <div class="modal-box">
-    <h3>Sana bo'yicha filtrlash</h3>
-    <p>Buyurtmalarni ko'rish uchun sanani tanlang.</p>
-    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
-      <input type="date" id="filterDate" style="padding: 10px; border-radius: 8px; border: 1px solid var(--line-2); font-family: inherit; width: 100%; outline: none;">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeCalendar()">Bekor qilish</button>
-      <button class="btn-confirm" style="background: var(--blue);" onclick="applyDateFilter()">Ko'rish</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-overlay" id="addProductModal">
   <div class="modal-box" style="text-align: left;">
     <h3 style="text-align:center;">Yangi mahsulot</h3>
@@ -376,7 +364,6 @@ const API = '/api';
 const TOKEN_KEY = 'yamato_admin_token';
 let STATE = { orders: [], stats: null, filter: 'all', loading: false, refreshInterval: null };
 let modalCallback = null;
-let SELECTED_DATE = null;
 
 function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
@@ -387,12 +374,13 @@ async function toggleKassa() {
   const isClosed = btn.classList.contains('closed');
   const title = isClosed ? "Kassani ochish" : "Kassani yopish";
   const desc = isClosed ? "Kassani ochmoqchimisiz? Bugungi kun hisoboti boshlandi." : "Kassani yopib, ertangi kunga o'tmoqchimisiz? Ertangi buyurtmalar yangi kunga yoziladi.";
+  
   customConfirm(title, desc, async () => {
     try {
-      const res = await apiFetch('/kassa', { method: 'POST', body: JSON.stringify({ closed: !isClosed }) });
+      const action = isClosed ? 'open' : 'close';
+      const res = await apiFetch('/kassa', { method: 'POST', body: JSON.stringify({ action }) });
       if (res.success) {
-        if (!isClosed) { btn.classList.add('closed'); toast('Kassa yopildi. Ertangi kun hisoboti boshlandi.', 'success'); }
-        else { btn.classList.remove('closed'); toast('Kassa ochildi. Bugungi kun hisoboti boshlandi.', 'success'); }
+        toast(isClosed ? 'Kassa ochildi' : 'Kassa yopildi', 'success');
         loadOrders(true);
       } else { toast(res.error || 'Xatolik yuz berdi', 'error'); }
     } catch (e) { toast('Server bilan aloqa yo\'q', 'error'); }
@@ -407,24 +395,6 @@ function customConfirm(title, desc, callback) {
 }
 function closeCustomModal() { document.getElementById('customModal').classList.remove('show'); modalCallback = null; }
 document.getElementById('modalConfirmBtn').addEventListener('click', () => { if (modalCallback) modalCallback(); closeCustomModal(); });
-
-function openCalendar() { if (SELECTED_DATE) document.getElementById('filterDate').value = SELECTED_DATE; document.getElementById('calendarModal').classList.add('show'); }
-function closeCalendar() { document.getElementById('calendarModal').classList.remove('show'); }
-function applyDateFilter() {
-  const dateVal = document.getElementById('filterDate').value;
-  if (!dateVal) return;
-  SELECTED_DATE = dateVal; closeCalendar(); renderOrders(); updateStatsForDate(dateVal);
-  toast(`${SELECTED_DATE} sanasidagi ma'lumotlar`, 'success');
-}
-function clearDateFilter() { SELECTED_DATE = null; renderOrders(); renderStats(); }
-function updateStatsForDate(dateStr) {
-  let daySum = 0, dayCount = 0;
-  STATE.orders.forEach(o => {
-    if (o.created_at && o.created_at.startsWith(dateStr) && o.status !== 'cancelled') { dayCount++; daySum += Number(o.total) || 0; }
-  });
-  document.getElementById('statTodayOrders').textContent = dayCount;
-  document.getElementById('statTodaySum').textContent = fmtShort(daySum);
-}
 
 function toggleDotsMenu() { const menu = document.getElementById('dotsMenu'); menu.style.display = menu.style.display === 'none' ? 'block' : 'none'; }
 document.addEventListener('click', (e) => { const menu = document.getElementById('dotsMenu'); if (menu && !e.target.closest('#dotsMenu') && !e.target.closest('.icon-btn')) menu.style.display = 'none'; });
@@ -570,16 +540,17 @@ async function loadOrders(showLoading = false) {
         if (hasNew) playSound();
       } else { savedIds = newOrders.map(o => o.id); }
       localStorage.setItem('yamato_seen_orders', JSON.stringify(savedIds));
+      
       const cancelledOrders = (cancelledData && cancelledData.orders) || [];
       STATE.orders = [...newOrders, ...cancelledOrders];
     }
     if (statsData.success) {
       STATE.stats = statsData.stats;
       const kassaBtn = document.getElementById('kassaBtn');
-      if (statsData.stats.kassaClosed) kassaBtn.classList.add('closed');
+      if (!statsData.stats.kassa || statsData.stats.kassa.is_closed) kassaBtn.classList.add('closed');
       else kassaBtn.classList.remove('closed');
     }
-    if (!SELECTED_DATE) renderStats();
+    renderStats();
     renderOrders();
   } catch (e) { console.warn(e); }
   finally { STATE.loading = false; btn.classList.remove('spinning'); }
@@ -612,17 +583,18 @@ async function deleteOrder(id) {
 
 function renderStats() {
   const s = STATE.stats || {};
+  // Joriy smena
   document.getElementById('statTodayOrders').textContent = s.todayOrders || 0;
   document.getElementById('statTodaySum').textContent = fmtShort(s.todaySum || 0);
+  // Jami
   document.getElementById('statTotal').textContent = s.totalOrders || 0;
   document.getElementById('statTotalSum').textContent = fmtShort(s.totalSum || 0);
+  
   const byStatus = s.byStatus || {};
-  // "Barchasi" — bugungi (bekor qilinmagan) buyurtmalar soni
   const all = Object.values(byStatus).reduce((a, b) => a + b, 0);
   setCount('c-all', all);
-  // Har bir status uchun — bugungi byStatus dan
   ['new', 'accepted', 'cooking', 'delivering', 'done'].forEach(st => setCount('c-' + st, byStatus[st] || 0));
-  // "Bekor" — frontenddagi barcha bekor qilinganlardan (backend byStatus da cancelled yo'q)
+  
   const cancelledCount = STATE.orders.filter(o => o.status === 'cancelled').length;
   setCount('c-cancelled', cancelledCount);
 }
@@ -635,7 +607,7 @@ function renderOrders() {
   if (STATE.filter === 'all') list = list.filter(o => o.status !== 'cancelled');
   else list = list.filter(o => o.status === STATE.filter);
   if (q) list = list.filter(o => (o.order_num || '').toLowerCase().includes(q) || (o.name || '').toLowerCase().includes(q) || (o.phone || '').toLowerCase().includes(q));
-  if (SELECTED_DATE) list = list.filter(o => o.created_at && o.created_at.startsWith(SELECTED_DATE));
+  
   if (!list.length) {
     container.innerHTML = `
       <div class="empty">

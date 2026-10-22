@@ -15,15 +15,21 @@ export default async function handler(req, res) {
   catch { return res.status(401).json({ success: false, error: 'Ruxsat yo\'q' }); }
 
   if (req.method === 'GET') {
-    const isClosed = await getKassaStatus();
-    return res.status(200).json({ success: true, kassaClosed: isClosed });
+    const statusData = await getKassaStatus();
+    return res.status(200).json({ success: true, kassa: statusData });
   }
 
   if (req.method === 'POST') {
-    const { closed } = req.body;
-    await setKassaStatus(closed);
-    return res.status(200).json({ success: true });
+    const { action } = req.body;
+    const now = new Date().toISOString();
+    
+    if (action === 'open') {
+      await setKassaStatus({ is_closed: false, last_opened_at: now });
+      return res.status(200).json({ success: true });
+    } else if (action === 'close') {
+      await setKassaStatus({ is_closed: true, last_closed_at: now });
+      return res.status(200).json({ success: true });
+    }
+    return res.status(400).json({ success: false, error: 'Noto\'g\'ri amal' });
   }
-
-  return res.status(405).json({ success: false, error: 'Method not allowed' });
 }
