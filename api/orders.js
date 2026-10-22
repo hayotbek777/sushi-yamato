@@ -53,6 +53,12 @@ export default async function handler(req, res) {
       return o.business_date === businessDate; 
     });
 
+    // 4. "Bekor" tab uchun — bekor qilinganlarni alohida qaytarish
+    if (status === 'cancelled') {
+      const cancelled = allOrders.filter(o => o.status === 'cancelled');
+      return res.status(200).json({ success: true, orders: cancelled });
+    }
+
     if (stats) {
       // JAMI (Barcha vaqtlardagi barcha buyurtmalar)
       let totalOrders = 0, totalSum = 0;
