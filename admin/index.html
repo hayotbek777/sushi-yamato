@@ -105,6 +105,7 @@ ul{list-style:none}
 /* ORDER CARDS */
 .orders{display:grid;gap:14px}
 .order{background:var(--white);border-radius:var(--radius);border:1px solid var(--line);overflow:hidden;transition:box-shadow .3s var(--ease),border-color .3s}
+.order:hover{box-shadow:var(--shadow-md);border-color:transparent}
 .order-head{padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;flex-wrap:wrap}
 .order-num{font-weight:900;font-size:1rem;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
 .order-num .dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.6s infinite}
@@ -223,13 +224,17 @@ ul{list-style:none}
       </div>
       <div class="header-actions">
         <div class="header-user"><div class="av">A</div><span id="userName">admin</span></div>
-        <!-- Faqat shu tugma qoldi: Kassani yopish -->
-        <button class="icon-btn" onclick="closeKassa()" title="Kassani yopish (Yangi smena)" style="background:rgba(220,31,38,0.1); color:var(--red);">
+        
+        <!-- KALENDAR TUGMASI (Kassa olib tashlandi, faqat shu qoldi) -->
+        <button class="icon-btn" onclick="openCalendar()" title="Sanani tanlash">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
         </button>
+
         <div style="position: relative;">
           <button class="icon-btn" onclick="toggleDotsMenu()" title="Qo'shimcha">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
@@ -248,11 +253,9 @@ ul{list-style:none}
 
   <div class="wrap">
     <div class="stats">
-      <!-- Bugungi (Smena) -->
       <div class="stat c1"><div class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><div class="label">Bugungi buyurtmalar</div><div class="value" id="statTodayOrders">0</div></div>
       <div class="stat c2"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="label">Bugungi summa</div><div class="value" id="statTodaySum">0</div></div>
       
-      <!-- Jami (O'chmaydi) -->
       <div class="stat c3"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div class="label">Jami buyurtma</div><div class="value" id="statTotal">0</div></div>
       <div class="stat c4"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div><div class="label">Jami summa</div><div class="value" id="statTotalSum">0</div></div>
     </div>
@@ -286,6 +289,7 @@ ul{list-style:none}
 
 <div class="toast-wrap" id="toastWrap"></div>
 
+<!-- TASDIQLASH MODAL -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-box">
     <h3 id="modalTitle">Tasdiqlash</h3>
@@ -297,11 +301,27 @@ ul{list-style:none}
   </div>
 </div>
 
+<!-- KALENDAR MODAL -->
+<div class="modal-overlay" id="calendarModal">
+  <div class="modal-box">
+    <h3>Sana bo'yicha filtrlash</h3>
+    <p>Buyurtmalarni ko'rish uchun sanani tanlang.</p>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+      <input type="date" id="filterDate" style="padding: 10px; border-radius: 8px; border: 1px solid var(--line-2); font-family: inherit; width: 100%; outline: none;">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="clearDateFilter()">Barchasini ko'rish</button>
+      <button class="btn-confirm" style="background: var(--blue);" onclick="applyDateFilter()">Ko'rish</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAHSULOT QO'SHISH MODAL -->
 <div class="modal-overlay" id="addProductModal">
   <div class="modal-box" style="text-align: left;">
     <h3 style="text-align:center;">Yangi mahsulot</h3>
-    <div class="field"><label>Nomi</label><input type="text" id="npName" placeholder="Masalan: Ролл Филадельфия"></div>
-    <div class="field"><label>Tavsif</label><input type="text" id="npDesc" placeholder="Рис, Лосось..."></div>
+    <div class="field"><label>Nomi (Rus tilida)</label><input type="text" id="npName" placeholder="Masalan: Ролл Филадельфия"></div>
+    <div class="field"><label>Masalliqlar (Tavsif)</label><input type="text" id="npDesc" placeholder="Рис, Лосось..."></div>
     <div class="field-row">
       <div class="field"><label>Narxi</label><input type="number" id="npPrice" placeholder="75000"></div>
       <div class="field"><label>Rasm</label><input type="file" id="npImgFile" accept="image/*" style="padding: 10px; background: var(--washi); border: 1px dashed var(--line-2); border-radius: 8px;"></div>
@@ -314,6 +334,7 @@ ul{list-style:none}
         <option value="qovurilgan">Qovurilgan</option>
         <option value="setlar">Setlar</option>
         <option value="ichimliklar">Ichimliklar</option>
+        <option value="shirinliklar">Shirinliklar</option>
       </select>
     </div>
     <div class="modal-actions" style="margin-top:20px;">
@@ -323,6 +344,7 @@ ul{list-style:none}
   </div>
 </div>
 
+<!-- MAHSULOTLAR RO'YXATI MODAL -->
 <div class="modal-overlay" id="productsListModal">
   <div class="modal-box" style="text-align: left; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;">
     <h3 style="text-align:center;">Mahsulotlar ro'yxati</h3>
@@ -334,38 +356,50 @@ ul{list-style:none}
 <script>
 const API = '/api';
 const TOKEN_KEY = 'yamato_admin_token';
-const SESSION_KEY = 'yamato_session_start'; // Smena boshlangan vaqt
-
 let STATE = { orders: [], stats: null, filter: 'all', loading: false, refreshInterval: null };
 let modalCallback = null;
+let SELECTED_DATE = null; // Kalendar uchun
 
 function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
 function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
 
-// Smena vaqtini olish yoki yaratish
-function getSessionStart() {
-  let s = localStorage.getItem(SESSION_KEY);
-  if (!s) {
-    s = new Date().toISOString();
-    localStorage.setItem(SESSION_KEY, s);
-  }
-  return s;
+// ================= KALENDAR FUNKSIYALARI =================
+function openCalendar() { 
+  if (SELECTED_DATE) document.getElementById('filterDate').value = SELECTED_DATE; 
+  document.getElementById('calendarModal').classList.add('show'); 
 }
-
-// KASSANI YOPISH (Yangi smena)
-function closeKassa() {
-  customConfirm(
-    'Kassani yopish', 
-    'Barcha joriy buyurtmalar ekrandan o\'chadi va yangi smena boshlanadi. Jami statistika saqlanib qoladi. Davom etasizmi?', 
-    () => {
-      const newSession = new Date().toISOString();
-      localStorage.setItem(SESSION_KEY, newSession);
-      toast('Kassa yopildi. Yangi smena boshlandi!', 'success');
-      loadOrders(true);
+function closeCalendar() { 
+  document.getElementById('calendarModal').classList.remove('show'); 
+}
+function applyDateFilter() {
+  const dateVal = document.getElementById('filterDate').value;
+  if (!dateVal) return;
+  SELECTED_DATE = dateVal; 
+  closeCalendar(); 
+  renderOrders();
+  updateStatsForDate(dateVal);
+  toast(`${SELECTED_DATE} sanasidagi ma'lumotlar`, 'success');
+}
+function clearDateFilter() { 
+  SELECTED_DATE = null; 
+  closeCalendar();
+  renderOrders(); 
+  renderStats(); 
+  toast('Barcha buyurtmalar ko\'rsatilmoqda', 'success');
+}
+function updateStatsForDate(dateStr) {
+  let daySum = 0, dayCount = 0;
+  STATE.orders.forEach(o => {
+    if (o.created_at && o.created_at.startsWith(dateStr) && o.status !== 'cancelled') { 
+      dayCount++; 
+      daySum += Number(o.total) || 0; 
     }
-  );
+  });
+  document.getElementById('statTodayOrders').textContent = dayCount;
+  document.getElementById('statTodaySum').textContent = fmtShort(daySum);
 }
+// ==========================================================
 
 function customConfirm(title, desc, callback) {
   document.getElementById('modalTitle').textContent = title;
@@ -484,15 +518,11 @@ async function loadOrders(showLoading = false) {
     btn.classList.add('spinning');
     document.getElementById('ordersContainer').innerHTML = '<div class="loading"><div class="spinner"></div><span>Yuklanmoqda...</span></div>';
   }
-  
-  // Smena vaqtini olamiz va serverga yuboramiz
-  const sessionStart = getSessionStart();
-  
   try {
     const [ordersData, statsData, cancelledData] = await Promise.all([
-      apiFetch(`/orders?status=all&sessionStart=${sessionStart}`),
-      apiFetch(`/orders?stats=1&sessionStart=${sessionStart}`),
-      apiFetch(`/orders?status=cancelled&sessionStart=${sessionStart}`)
+      apiFetch('/orders?status=all'),
+      apiFetch('/orders?stats=1'),
+      apiFetch('/orders?status=cancelled')
     ]);
     
     if (ordersData.success) {
@@ -503,7 +533,8 @@ async function loadOrders(showLoading = false) {
     if (statsData.success) {
       STATE.stats = statsData.stats;
     }
-    renderStats();
+    
+    if (!SELECTED_DATE) renderStats();
     renderOrders();
   } catch (e) { console.warn(e); }
   finally { STATE.loading = false; btn.classList.remove('spinning'); }
@@ -527,10 +558,8 @@ async function deleteOrder(id) {
 
 function renderStats() {
   const s = STATE.stats || {};
-  // Bugungi (Smena)
   document.getElementById('statTodayOrders').textContent = s.todayOrders || 0;
   document.getElementById('statTodaySum').textContent = fmtShort(s.todaySum || 0);
-  // Jami (Barchasi)
   document.getElementById('statTotal').textContent = s.totalOrders || 0;
   document.getElementById('statTotalSum').textContent = fmtShort(s.totalSum || 0);
   
@@ -548,16 +577,23 @@ function renderOrders() {
   const container = document.getElementById('ordersContainer');
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   let list = STATE.orders;
+  
   if (STATE.filter === 'all') list = list.filter(o => o.status !== 'cancelled');
   else list = list.filter(o => o.status === STATE.filter);
+  
   if (q) list = list.filter(o => (o.order_num || '').toLowerCase().includes(q) || (o.name || '').toLowerCase().includes(q) || (o.phone || '').toLowerCase().includes(q));
+  
+  // KALENDAR FILTRI (100% ishlaydi)
+  if (SELECTED_DATE) {
+    list = list.filter(o => o.created_at && o.created_at.startsWith(SELECTED_DATE));
+  }
   
   if (!list.length) {
     container.innerHTML = `
       <div class="empty">
         <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <h3>Buyurtma topilmadi</h3>
-        <p>${q ? 'Qidiruv bo\'yicha hech narsa yo\'q' : 'Hozircha buyurtmalar yo\'q'}</p>
+        <p>${q ? 'Qidiruv bo\'yicha hech narsa yo\'q' : (SELECTED_DATE ? SELECTED_DATE + ' sanasida buyurtma yo\'q' : 'Hozircha buyurtmalar yo\'q')}</p>
       </div>`;
     return;
   }
@@ -596,6 +632,7 @@ function orderHTML(o) {
       </div>
       <div class="order-body">
         <div class="order-section"><h4>Mahsulotlar (${items.length})</h4><div class="items-list">${itemsHTML}</div></div>
+        ${receiptHTML}
         <div class="actions">${actions}</div>
       </div>
     </div>`;
