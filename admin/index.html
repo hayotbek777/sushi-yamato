@@ -617,9 +617,14 @@ function renderStats() {
   document.getElementById('statTotal').textContent = s.totalOrders || 0;
   document.getElementById('statTotalSum').textContent = fmtShort(s.totalSum || 0);
   const byStatus = s.byStatus || {};
+  // "Barchasi" — bugungi (bekor qilinmagan) buyurtmalar soni
   const all = Object.values(byStatus).reduce((a, b) => a + b, 0);
   setCount('c-all', all);
-  ['new', 'accepted', 'cooking', 'delivering', 'done', 'cancelled'].forEach(st => setCount('c-' + st, byStatus[st] || 0));
+  // Har bir status uchun — bugungi byStatus dan
+  ['new', 'accepted', 'cooking', 'delivering', 'done'].forEach(st => setCount('c-' + st, byStatus[st] || 0));
+  // "Bekor" — frontenddagi barcha bekor qilinganlardan (backend byStatus da cancelled yo'q)
+  const cancelledCount = STATE.orders.filter(o => o.status === 'cancelled').length;
+  setCount('c-cancelled', cancelledCount);
 }
 function setCount(id, n) { const el = document.getElementById(id); if (el) el.textContent = n; }
 
