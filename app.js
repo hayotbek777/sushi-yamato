@@ -132,7 +132,7 @@ const getP = id => PRODUCTS.find(p => p.id === id);
    ========================================================= */
 let CART = JSON.parse(localStorage.getItem('ym_cart') || '{}');
 let ACTIVE_FILTER = 'all';
-let PRODUCTS = [];
+let PRODUCTS = []; 
 
 const saveCart = () => localStorage.setItem('ym_cart', JSON.stringify(CART));
 const cartCount = () => Object.values(CART).reduce((a, b) => a + b, 0);
@@ -150,9 +150,8 @@ function cardHTML(p) {
     p.badge === 'new' ? '<span class="badge new">Yangi</span>' :
       p.badge === 'top' ? '<span class="badge top">Top</span>' : '';
   const pieces = p.pieces ? `${p.pieces} dona` : '';
-
+  
   // TAVSIFNI TEKSHIRISH (undefined chiqmasligi uchun)
-  // Bazadan qanday nom bilan kelsa ham, tavsifni topib oladi
   const pDesc = p.desc || p.description || p.tavsif;
   const safeDesc = (pDesc && pDesc !== 'undefined') ? pDesc : '';
 
@@ -347,7 +346,8 @@ function openProduct(id) {
   const p = getP(id);
   if (!p) return;
 
-  const safeDesc = (p.desc && p.desc !== 'undefined') ? p.desc : 'Yangi tayyorlangan, mazali taom.';
+  const pDesc = p.desc || p.description || p.tavsif;
+  const safeDesc = (pDesc && pDesc !== 'undefined') ? pDesc : 'Yangi tayyorlangan, mazali taom.';
 
   const body = $('#productModalBody');
   body.innerHTML = `
@@ -453,10 +453,17 @@ function openCheckout() {
   openModal('checkoutModal');
 }
 
-function selectTime(el) {
+function selectTime(el, type) {
   $$('.time-opt').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  CHECKOUT.time = el.textContent.includes('Keyinroq') ? 'later' : 'now';
+  CHECKOUT.time = type;
+  
+  const picker = document.getElementById('timePickerField');
+  if (type === 'later') {
+    picker.style.display = 'block';
+  } else {
+    picker.style.display = 'none';
+  }
 }
 
 function selectPay(el, type) {
@@ -466,9 +473,9 @@ function selectPay(el, type) {
 
   const receiptField = document.getElementById('receiptField');
   if (type === 'online') {
-    receiptField.style.display = 'block';
+    receiptField.style.display = 'block'; 
   } else {
-    receiptField.style.display = 'none';
+    receiptField.style.display = 'none';  
   }
 }
 
@@ -487,20 +494,26 @@ function maskPhone(inp) {
 async function placeOrder() {
   const name = $('#ckName').value.trim();
   const phone = $('#ckPhone').value.trim();
-  const city = $('#ckCity').value;
+  const city = $('#ckCity').value; 
   const house = $('#ckHouse').value.trim();
   const addr = $('#ckAddr').value.trim();
   const landmark = $('#ckLandmark').value.trim();
   const receiptInput = document.getElementById('ckReceipt');
+  const timeVal = document.getElementById('ckTime') ? document.getElementById('ckTime').value : '';
 
   if (!name || phone.replace(/\D/g, '').length < 12) {
     toast('Ism va telefon raqamini to\'ldiring');
     return;
   }
   if (!addr) { toast('Ko\'cha nomini kiriting'); return; }
+  
+  if (!landmark) { 
+    toast('Iltimos, mo\'ljalni to\'liq kiriting (majburiy)'); 
+    return; 
+  }
 
-  if (!landmark) {
-    toast('Iltimos, mo\'ljalni to\'liq kiriting (majburiy)');
+  if (CHECKOUT.time === 'later' && !timeVal) {
+    toast('Iltimos, yetkazib berish vaqtini tanlang!');
     return;
   }
 
@@ -527,12 +540,13 @@ async function placeOrder() {
   const total = subtotal + delivery;
 
   const payload = {
-    name, phone,
-    district: city,
+    name, phone, 
+    district: city, 
     addr, house, landmark,
     time: CHECKOUT.time,
+    time_value: timeVal, // Tanlangan soat
     pay: CHECKOUT.pay,
-    receipt: receiptBase64,
+    receipt: receiptBase64, 
     items, subtotal, delivery, total
   };
 
@@ -581,13 +595,13 @@ function openTracking(orderNum, payType) {
     head.style.display = 'none';
     body.innerHTML =
       '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 24px 56px;">' +
-      '<div style="width:120px;height:120px;border-radius:50%;background:#2FBF71;display:grid;place-items:center;box-shadow:0 12px 32px rgba(47,191,113,.35);margin-bottom:28px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);">' +
-      '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="m5 12 5 5L20 7"/>' +
-      '</svg>' +
-      '</div>' +
-      '<div style="font-size:1.4rem;font-weight:800;color:#0E0E10;margin-bottom:8px;">Buyurtma qabul qilindi</div>' +
-      '<div style="font-size:.92rem;color:#8a8a92;">Tez orada siz bilan bog\'lanamiz</div>' +
+        '<div style="width:120px;height:120px;border-radius:50%;background:#2FBF71;display:grid;place-items:center;box-shadow:0 12px 32px rgba(47,191,113,.35);margin-bottom:28px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);">' +
+          '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="m5 12 5 5L20 7"/>' +
+          '</svg>' +
+        '</div>' +
+        '<div style="font-size:1.4rem;font-weight:800;color:#0E0E10;margin-bottom:8px;">Buyurtma qabul qilindi</div>' +
+        '<div style="font-size:.92rem;color:#8a8a92;">Tez orada siz bilan bog\'lanamiz</div>' +
       '</div>' +
       '<style>@keyframes popIn{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}</style>';
   } else {
@@ -598,10 +612,10 @@ function openTracking(orderNum, payType) {
       '<div class="order-num">' + orderNum + '</div>';
     body.innerHTML =
       '<div style="text-align:center;padding:8px 4px 20px">' +
-      '<div style="font-size:1.15rem;font-weight:800;line-height:1.4;margin-bottom:10px">To\'lov qabul qilindi</div>' +
-      '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:22px">' +
-      "Buyurtmangiz tayyorlanmoqda. Operatorimiz chekni tasdiqlash uchun siz bilan bog'lanadi." +
-      '</p>' +
+        '<div style="font-size:1.15rem;font-weight:800;line-height:1.4;margin-bottom:10px">To\'lov qabul qilindi</div>' +
+        '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:22px">' +
+          "Buyurtmangiz tayyorlanmoqda. Operatorimiz chekni tasdiqlash uchun siz bilan bog'lanadi." +
+        '</p>' +
       '</div>';
   }
 
@@ -689,19 +703,19 @@ function toggleFav(e, id) {
    ISHGA TUSHIRISH
    ========================================================= */
 document.addEventListener('DOMContentLoaded', async () => {
-  PRODUCTS = [...DEFAULT_PRODUCTS];
+  PRODUCTS = [...DEFAULT_PRODUCTS]; 
 
   try {
     const res = await fetch('/api/products');
     const data = await res.json();
-
+    
     if (data.success && data.products && data.products.length > 0) {
       data.products.forEach(newP => {
         const idx = PRODUCTS.findIndex(p => p.id === newP.id);
         if (idx !== -1) {
-          PRODUCTS[idx] = { ...PRODUCTS[idx], ...newP };
+          PRODUCTS[idx] = { ...PRODUCTS[idx], ...newP }; 
         } else {
-          PRODUCTS.push(newP);
+          PRODUCTS.push(newP); 
         }
       });
     }
