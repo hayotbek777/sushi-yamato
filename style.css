@@ -1006,13 +1006,19 @@ section{padding:64px 0}
 .spacer-mob{height:80px}
 @media(min-width:768px){.spacer-mob{display:none}}
 
-/* ===== Mahsulot rasmlari (shaffof fonli) — kesilmasin ===== */
-.p-media, .pd-media {
-  background: #fff; /* Orqa fon oq bo'lishi shart */
+/* =========================================================
+   YANGI: SHIRINLIKLAR RASMLARI UCHUN ALOHIDA SOZLAMA
+   ========================================================= */
+/* Faqat shirinliklar (photo_ bilan boshlanuvchi rasmlar) uchun */
+.p-media img[src*="photo_"] {
+  object-fit: contain !important; 
+  padding: 12px !important;
+  background-color: #ffffff; /* Orqa fonni toza oq qilish */
 }
 
-.p-media img{
-  width:100%;height:100%;object-fit:contain; /* cover dan contain ga o'zgartirildi */
-  display:block;transition:transform .7s var(--ease);
-  padding:10px; /* Chetlardan biroz bo'sh joy berish uchun */
+/* Mahsulot modalida ham shirinliklar to'g'ri ko'rinishi uchun */
+.pd-media img[src*="photo_"] {
+  object-fit: contain !important;
+  padding: 20px !important;
+  background-color: #ffffff;
 }
