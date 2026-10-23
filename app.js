@@ -70,6 +70,8 @@ let DEFAULT_PRODUCTS = [
   { "id": "set-guest", "name": "Сет “Гостевой”", "desc": "Ролл Филадельфия, Ролл саки маки, Жареный ролл с курицей, Запеченный ролл с курицей", "price": 241000, "pieces": 0, "cat": ["setlar"], "badge": "hit", "img": "images/62.png" },
   { "id": "set-grand", "name": "Grand Set", "desc": "Ролл Филадельфия, Ролл Филадельфия с угрем, Запеченный ролл с угрем в соусе спайси, Ролл калифорния с икрой", "price": 249000, "pieces": 0, "cat": ["setlar", "yangi"], "badge": "new", "img": "images/63.png" },
   { "id": "set-mega", "name": "Мега празник", "desc": "Мини запеченный с курицей, Мини запеченный с лосось, Жареный сендвич с лососем, Сладкий ролл с фруктами, Жареный овощной ролл, Ролл Филадельфия лайт, Вок с курицей, Вок с креветками, кола 1л", "price": 444000, "pieces": 0, "cat": ["setlar", "yangi"], "badge": "new", "img": "images/64.png" },
+  { "id": "fanta-glass", "name": "Фанта 0,25 (стекло)", "desc": "", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/65.png" },
+  { "id": "cola-glass", "name": "Кола 0,25 (стекло)", "desc": "", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/66.png" },
   { "id": "cola-05", "name": "Кола 0,5", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/67.png" },
   { "id": "fanta-05", "name": "Фанта 0,5", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/68.png" },
   { "id": "sprite-05", "name": "Спрайт 0,5", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/69.png" },
@@ -99,26 +101,20 @@ let DEFAULT_PRODUCTS = [
   { "id": "molochniy-choy-08", "name": "Молочный улун", "desc": "0.8 л", "price": 40000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
   { "id": "yaprok-choy-065", "name": "Япрок чой", "desc": "0.65 л", "price": 20000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
   { "id": "yaprok-choy-08", "name": "Япрок чой", "desc": "0.8 л", "price": 25000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
-
-  // --- YANGI QO'SHILGAN SHIRINLIKLAR VA SHAKARLAR ---
   { "id": "alpen-gold-1", "name": "Alpen Gold Фундук и Изюм", "desc": "Молочный шоколад с фундуком и изюмом", "price": 25000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/alpengold1.png" },
   { "id": "alpen-gold-2", "name": "Alpen Gold Фундук", "desc": "Молочный шоколад с цельным фундуком", "price": 25000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold2.png" },
   { "id": "alpen-gold-3", "name": "Alpen Gold Молочный", "desc": "Классический молочный шоколад", "price": 22000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold3.png" },
   { "id": "alpen-gold-4567", "name": "Alpen Gold Соленый арахис", "desc": "Молочный шоколад с соленым арахисом и крекером", "price": 25000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold4567.png" },
   { "id": "alpen-gold-max", "name": "Alpen Gold Max Fun", "desc": "Взрывная карамель, мармелад, печенье", "price": 28000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/alpengoldmax.png" },
   { "id": "alpen-gold-oq", "name": "Alpen Gold Миндаль и Кокос", "desc": "Белый шоколад с миндалем и кокосом", "price": 26000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengoldoq.png" },
-
-  { "id": "bounty-1", "name": "Bounty Trio", "desc": "Кокосовая начинка в молочном шоколаде", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bountiy1.png" },
+  { "id": "bounty-1", "name": "Bounty Trio", "desc": "Кокосовая начинка в молочном шоколаде", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bounty1.png" },
   { "id": "bounty-2", "name": "Bounty", "desc": "Кокосовая начинка в молочном шоколаде", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bounty2.png" },
-
   { "id": "karak-tea", "name": "GOAL Karak Tea", "desc": "Инстант чай с молоком (1 шт)", "price": 6000, "pieces": 0, "cat": ["choy"], "img": "images/karaktea.png" },
   { "id": "maccoffee", "name": "MacCoffee 3 in 1", "desc": "Кофейный напиток (1 шт)", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/maccoffe.png" },
   { "id": "milka-1", "name": "Milka Alpine Milk", "desc": "Молочный шоколад", "price": 26000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/milka1.png" },
   { "id": "nestle-1", "name": "Nestle Almond & Raisin", "desc": "Молочный шоколад с миндалем и изюмом", "price": 24000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/nestle1.png" },
-
   { "id": "snickers-1", "name": "Snickers", "desc": "Нуга, карамель, арахис", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/snickers1.png" },
   { "id": "snickers-2", "name": "Snickers Super", "desc": "Большой батончик с арахисом", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/snickers2.png" },
-
   { "id": "twix-1", "name": "Twix Xtra", "desc": "Печенье, карамель, шоколад", "price": 12000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix1.png" },
   { "id": "twix-2", "name": "Twix", "desc": "Печенье, карамель, шоколад", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix2.png" }
 ];
@@ -155,6 +151,11 @@ function cardHTML(p) {
       p.badge === 'top' ? '<span class="badge top">Top</span>' : '';
   const pieces = p.pieces ? `${p.pieces} dona` : '';
 
+  // TAVSIFNI TEKSHIRISH (undefined chiqmasligi uchun)
+  // Bazadan qanday nom bilan kelsa ham, tavsifni topib oladi
+  const pDesc = p.desc || p.description || p.tavsif;
+  const safeDesc = (pDesc && pDesc !== 'undefined') ? pDesc : '';
+
   return `
     <div class="p-card" data-id="${p.id}">
       <div class="p-media" onclick="openProduct('${p.id}')">
@@ -166,7 +167,7 @@ function cardHTML(p) {
       </div>
       <div class="p-body">
         <div class="p-name" onclick="openProduct('${p.id}')">${p.name}</div>
-        <div class="p-desc">${p.desc}</div>
+        <div class="p-desc">${safeDesc}</div>
         ${pieces ? `<div class="p-meta">${pieces}</div>` : ''}
         <div class="p-foot">
           <div class="p-price">${fmt(p.price)}</div>
@@ -346,6 +347,8 @@ function openProduct(id) {
   const p = getP(id);
   if (!p) return;
 
+  const safeDesc = (p.desc && p.desc !== 'undefined') ? p.desc : 'Yangi tayyorlangan, mazali taom.';
+
   const body = $('#productModalBody');
   body.innerHTML = `
     <div class="pd">
@@ -356,7 +359,7 @@ function openProduct(id) {
           <b>4.9</b><span>· 120+ sharh</span>
         </div>
         <h2>${p.name}</h2>
-        <p class="desc">${p.desc || 'Yangi tayyorlangan, mazali taom.'}</p>
+        <p class="desc">${safeDesc}</p>
         <div class="pd-specs">
           ${p.pieces ? `<div><small>Miqdor</small><b>${p.pieces} dona</b></div>` : ''}
           <div><small>Kategoriya</small><b>${p.cat.map(c => c[0].toUpperCase() + c.slice(1)).join(', ')}</b></div>
@@ -433,7 +436,7 @@ function runSearch(q) {
   body.innerHTML = res.map(p => `
     <div class="search-result" onclick="closeModal('searchModal');openProduct('${p.id}')">
       <div class="sr-img"><img src="${p.img}" alt="${p.name}" onerror="this.src='images/placeholder.webp'"></div>
-      <div class="sr-info"><b>${p.name}</b><small>${p.desc || ''}</small></div>
+      <div class="sr-info"><b>${p.name}</b><small>${(p.desc && p.desc !== 'undefined') ? p.desc : ''}</small></div>
       <div class="sr-price">${fmt(p.price)}</div>
     </div>`).join('');
 }
@@ -692,18 +695,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res = await fetch('/api/products');
     const data = await res.json();
 
-    if (data.success && data.products) {
+    if (data.success && data.products && data.products.length > 0) {
       data.products.forEach(newP => {
         const idx = PRODUCTS.findIndex(p => p.id === newP.id);
         if (idx !== -1) {
-          PRODUCTS[idx] = newP;
+          PRODUCTS[idx] = { ...PRODUCTS[idx], ...newP };
         } else {
           PRODUCTS.push(newP);
         }
       });
     }
   } catch (e) {
-    console.log("Bazadan yuklashda xato (Zaxira ishlatilmoqda):", e);
+    console.log("Bazadan yuklashda xato, zaxira ro'yxat ishlatilmoqda:", e);
   }
 
   renderBest();
@@ -723,5 +726,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (e.key === 'Escape') closeAll();
   });
 });
-
-

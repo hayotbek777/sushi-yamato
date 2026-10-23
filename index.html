@@ -4,499 +4,771 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0E0E10">
-<title>Yamato Sushi — Urganchda yapon oshxonasi</title>
-<link rel="icon" type="image/png" href="images/logo2.png">
-<meta name="description" content="Yamato Sushi — Urganchda yapon oshxonasi. Sushi, rollar, setlar. Tel: +998 87 645-05-05">
+<title>Yamato Admin — Buyurtmalar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E0E10;--ink-2:#1a1a1e;--ink-3:#2a2a30;
+  --washi:#F6F1E8;--washi-2:#EDE6D8;--white:#ffffff;
+  --red:#DC1F26;--red-dark:#A8181F;--matcha:#2FBF71;
+  --gold:#E4B15A;--blue:#3B82F6;--purple:#8B5CF6;--orange:#F59E0B;
+  --muted:#8a8a92;--line:rgba(14,14,16,.08);--line-2:rgba(14,14,16,.14);
+  --shadow-sm:0 1px 2px rgba(14,14,16,.04),0 2px 8px rgba(14,14,16,.04);
+  --shadow-md:0 4px 12px rgba(14,14,16,.06),0 12px 32px rgba(14,14,16,.08);
+  --shadow-lg:0 24px 60px rgba(14,14,16,.14);
+  --radius:16px;--radius-lg:22px;--ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--washi);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+img{max-width:100%;display:block}
+svg{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0E0E10 0%,#1a1a1e 100%)}
+#loginScreen.hide{display:none}
+.login-card{width:100%;max-width:420px;background:var(--washi);border-radius:var(--radius-lg);padding:40px 36px;box-shadow:var(--shadow-lg)}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.login-logo .mark{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red-dark));display:grid;place-items:center;color:#fff;font-weight:900;font-size:1.2rem}
+.login-logo h1{font-size:1.1rem;font-weight:900;letter-spacing:-.02em}
+.login-logo small{display:block;font-size:.72rem;color:var(--muted);font-weight:500;letter-spacing:.1em;text-transform:uppercase}
+.login-card h2{font-size:1.5rem;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
+.login-card p.sub{font-size:.88rem;color:var(--muted);margin-bottom:28px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.76rem;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.field input{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid var(--line-2);background:var(--white);font-size:.94rem;outline:none;transition:border-color .2s,box-shadow .2s}
+.field input:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(14,14,16,.06)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:12px;font-weight:700;font-size:.9rem;transition:all .25s var(--ease);white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--ink);color:#fff;width:100%}
+.btn-primary:hover{background:var(--red)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.login-error{background:rgba(220,31,38,.1);color:var(--red-dark);padding:11px 14px;border-radius:10px;font-size:.84rem;font-weight:500;margin-bottom:16px;display:none}
+.login-error.show{display:block}
+
+/* DASHBOARD */
+#dashboard{display:none}
+#dashboard.show{display:block}
+.header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--line)}
+.header-inner{max-width:1400px;margin:0 auto;padding:0 24px;height:68px;display:flex;align-items:center;gap:16px}
+.header .logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1rem;letter-spacing:-.02em}
+.header .logo .mark{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red-dark));display:grid;place-items:center;color:#fff;font-weight:900;font-size:.9rem}
+.header .logo small{display:block;font-size:.66rem;color:var(--muted);font-weight:500;letter-spacing:.1em;text-transform:uppercase}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.header-user{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;background:var(--washi-2);font-size:.84rem;font-weight:600}
+.header-user .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--orange));display:grid;place-items:center;color:#fff;font-weight:700;font-size:.78rem}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;transition:background .2s}
+.icon-btn:hover{background:rgba(14,14,16,.06)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+.wrap{max-width:1400px;margin:0 auto;padding:28px 24px 60px}
+
+/* STATS */
+.stats{display:grid;gap:14px;grid-template-columns:repeat(4,1fr);margin-bottom:28px}
+@media(max-width:960px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--white);border-radius:var(--radius);padding:20px;border:1px solid var(--line);position:relative;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.stat:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.stat .ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;margin-bottom:14px}
+.stat .ico svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.stat.c1 .ico{background:linear-gradient(135deg,var(--red),var(--red-dark))}
+.stat.c2 .ico{background:linear-gradient(135deg,var(--matcha),#1a9e57)}
+.stat.c3 .ico{background:linear-gradient(135deg,var(--gold),var(--orange))}
+.stat.c4 .ico{background:linear-gradient(135deg,var(--purple),#6D28D9)}
+.stat .label{font-size:.74rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.stat .value{font-size:clamp(1.2rem,2.4vw,1.6rem);font-weight:900;letter-spacing:-.03em}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:9px 16px;border-radius:999px;background:var(--white);border:1px solid var(--line);font-size:.84rem;font-weight:600;white-space:nowrap;transition:all .25s var(--ease);display:flex;align-items:center;gap:6px}
+.chip:hover{border-color:var(--ink)}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip .count{background:rgba(255,255,255,.18);padding:1px 7px;border-radius:999px;font-size:.7rem;font-weight:700}
+.chip:not(.active) .count{background:var(--washi-2);color:var(--muted)}
+
+.toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search-box{flex:1;min-width:200px;position:relative}
+.search-box svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2}
+.search-box input{width:100%;padding:12px 16px 12px 42px;border-radius:12px;border:1px solid var(--line-2);background:var(--white);font-size:.9rem;outline:none;transition:border-color .2s,box-shadow .2s}
+.search-box input:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(14,14,16,.06)}
+.refresh-btn{padding:12px 18px;border-radius:12px;background:var(--white);border:1px solid var(--line-2);font-size:.88rem;font-weight:600;display:flex;align-items:center;gap:8px;transition:all .25s var(--ease)}
+.refresh-btn:hover{border-color:var(--ink);background:var(--ink);color:#fff}
+.refresh-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.refresh-btn.spinning svg{animation:spin .8s linear}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ORDER CARDS */
+.orders{display:grid;gap:14px}
+.order{background:var(--white);border-radius:var(--radius);border:1px solid var(--line);overflow:hidden;transition:box-shadow .3s var(--ease),border-color .3s}
+.order:hover{box-shadow:var(--shadow-md);border-color:transparent}
+.order-head{padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;flex-wrap:wrap}
+.order-num{font-weight:900;font-size:1rem;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.order-num .dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.order-meta{display:flex;align-items:center;gap:14px;font-size:.82rem;color:var(--muted);margin-left:auto;flex-wrap:wrap}
+.order-meta b{color:var(--ink);font-weight:700}
+.order-total{font-weight:900;font-size:1rem;color:var(--ink);white-space:nowrap}
+.order-status{padding:6px 12px;border-radius:999px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.status-new{background:rgba(220,31,38,.12);color:var(--red-dark)}
+.status-accepted{background:rgba(59,130,246,.12);color:#1e40af}
+.status-cooking{background:rgba(245,158,11,.15);color:#92400e}
+.status-delivering{background:rgba(139,92,246,.12);color:#5b21b6}
+.status-done{background:rgba(47,191,113,.14);color:#166534}
+.status-cancelled{background:rgba(138,138,146,.15);color:#52525b}
+.order-chevron{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:2.4;transition:transform .3s var(--ease)}
+.order.open .order-chevron{transform:rotate(180deg)}
+.order-body{display:none;padding:0 20px 20px;border-top:1px solid var(--line);background:var(--washi)}
+.order.open .order-body{display:block;animation:fadeIn .3s var(--ease)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.order-section{margin-top:18px}
+.order-section h4{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.info-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.info-item{background:var(--white);border-radius:10px;padding:11px 14px;border:1px solid var(--line)}
+.info-item small{display:block;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;font-weight:600}
+.info-item b{font-size:.88rem;font-weight:600;word-break:break-word}
+.receipt-img{max-width:200px;border-radius:8px;border:2px solid var(--gold);box-shadow:0 4px 12px rgba(0,0,0,0.1);transition:transform 0.2s;cursor:pointer}
+.items-list{display:flex;flex-direction:column;gap:6px}
+.item-row{display:flex;align-items:center;gap:12px;background:var(--white);border-radius:10px;padding:10px 14px;border:1px solid var(--line);font-size:.86rem}
+.item-row .qty{min-width:32px;height:28px;border-radius:8px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:800;font-size:.78rem}
+.item-row .name{flex:1;font-weight:600}
+.item-row .price{font-weight:800;white-space:nowrap}
+.summary{background:var(--white);border-radius:10px;padding:14px 16px;border:1px solid var(--line);display:flex;flex-direction:column;gap:8px;max-width:320px}
+.sum-row{display:flex;justify-content:space-between;font-size:.86rem}
+.sum-row.total{font-size:1.05rem;font-weight:900;padding-top:10px;border-top:1px solid var(--line)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.action-btn{padding:9px 16px;border-radius:10px;font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:6px;transition:all .2s var(--ease);border:1.5px solid transparent}
+.action-btn:hover{transform:translateY(-1px)}
+.action-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.action-btn.accept{background:var(--blue);color:#fff}
+.action-btn.cook{background:var(--orange);color:#fff}
+.action-btn.deliver{background:var(--purple);color:#fff}
+.action-btn.done{background:var(--matcha);color:#fff}
+.action-btn.cancel{background:transparent;border-color:var(--line-2);color:var(--muted)}
+.action-btn.call{background:var(--ink);color:#fff}
+.action-btn.delete{background:transparent;border-color:var(--red);color:var(--red)}
+
+/* EMPTY & LOADING */
+.empty{text-align:center;padding:80px 20px;color:var(--muted)}
+.empty svg{width:72px;height:72px;stroke:currentColor;fill:none;stroke-width:1.2;margin:0 auto 20px;opacity:.35}
+.empty h3{font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:6px}
+.loading{display:flex;flex-direction:column;align-items:center;padding:80px 20px;gap:16px;color:var(--muted)}
+.spinner{width:40px;height:40px;border-radius:50%;border:3px solid var(--line-2);border-top-color:var(--red);animation:spin 1s linear infinite}
+
+/* TOAST & MODAL */
+.toast-wrap{position:fixed;top:84px;right:20px;z-index:400;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--ink);color:#fff;padding:13px 18px;border-radius:12px;display:flex;align-items:center;gap:10px;font-size:.86rem;font-weight:500;box-shadow:var(--shadow-lg);transform:translateX(120%);transition:transform .4s var(--ease);pointer-events:auto;max-width:340px}
+.toast.show{transform:translateX(0)}
+.toast .t-ico{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
+.toast.success .t-ico{background:var(--matcha)}
+.toast.error .t-ico{background:var(--red)}
+.toast .t-ico svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:3}
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(14,14,16,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal-box{background:var(--white);border-radius:16px;padding:24px;width:100%;max-width:400px;box-shadow:0 20px 40px rgba(0,0,0,0.2);transform:scale(0.95);transition:transform 0.2s;text-align:center}
+.modal-overlay.show .modal-box{transform:scale(1)}
+.modal-box h3{font-size:1.2rem;font-weight:800;margin-bottom:10px}
+.modal-box p{font-size:0.9rem;color:var(--muted);margin-bottom:20px}
+.modal-actions{display:flex;gap:10px;justify-content:center}
+.modal-actions button{padding:10px 20px;border-radius:10px;font-weight:600;font-size:0.9rem;transition:all 0.2s}
+.modal-actions .btn-cancel{background:var(--washi-2);color:var(--ink)}
+.modal-actions .btn-confirm{background:var(--red);color:#fff}
+
+@media(max-width:640px){
+  .header-inner{padding:0 16px;height:62px}
+  .wrap{padding:20px 16px 50px}
+  .order-head{padding:14px 16px;gap:10px}
+  .order-body{padding:0 16px 16px}
+  .order-meta{width:100%;margin-left:0;gap:10px}
+  .summary{max-width:100%}
+  .toast-wrap{top:74px;left:16px;right:16px}
+  .toast{max-width:100%}
+}
+</style>
 </head>
 <body>
 
-<!-- ================= HEADER ================= -->
-<header class="header" id="header">
-  <div class="wrap header-inner">
-    <a href="#" class="logo" onclick="scrollTop(event)">
-      <img src="images/logo.png" alt="Yamato" class="logo-mark">
-      sushi_yamato
-    </a>
-    <nav class="nav">
-      <a href="#menu">Menyu</a>
-      <a href="#sets">Setlar</a>
-      <a href="#about">Biz haqimizda</a>
-      <a href="#wedding">To'y uchun</a>
-      <a href="#delivery">Yetkazib berish</a>
-      <a href="#location">Manzil</a>
-    </nav>
-    <div class="header-actions">
-      <button class="icon-btn" onclick="openSearch()" aria-label="Qidirish">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      </button>
-      <button class="icon-btn" onclick="openCart()" aria-label="Savat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span class="cart-count" id="cartCount">0</span>
-      </button>
-      <button class="btn btn-primary btn-order" onclick="openCart()">BUYURTMA BERISH</button>
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="mark">Y</div>
+      <div><h1>Yamato Sushi</h1><small>Admin Panel</small></div>
     </div>
-  </div>
-</header>
-
-<!-- ================= HERO ================= -->
-<section class="hero">
-  <div class="wrap hero-grid">
-    <div class="hero-content reveal">
-      <a href="tel:+998876450505" class="hero-badge" style="text-decoration: none;">
-        <span class="pulse" style="background: #2FBF71;"></span> TEL: +998 87 645-05-05
-      </a>
-      
-      <h1 class="h1" style="font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.1;">YAMATO:<br><em>Haqiqiy Yapon ta'mini his qiling!</em></h1>
-      <p class="hero-sub">Yamato•SUSHI•Urgench — yapon oshxonasi. Sushi, roll va setlar. To'y va marosimlar uchun.</p>
-      <div class="hero-cta">
-        <a href="#menu" class="btn btn-red btn-lg">MENYUNI KO'RISH →</a>
-        <a href="#sets" class="btn btn-ghost btn-lg">SETLARNI KO'RISH</a>
+    <h2>Kirish</h2>
+    <p class="sub">Buyurtmalarni boshqarish uchun tizimga kiring.</p>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm" onsubmit="doLogin(event)">
+      <div class="field">
+        <label for="loginUser">Login</label>
+        <input type="text" id="loginUser" placeholder="Login" autocomplete="username" required>
       </div>
-      <div class="hero-meta">
-        <div class="hero-meta-item"><div class="ico">🚚</div><div><b>Urganch bo'ylab</b><small>Yetkazib berish</small></div></div>
-        <div class="hero-meta-item"><div class="ico">⏰</div><div><b>11:00 – 00:00</b><small>Ish vaqti</small></div></div>
-        <div class="hero-meta-item"><div class="ico">💍</div><div><b>To'y va marosim</b><small>Xizmati mavjud</small></div></div>
+      <div class="field">
+        <label for="loginPass">Parol</label>
+        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" required>
       </div>
-    </div>
-    <div class="hero-visual reveal">
-      <div class="hero-img-wrap">
-        <img src="https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&q=80" alt="Yamato Sushi" loading="eager">
-      </div>
-      <div class="hero-float f1">
-        <div class="avatar-stack"><div style="background:#DC1F26">D</div><div style="background:#2FBF71">K</div><div style="background:#E4B15A">A</div></div>
-        <div><b>4 800+</b><br><small class="muted">mamnun mijoz</small></div>
-      </div>
-      <div class="hero-float f2">🎌 <div><b>Yapon oshxonasi</b><br><small class="muted">Xorazm</small></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= CATEGORY ================= -->
-<section style="padding-top:8px;padding-bottom:32px">
-  <div class="wrap">
-    <div class="cat-bar" id="catBar">
-      <button class="cat-chip active" data-cat="all">🍣 Barchasi</button>
-      <button class="cat-chip" data-cat="klassik">🍣 Klassik</button>
-      <button class="cat-chip" data-cat="pishirilgan">🔥 Pishirilgan</button>
-      <button class="cat-chip" data-cat="qovurilgan">🍤 Qovurilgan</button>
-      <button class="cat-chip" data-cat="setlar">🍱 Setlar</button>
-      <button class="cat-chip" data-cat="yangi">🆕 Yangilar</button>
-      <button class="cat-chip" data-cat="maki">🥢 Maki va sushi</button>
-      <button class="cat-chip" data-cat="achchiq">🌶️ Achchiq</button>
-      <button class="cat-chip" data-cat="vegetarian">💚 Vegetarian</button>
-      <button class="cat-chip" data-cat="ichimliklar">🥤 Ichimliklar</button>
-      <button class="cat-chip" data-cat="shirinliklar">🍰 Shirinliklar</button>
-    </div>
-  </div>
-</section>
-
-<!-- ================= BEST ================= -->
-<section id="bestsellers">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <div class="kicker">TOP TANLOV</div>
-        <h2 class="h2">ENG KO'P BUYURTIRILADIGANLAR</h2>
-        <p>Urganchda eng ko'p sevadigan taomlar.</p>
-      </div>
-      <a href="#menu" class="btn btn-ghost">Barchasini ko'rish →</a>
-    </div>
-    <div class="carousel" id="bestCarousel"></div>
-  </div>
-</section>
-
-<!-- ================= SETS ================= -->
-<section id="sets" style="background:var(--washi-2);border-radius:var(--radius-xl) var(--radius-xl) 0 0">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <div class="kicker">SETLAR</div>
-        <h2 class="h2">KO'PROQ SUSHI. KO'PROQ ODAM.</h2>
-        <p>Ko'proq sushi. Ko'proq odam. Ko'proq zavq.</p>
-      </div>
-    </div>
-    <div class="sets-grid" id="setsGrid"></div>
-  </div>
-</section>
-
-<!-- ================= MENU ================= -->
-<section id="menu">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <div class="kicker">TO'LIQ MENYU</div>
-        <h2 class="h2">MENYU</h2>
-        <p>Yangi tayyorlangan. Har kuni.</p>
-      </div>
-    </div>
-    <div class="menu-filters" id="menuFilters">
-      <button class="filter-chip active" data-filter="all">Barchasi</button>
-      <button class="filter-chip" data-filter="klassik">Klassik rollar</button>
-      <button class="filter-chip" data-filter="maki">Maki va sushi</button>
-      <button class="filter-chip" data-filter="opalyon">Kuydirilgan</button>
-      <button class="filter-chip" data-filter="qovurilgan">Qovurilgan</button>
-      <button class="filter-chip" data-filter="wok">Wok va Poke</button>
-      <button class="filter-chip" data-filter="pishirilgan">Pishirilgan</button>
-      <button class="filter-chip" data-filter="setlar">Setlar</button>
-      <button class="filter-chip" data-filter="yangi">Yangilar</button>
-      <button class="filter-chip" data-filter="ichimliklar">Ichimliklar</button>
-      <button class="filter-chip" data-filter="choy">Choy</button>
-      <button class="filter-chip" data-filter="shirinliklar">Shirinliklar</button>
-    </div>
-    <div class="grid-products" id="menuGrid"></div>
-  </div>
-</section>
-
-<!-- ================= WEDDING ================= -->
-<section id="wedding" style="padding-top:0">
-  <div class="wrap">
-    <div class="wedding reveal">
-      <div class="kicker">TO'Y VA MAROSIMLAR</div>
-      <h2>TO'YINGIZNI YAMATO BILAN O'TKAZING</h2>
-      <p>Katta buyurtmalar, to'y va marosimlar uchun maxsus taklif. Sushi-bar xizmati, brendlangan stend va professional xizmat.</p>
-      <div class="wedding-info">
-        <div class="w-card"><div class="w-ico">🍣</div><div><small>Sushi-bar xizmati</small><b>To'yda jonli sushi</b></div></div>
-        <div class="w-card"><div class="w-ico">📋</div><div><small>Maxsus menyu</small><b>Sizga moslashtirilgan</b></div></div>
-        <div class="w-card"><div class="w-ico">📞</div><div><small>Buyurtma uchun</small><b><a href="tel:+998944900555" style="color:#E4B15A">+998 94 490 05 55</a></b></div></div>
-        <div class="w-card"><div class="w-ico">💳</div><div><small>To'lov</small><small>Naqd / Karta / Click</small></div></div>
-      </div>
-      <div class="wedding-cta">
-        <a href="tel:+998944900555" class="btn btn-red btn-lg">📞 Qo'ng'iroq qilish</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= DELIVERY ================= -->
-<section id="delivery">
-  <div class="wrap">
-    <div class="delivery reveal">
-      <div class="kicker">YETKAZIB BERISH</div>
-      <h2 class="h2">URGANCH BO'YLAB YETKAZIB BERAMIZ</h2>
-      <div class="del-grid">
-        <div class="del-item"><div class="ico">🚚</div><h3>30–45 daqiqa</h3><p>Urganch shahri bo'ylab o'rtacha yetkazib berish vaqti.</p></div>
-        <div class="del-item"><div class="ico">🕐</div><h3>11:00 – 00:00</h3><p>Har kuni, dam olish kunlarisiz.</p></div>
-        <div class="del-item"><div class="ico">📦</div><h3>Issiq va yangi</h3><p>Har bir buyurtma ehtiyotkorlik bilan qadoqlanadi.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= STORY ================= -->
-<section id="about">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <div class="kicker">BIZ HAQIMIZDA</div>
-        <h2 class="h2">YAMATO NIMA?</h2>
-        <p>"Yamato — bu yapon an'analari va zamonaviy did."</p>
-      </div>
-    </div>
-    <div class="brand-story reveal">
-      <div class="story-card">
-        <img src="https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=500&q=80" alt="Yangi masalliqlar" loading="lazy">
-        <div class="label">Yangi masalliqlar</div>
-      </div>
-      <div class="story-card">
-        <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=500&q=80" alt="Toza tayyorlash" loading="lazy">
-        <div class="label">Toza tayyorlash</div>
-      </div>
-      <div class="story-card">
-        <img src="https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=500&q=80" alt="Chiroyli qadoqlash" loading="lazy">
-        <div class="label">Chiroyli qadoqlash</div>
-      </div>
-      <div class="story-card">
-        <img src="https://images.unsplash.com/photo-1607330289024-1535c6b4e1c1?w=500&q=80" alt="Tez yetkazish" loading="lazy">
-        <div class="label">Tez yetkazish</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= PACKAGING ================= -->
-<section id="packaging" style="padding-top:0">
-  <div class="wrap">
-    <div class="packaging reveal">
-      <div>
-        <div class="kicker" style="color:var(--gold)">QADOQLASH</div>
-        <h2 class="h2">HAR BIR ROLL — SAN'AT ASARI.</h2>
-        <p>Har bir boks brendlangan qutida, tayoqchalar, soya sousi, wasabi va zanjabil bilan birga keladi.</p>
-        <div class="tags"><span>MADE FOR DELIVERY.</span><span>MADE FOR PHOTOS.</span><span>MADE FOR SHARING.</span></div>
-        <a href="#menu" class="btn btn-red">BUYURTMA BERISH →</a>
-      </div>
-      <div class="packaging-img">
-        <img src="https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=800&q=80" alt="Yamato qadoqlash" loading="lazy">
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= CULTURE ================= -->
-<section id="culture" style="padding-top:0">
-  <div class="wrap">
-    <div class="culture reveal">
-      <h2>SUSHI <em>- BU KAYFIYAT.</em></h2>
-      <p>Urganch kechalari, do'stlar va yapon taomlari. Yamato — bu kayfiyat.</p>
-      <div class="culture-gallery">
-        <div><img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&q=80" alt="" loading="lazy"></div>
-        <div><img src="https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=400&q=80" alt="" loading="lazy"></div>
-        <div><img src="https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=400&q=80" alt="" loading="lazy"></div>
-        <div><img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=400&q=80" alt="" loading="lazy"></div>
-        <div><img src="https://images.unsplash.com/photo-1607330289024-1535c6b4e1c1?w=400&q=80" alt="" loading="lazy"></div>
-        <div><img src="https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400&q=80" alt="" loading="lazy"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= INSTAGRAM ================= -->
-<section id="instagram">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <div class="kicker">INSTAGRAM</div>
-        <h2 class="h2">@sushi_yamato_</h2>
-        <p>Buyurtma qilishdan oldin ko'rib oling. 4 853 obunachi.</p>
-      </div>
-      <a href="https://instagram.com/sushi_yamato_" target="_blank" class="btn btn-ghost">INSTAGRAM →</a>
-    </div>
-    <div class="ig-grid reveal">
-      <div class="ig-item"><img src="https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&q=80" alt="" loading="lazy"><div class="ig-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/></svg></div></div>
-      <div class="ig-item"><img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=400&q=80" alt="" loading="lazy"><div class="ig-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/></svg></div></div>
-      <div class="ig-item"><img src="https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=400&q=80" alt="" loading="lazy"><div class="ig-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/></svg></div></div>
-      <div class="ig-item"><img src="https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=400&q=80" alt="" loading="lazy"><div class="ig-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/></svg></div></div>
-      <div class="ig-item"><img src="https://images.unsplash.com/photo-1607330289024-1535c6b4e1c1?w=400&q=80" alt="" loading="lazy"><div class="ig-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/></svg></div></div>
-      <div class="ig-item"><img src="https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400&q=80" alt="" loading="lazy"><div class="ig-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/></svg></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= REVIEWS ================= -->
-<section id="reviews" style="padding-top:0">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <div class="kicker">SHARHLAR</div>
-        <h2 class="h2">URGANCHLIKLAR NIMA DEYDI?</h2>
-      </div>
-    </div>
-    <div class="reviews-grid" id="reviewsGrid"></div>
-  </div>
-</section>
-
-<!-- ================= LOCATION ================= -->
-<section id="location" style="padding-top:0">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div>
-        <div class="kicker">MANZIL</div>
-        <h2 class="h2">BIZNING MANZIL</h2>
-        <p>Urganch shahridagi restoranimiz.</p>
-      </div>
-    </div>
-    <div class="location-card reveal">
-      <div class="location-map">
-        <img src="https://static-maps.yandex.ru/1.x/?ll=60.625196,41.556795&z=16&size=650,450&l=map&pt=60.625196,41.556795,pm2rdm" alt="Xarita" loading="lazy">
-      </div>
-      <div class="location-info">
-        <h3>Yamato Sushi — Urganch</h3>
-        <div class="loc-row">
-          <div class="loc-ico"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
-          <div class="loc-text"><small>Shahar</small><b>Urganch, Xorazm viloyati</b></div>
-        </div>
-        <div class="loc-row">
-          <div class="loc-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-          <div class="loc-text"><small>Ish vaqti</small><b>Har kuni, 11:00 – 00:00</b></div>
-        </div>
-        <div class="loc-row">
-          <div class="loc-ico"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></svg></div>
-          <div class="loc-text"><small>Buyurtma</small><b><a href="tel:+998876450505">+998 87 645-05-05</a></b></div>
-        </div>
-        <div class="loc-row">
-          <div class="loc-ico">💍</div>
-          <div class="loc-text"><small>To'y va marosimlar</small><b><a href="tel:+998944900555">+998 94 490 05 55</a></b></div>
-        </div>
-        <div class="loc-actions">
-          <a href="tel:+998876450505" class="btn btn-red">📞 Qo'ng'iroq qilish</a>
-          <a href="https://yandex.uz/maps/org/sushi_yamato/137706105591/?ll=60.625196%2C41.556795&z=16.63" target="_blank" class="btn btn-ghost">Xaritada ko'rish →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= FOOTER ================= -->
-<footer class="footer">
-  <div class="wrap">
-    <div class="footer-grid">
-      <div>
-        <div class="logo"><img src="images/logo.png" alt="Yamato" class="logo-mark">sushi_yamato_</div>
-        <p class="tagline">Yamato•SUSHI•Urgench. Yapon oshxonasi. Har kuni 11:00 – 00:00.</p>
-        <div class="socials">
-          <a href="https://instagram.com/sushi_yamato_" target="_blank" aria-label="Instagram"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="#fff"/></svg></a>
-          <a href="tel:+998876450505" aria-label="Phone"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></svg></a>
-        </div>
-      </div>
-      <div>
-        <h4>Menyu</h4>
-        <ul>
-          <li><a href="#menu">Menyu</a></li>
-          <li><a href="#sets">Setlar</a></li>
-          <li><a href="#about">Biz haqimizda</a></li>
-          <li><a href="#wedding">To'y uchun</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Kompaniya</h4>
-        <ul>
-          <li><a href="#about">Biz haqimizda</a></li>
-          <li><a href="#delivery">Yetkazib berish</a></li>
-          <li><a href="#location">Manzil</a></li>
-          <li><a href="https://instagram.com/sushi_yamato_" target="_blank">Instagram</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Aloqa</h4>
-        <ul>
-          <li><a href="tel:+998876450505">+998 87 645-05-05</a></li>
-          <li><a href="tel:+998944900555">+998 94 490 05 55</a></li>
-          <li><a href="#">Urganch, Xorazm</a></li>
-          <li><a href="#">11:00 – 00:00</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div>© 2026 sushi_yamato. Barcha huquqlar himoyalangan. Urganch, O'zbekiston.</div>
-    </div>
-  </div>
-</footer>
-
-<div class="spacer-mob"></div>
-<div class="overlay" id="overlay" onclick="closeAll()"></div>
-
-<!-- ================= CART DRAWER ================= -->
-<aside class="drawer" id="cartDrawer">
-  <div class="drawer-head">
-    <h3>🛒 SAVAT</h3>
-    <button class="close" onclick="closeCart()" aria-label="Yopish"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-  </div>
-  <div class="drawer-body" id="cartBody"></div>
-  <div class="drawer-foot" id="cartFoot" style="display:none">
-    <div class="sum-row"><span>Mahsulotlar</span><b id="sumItems">0 UZS</b></div>
-    <div class="sum-row"><span>Yetkazib berish</span><b id="sumDelivery">15 000 UZS</b></div>
-    <div class="sum-row total"><span>Jami</span><b id="sumTotal">0 UZS</b></div>
-    <button class="btn btn-red btn-lg" onclick="openCheckout()">BUYURTMANI RASMIYLASHTIRISH →</button>
-  </div>
-</aside>
-
-<!-- ================= MODALS ================= -->
-<div class="modal" id="productModal">
-  <div class="modal-bg" onclick="closeModal('productModal')"></div>
-  <div class="modal-panel">
-    <button class="modal-close" onclick="closeModal('productModal')" aria-label="Yopish"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    <div class="modal-scroll" id="productModalBody"></div>
+      <button type="submit" class="btn btn-primary" id="loginBtn">KIRISH →</button>
+    </form>
   </div>
 </div>
 
-<div class="modal" id="searchModal">
-  <div class="modal-bg" onclick="closeModal('searchModal')"></div>
-  <div class="search-panel">
-    <div class="search-head">
-      <svg viewBox="0 0 24 24" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="text" id="searchInput" placeholder="Sushi, set yoki taom qidiring..." autocomplete="off" aria-label="Qidirish">
-      <button onclick="closeModal('searchModal')" aria-label="Yopish"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    </div>
-    <div class="search-body" id="searchBody"></div>
-  </div>
-</div>
+<div id="dashboard">
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="mark">Y</div>
+        <div>Yamato Admin<small>Buyurtmalar</small></div>
+      </div>
+      <div class="header-actions">
+        <div class="header-user"><div class="av">A</div><span id="userName">admin</span></div>
+        
+        <!-- KALENDAR -->
+        <button class="icon-btn" onclick="openCalendar()" title="Sanani tanlash">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </button>
 
-<div class="modal" id="checkoutModal">
-  <div class="modal-bg" onclick="closeModal('checkoutModal')"></div>
-  <div class="checkout-panel">
-    <button class="modal-close" onclick="closeModal('checkoutModal')" aria-label="Yopish"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    <div class="checkout-head">
-      <h3>Buyurtmani rasmiylashtirish</h3>
-      <p>Ma'lumotlaringizni to'ldiring va buyurtmani tasdiqlang.</p>
-    </div>
-    <div class="checkout-body">
-      <div class="step">
-        <div class="step-title"><div class="num">1</div><h4>MANZIL</h4></div>
-        <div class="field"><label for="ckName">Ism</label><input type="text" id="ckName" placeholder="Ismingiz" autocomplete="name"></div>
-        <div class="field"><label for="ckPhone">Telefon</label><input type="tel" id="ckPhone" placeholder="+998 __ ___-__-__" oninput="maskPhone(this)" autocomplete="tel"></div>
-        <div class="field-row">
-          <div class="field"><label for="ckCity">Shahar</label>
-            <select id="ckCity">
-              <option value="Urganch">Urganch shahri</option>
-            </select>
+        <div style="position: relative;">
+          <button class="icon-btn" onclick="toggleDotsMenu()" title="Qo'shimcha">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+          </button>
+          <div id="dotsMenu" style="display:none; position:absolute; top:100%; right:0; background:var(--white); border-radius:12px; box-shadow:var(--shadow-md); border:1px solid var(--line); padding:8px; width:220px; z-index:100; margin-top:8px;">
+            <button onclick="openAddProductModal()" style="width:100%; text-align:left; padding:12px 14px; border-radius:8px; font-weight:600; font-size:0.9rem;">➕ Mahsulot qo'shish</button>
+            <button onclick="openProductsListModal()" style="width:100%; text-align:left; padding:12px 14px; border-radius:8px; font-weight:600; font-size:0.9rem;">📋 Mahsulotlar ro'yxati</button>
           </div>
-          <div class="field"><label for="ckHouse">Uy / Kvartira</label><input type="text" id="ckHouse" placeholder="12, 45"></div>
         </div>
-        <div class="field"><label for="ckAddr">Ko'cha nomi</label><input type="text" id="ckAddr" placeholder="Ko'cha nomi" autocomplete="street-address"></div>
-        <div class="field">
-          <label for="ckLandmark">Aniq manzil / Mo'ljal (majburiy)</label>
-          <input type="text" id="ckLandmark" placeholder="Masalan: Cholish bozori yoni, 11-uy" required>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-title"><div class="num">2</div><h4>YETKAZIB BERISH</h4></div>
-        <div class="time-options">
-          <div class="time-opt active" onclick="selectTime(this)">⚡ Hozir</div>
-          <div class="time-opt" onclick="selectTime(this)">🕐 Keyinroq</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-title"><div class="num">3</div><h4>TO'LOV</h4></div>
-        <div class="pay-options">
-          <div class="pay-opt active" data-pay="cash" onclick="selectPay(this, 'cash')">💵 Naqd (kuryerga)</div>
-          <div class="pay-opt" data-pay="click" onclick="selectPay(this, 'online')">📱 Click</div>
-          <div class="pay-opt" data-pay="payme" onclick="selectPay(this, 'online')">📱 Payme</div>
-          <div class="pay-opt" data-pay="karta" onclick="selectPay(this, 'online')">💳 Karta</div>
-        </div>
-        <div class="field" id="receiptField" style="display:none; margin-top: 15px; background: #fff3cd; padding: 15px; border-radius: 12px;">
-          <label style="color: #856404;">📸 To'lov cheki (skrinshot)</label>
-          <p style="font-size: 0.75rem; color: #856404; margin-bottom: 10px;">
-            To'lov qilganingizdan so'ng, <b>chek skrinshotini yuklang!</b>
-          </p>
-          <input type="file" id="ckReceipt" accept="image/*" style="width: 100%; padding: 8px; border: 1px dashed #856404; border-radius: 8px;">
-        </div>
+        <button class="icon-btn" onclick="doLogout()" title="Chiqish">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+        </button>
       </div>
     </div>
-    <div class="checkout-foot">
-      <div class="sum-row total" style="border:none;padding:0;margin-bottom:14px"><span>Jami</span><b id="ckTotal">0 UZS</b></div>
-      <button class="btn btn-red btn-lg" onclick="placeOrder()">BUYURTMA BERISH →</button>
+  </header>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat c1"><div class="ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><div class="label">Bugungi buyurtmalar</div><div class="value" id="statTodayOrders">0</div></div>
+      <div class="stat c2"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="label">Bugungi summa</div><div class="value" id="statTodaySum">0</div></div>
+      
+      <div class="stat c3"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div class="label">Jami buyurtma</div><div class="value" id="statTotal">0</div></div>
+      <div class="stat c4"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div><div class="label">Jami summa</div><div class="value" id="statTotalSum">0</div></div>
+    </div>
+
+    <div class="filters" id="filters">
+      <button class="chip active" data-status="all">Barchasi <span class="count" id="c-all">0</span></button>
+      <button class="chip" data-status="new">🆕 Yangi <span class="count" id="c-new">0</span></button>
+      <button class="chip" data-status="accepted">✅ Qabul <span class="count" id="c-accepted">0</span></button>
+      <button class="chip" data-status="cooking">🔥 Tayyorlanmoqda <span class="count" id="c-cooking">0</span></button>
+      <button class="chip" data-status="delivering">🚚 Yetkazilmoqda <span class="count" id="c-delivering">0</span></button>
+      <button class="chip" data-status="done">✔️ Yakunlangan <span class="count" id="c-done">0</span></button>
+      <button class="chip" data-status="cancelled">❌ Bekor <span class="count" id="c-cancelled">0</span></button>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" placeholder="Buyurtma raqami, ism yoki telefon..." oninput="renderOrders()">
+      </div>
+      <button class="refresh-btn" id="refreshBtn" onclick="loadOrders(true)">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        Yangilash
+      </button>
+    </div>
+
+    <div id="ordersContainer">
+      <div class="loading"><div class="spinner"></div><span>Yuklanmoqda...</span></div>
     </div>
   </div>
-</div>
-
-<div class="modal" id="trackModal">
-  <div class="modal-bg" onclick="closeModal('trackModal')"></div>
-  <div class="track-panel">
-    <button class="modal-close" onclick="closeModal('trackModal')" aria-label="Yopish"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    <div class="track-head" id="trackHead"></div>
-    <div class="track-body" id="trackBody"></div>
-  </div>
-</div>
-
-<!-- ================= MOBILE NAV ================= -->
-<nav class="mob-nav">
-  <button onclick="scrollTop(event)" class="active"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M9 21V12h6v9"/></svg><span>Bosh sahifa</span></button>
-  <button onclick="scrollToId('menu')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Menyu</span></button>
-  <button onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Qidirish</span></button>
-  <button onclick="openCart()"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Savat</span><span class="mcart-count" id="mCartCount">0</span></button>
-  <button onclick="scrollToId('location')"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Manzil</span></button>
-</nav>
-
-<div class="sticky-cart" id="stickyCart">
-  <div><small>Savat</small><b id="stickyTotal">0 UZS</b></div>
-  <button class="go" onclick="openCart()">Ko'rish →</button>
 </div>
 
 <div class="toast-wrap" id="toastWrap"></div>
 
-<script src="app.js"></script>
+<!-- TASDIQLASH MODAL -->
+<div class="modal-overlay" id="customModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Tasdiqlash</h3>
+    <p id="modalDesc">Haqiqatan ham bu amalni bajarmoqchimisiz?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCustomModal()">Bekor qilish</button>
+      <button class="btn-confirm" id="modalConfirmBtn">Ha, davom etish</button>
+    </div>
+  </div>
+</div>
+
+<!-- KALENDAR MODAL -->
+<div class="modal-overlay" id="calendarModal">
+  <div class="modal-box">
+    <h3>Sana bo'yicha filtrlash</h3>
+    <p>Buyurtmalarni ko'rish uchun sanani tanlang.</p>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+      <input type="date" id="filterDate" style="padding: 10px; border-radius: 8px; border: 1px solid var(--line-2); font-family: inherit; width: 100%; outline: none;">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="clearDateFilter()">Barchasini ko'rish</button>
+      <button class="btn-confirm" style="background: var(--blue);" onclick="applyDateFilter()">Ko'rish</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAHSULOT QO'SHISH MODAL -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal-box" style="text-align: left;">
+    <h3 style="text-align:center;">Yangi mahsulot</h3>
+    <div class="field"><label>Nomi (Rus tilida)</label><input type="text" id="npName" placeholder="Masalan: Ролл Филадельфия"></div>
+    <div class="field"><label>Masalliqlar (Tavsif)</label><input type="text" id="npDesc" placeholder="Рис, Лосось..."></div>
+    <div class="field-row">
+      <div class="field"><label>Narxi</label><input type="number" id="npPrice" placeholder="75000"></div>
+      <div class="field"><label>Rasm</label><input type="file" id="npImgFile" accept="image/*" style="padding: 10px; background: var(--washi); border: 1px dashed var(--line-2); border-radius: 8px;"></div>
+    </div>
+    <div class="field">
+      <label>Kategoriyasi</label>
+      <select id="npCat" style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid var(--line-2); background:var(--white); font-size:.94rem; outline:none;">
+        <option value="klassik">Klassik</option>
+        <option value="pishirilgan">Pishirilgan</option>
+        <option value="qovurilgan">Qovurilgan</option>
+        <option value="setlar">Setlar</option>
+        <option value="ichimliklar">Ichimliklar</option>
+        <option value="shirinliklar">Shirinliklar</option>
+      </select>
+    </div>
+    <div class="modal-actions" style="margin-top:20px;">
+      <button class="btn-cancel" onclick="closeModalBox('addProductModal')">Bekor</button>
+      <button class="btn-confirm" style="background:var(--matcha);" onclick="saveNewProduct()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAHSULOTLAR RO'YXATI MODAL -->
+<div class="modal-overlay" id="productsListModal">
+  <div class="modal-box" style="text-align: left; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;">
+    <h3 style="text-align:center; margin-bottom: 15px;">Mahsulotlar ro'yxati</h3>
+    
+    <div style="padding: 0 0 15px 0; position: relative;">
+      <svg style="position:absolute; left:12px; top:12px; width:16px; height:16px; stroke:var(--muted); fill:none; stroke-width:2;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="adminProductSearch" placeholder="Mahsulot nomini qidirish..." oninput="renderAdminProducts()" style="width:100%; padding:10px 10px 10px 36px; border-radius:8px; border:1px solid var(--line-2); font-size:0.9rem; outline:none;">
+    </div>
+
+    <div id="productsListContainer" style="overflow-y: auto; flex: 1; margin-bottom: 20px; padding-right: 5px;"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeModalBox('productsListModal')">Yopish</button></div>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+const TOKEN_KEY = 'yamato_admin_token';
+let STATE = { orders: [], stats: null, filter: 'all', loading: false, refreshInterval: null };
+let modalCallback = null;
+let SELECTED_DATE = null; 
+
+let ADMIN_PRODUCTS = []; // Mahsulotlarni qidiruv uchun global massiv
+
+function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
+function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
+function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
+
+// OVOZ BILDIRISHNOMASI
+function playSound() { 
+  try { 
+    const audio = new Audio('/admin/ding.mp3'); 
+    audio.play().catch(e => console.log("Ovoz bloklandi.", e)); 
+  } catch (e) {} 
+}
+
+// ================= KALENDAR =================
+function openCalendar() { 
+  if (SELECTED_DATE) document.getElementById('filterDate').value = SELECTED_DATE; 
+  document.getElementById('calendarModal').classList.add('show'); 
+}
+function closeCalendar() { 
+  document.getElementById('calendarModal').classList.remove('show'); 
+}
+function applyDateFilter() {
+  const dateVal = document.getElementById('filterDate').value;
+  if (!dateVal) return;
+  SELECTED_DATE = dateVal; 
+  closeCalendar(); 
+  renderOrders();
+  updateStatsForDate(dateVal);
+  toast(`${SELECTED_DATE} sanasidagi ma'lumotlar`, 'success');
+}
+function clearDateFilter() { 
+  SELECTED_DATE = null; 
+  closeCalendar();
+  renderOrders(); 
+  renderStats(); 
+  toast('Barcha buyurtmalar ko\'rsatilmoqda', 'success');
+}
+function updateStatsForDate(dateStr) {
+  let daySum = 0, dayCount = 0;
+  STATE.orders.forEach(o => {
+    if (o.created_at && o.created_at.startsWith(dateStr) && o.status !== 'cancelled') { 
+      dayCount++; 
+      daySum += Number(o.total) || 0; 
+    }
+  });
+  document.getElementById('statTodayOrders').textContent = dayCount;
+  document.getElementById('statTodaySum').textContent = fmtShort(daySum);
+}
+// ============================================
+
+function customConfirm(title, desc, callback) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('customModal').classList.add('show');
+  modalCallback = callback;
+}
+function closeCustomModal() { document.getElementById('customModal').classList.remove('show'); modalCallback = null; }
+document.getElementById('modalConfirmBtn').addEventListener('click', () => { if (modalCallback) modalCallback(); closeCustomModal(); });
+
+function toggleDotsMenu() { const menu = document.getElementById('dotsMenu'); menu.style.display = menu.style.display === 'none' ? 'block' : 'none'; }
+document.addEventListener('click', (e) => { const menu = document.getElementById('dotsMenu'); if (menu && !e.target.closest('#dotsMenu') && !e.target.closest('.icon-btn')) menu.style.display = 'none'; });
+function openAddProductModal() { document.getElementById('dotsMenu').style.display = 'none'; document.getElementById('addProductModal').classList.add('show'); }
+function closeModalBox(id) { document.getElementById(id).classList.remove('show'); }
+
+async function saveNewProduct() {
+  const name = document.getElementById('npName').value.trim();
+  let desc = document.getElementById('npDesc').value.trim();
+  const price = document.getElementById('npPrice').value;
+  const cat = document.getElementById('npCat').value;
+  const fileInput = document.getElementById('npImgFile');
+
+  // Xatolikni oldini olish (undefined yozilmasligi uchun)
+  if (desc === 'undefined' || desc === 'null') desc = '';
+
+  if (!name || !price || !fileInput.files[0]) { toast('Nomi, narxi va rasmni tanlang!', 'error'); return; }
+  const file = fileInput.files[0];
+  if (file.size > 2 * 1024 * 1024) { toast('Rasm hajmi 2MB dan oshmasligi kerak!', 'error'); return; }
+  
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64Image = e.target.result;
+    const newProduct = { id: "prod-" + Date.now(), name, desc: desc, price: Number(price), pieces: 0, cat: [cat, "yangi"], badge: "new", img: base64Image };
+    try {
+      const res = await apiFetch('/products', { method: 'POST', body: JSON.stringify(newProduct) });
+      if (res.success) {
+        toast('Mahsulot saqlandi!', 'success'); closeModalBox('addProductModal');
+        document.getElementById('npName').value = ''; document.getElementById('npDesc').value = '';
+        document.getElementById('npPrice').value = ''; document.getElementById('npImgFile').value = '';
+      } else { toast(res.error || 'Xatolik', 'error'); }
+    } catch (err) { toast('Server bilan aloqa yo\'q', 'error'); }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function openProductsListModal() {
+  document.getElementById('dotsMenu').style.display = 'none';
+  const container = document.getElementById('productsListContainer');
+  container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  document.getElementById('productsListModal').classList.add('show');
+  document.getElementById('adminProductSearch').value = '';
+  
+  try {
+    const res = await fetch('/api/products');
+    const data = await res.json();
+    if (data.success && data.products) {
+      ADMIN_PRODUCTS = data.products;
+      renderAdminProducts();
+    } else { container.innerHTML = '<p style="text-align:center;">Mahsulotlar yo\'q</p>'; }
+  } catch (e) { container.innerHTML = '<p style="text-align:center; color:var(--red);">Xatolik</p>'; }
+}
+
+function renderAdminProducts() {
+  const container = document.getElementById('productsListContainer');
+  const q = document.getElementById('adminProductSearch').value.trim().toLowerCase();
+  
+  const filtered = ADMIN_PRODUCTS.filter(p => 
+    p.name && p.name.toLowerCase().includes(q)
+  );
+
+  if (!filtered.length) {
+    container.innerHTML = '<p style="text-align:center; padding:20px 0;">Mahsulot topilmadi</p>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(p => `
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px; border-bottom:1px solid var(--line);">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img src="${p.img || 'images/placeholder.webp'}" onerror="this.src='images/placeholder.webp'" style="width:40px; height:40px; object-fit:contain; background:#fff; border-radius:6px;">
+        <div><div style="font-weight:600; font-size:0.9rem;">${escapeHtml(p.name)}</div><div style="font-size:0.8rem; color:var(--muted);">${fmt(p.price)}</div></div>
+      </div>
+      <button onclick="deleteProduct('${p.id}')" style="background:var(--red); color:#fff; padding:6px 12px; border-radius:6px; font-size:0.8rem; font-weight:bold; cursor:pointer;">O'chirish</button>
+    </div>`).join('');
+}
+
+async function deleteProduct(id) {
+  customConfirm('Mahsulotni o\'chirish', 'Haqiqatan ham bu mahsulotni o\'chirmoqchimisiz?', async () => {
+    try {
+      const res = await apiFetch('/products', { method: 'DELETE', body: JSON.stringify({ id }) });
+      if (res.success) { toast('O\'chirildi', 'success'); openProductsListModal(); }
+      else { toast(res.error || 'Xatolik', 'error'); }
+    } catch (e) { toast('Server bilan aloqa yo\'q', 'error'); }
+  });
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginError');
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  err.classList.remove('show'); btn.disabled = true; btn.textContent = 'Tekshirilmoqda...';
+  try {
+    const res = await fetch(`${API}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+    const data = await res.json();
+    if (data.success && data.token) { setToken(data.token); showDashboard(data.user); }
+    else { err.textContent = data.error || 'Login xato'; err.classList.add('show'); }
+  } catch (e) { err.textContent = 'Server bilan aloqa yo\'q'; err.classList.add('show'); }
+  finally { btn.disabled = false; btn.textContent = 'KIRISH →'; }
+}
+
+function doLogout() {
+  clearToken(); localStorage.removeItem('yamato_seen_orders');
+  if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
+  document.getElementById('dashboard').classList.remove('show');
+  document.getElementById('loginScreen').classList.remove('hide');
+  document.getElementById('loginForm').reset();
+}
+
+function showDashboard(user) {
+  document.getElementById('loginScreen').classList.add('hide');
+  document.getElementById('dashboard').classList.add('show');
+  if (user) document.getElementById('userName').textContent = user;
+  loadOrders(true);
+  if (STATE.refreshInterval) clearInterval(STATE.refreshInterval);
+  STATE.refreshInterval = setInterval(() => loadOrders(false), 15000);
+}
+
+async function apiFetch(path, options = {}) {
+  const token = getToken();
+  const res = await fetch(`${API}${path}`, { ...options, headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}), ...(options.headers || {}) } });
+  if (res.status === 401) { doLogout(); toast('Sessiya tugadi', 'error'); throw new Error('Unauthorized'); }
+  return res.json();
+}
+
+async function loadOrders(showLoading = false) {
+  if (STATE.loading) return; STATE.loading = true;
+  const btn = document.getElementById('refreshBtn');
+  if (showLoading) {
+    btn.classList.add('spinning');
+    document.getElementById('ordersContainer').innerHTML = '<div class="loading"><div class="spinner"></div><span>Yuklanmoqda...</span></div>';
+  }
+  try {
+    const [ordersData, statsData, cancelledData] = await Promise.all([
+      apiFetch('/orders?status=all'),
+      apiFetch('/orders?stats=1'),
+      apiFetch('/orders?status=cancelled')
+    ]);
+    
+    if (ordersData.success) {
+      const newOrders = ordersData.orders || [];
+      let savedIdsStr = localStorage.getItem('yamato_seen_orders');
+      let savedIds = [];
+      if (savedIdsStr) {
+        savedIds = JSON.parse(savedIdsStr); let hasNew = false;
+        newOrders.forEach(o => { if (!savedIds.includes(o.id)) { savedIds.push(o.id); if (o.status === 'new') hasNew = true; } });
+        if (hasNew) playSound();
+      } else { savedIds = newOrders.map(o => o.id); }
+      localStorage.setItem('yamato_seen_orders', JSON.stringify(savedIds));
+
+      const cancelledOrders = (cancelledData && cancelledData.orders) || [];
+      STATE.orders = [...newOrders, ...cancelledOrders];
+    }
+    if (statsData.success) {
+      STATE.stats = statsData.stats;
+    }
+    
+    if (!SELECTED_DATE) renderStats();
+    renderOrders();
+  } catch (e) { console.warn(e); }
+  finally { STATE.loading = false; btn.classList.remove('spinning'); }
+}
+
+async function changeStatus(id, status) {
+  try {
+    const data = await apiFetch('/update', { method: 'POST', body: JSON.stringify({ id, status }) });
+    if (data.success) { toast('Holat yangilandi', 'success'); loadOrders(false); }
+    else { toast(data.error || 'Xatolik', 'error'); }
+  } catch (e) { toast('Server bilan aloqa yo\'q', 'error'); }
+}
+
+async function deleteOrder(id) {
+  try {
+    const data = await apiFetch('/update', { method: 'POST', body: JSON.stringify({ id, status: 'delete' }) });
+    if (data.success) { toast('Buyurtma o\'chirildi', 'success'); loadOrders(false); }
+    else { toast(data.error || 'Xatolik', 'error'); }
+  } catch (e) { toast('Server bilan aloqa yo\'q', 'error'); }
+}
+
+function renderStats() {
+  const s = STATE.stats || {};
+  document.getElementById('statTodayOrders').textContent = s.todayOrders || 0;
+  document.getElementById('statTodaySum').textContent = fmtShort(s.todaySum || 0);
+  document.getElementById('statTotal').textContent = s.totalOrders || 0;
+  document.getElementById('statTotalSum').textContent = fmtShort(s.totalSum || 0);
+  
+  const byStatus = s.byStatus || {};
+  const all = Object.values(byStatus).reduce((a, b) => a + b, 0);
+  setCount('c-all', all);
+  ['new', 'accepted', 'cooking', 'delivering', 'done'].forEach(st => setCount('c-' + st, byStatus[st] || 0));
+  
+  const cancelledCount = STATE.orders.filter(o => o.status === 'cancelled').length;
+  setCount('c-cancelled', cancelledCount);
+}
+function setCount(id, n) { const el = document.getElementById(id); if (el) el.textContent = n; }
+
+function renderOrders() {
+  const container = document.getElementById('ordersContainer');
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let list = STATE.orders;
+  
+  if (STATE.filter === 'all') list = list.filter(o => o.status !== 'cancelled');
+  else list = list.filter(o => o.status === STATE.filter);
+  
+  if (q) list = list.filter(o => (o.order_num || '').toLowerCase().includes(q) || (o.name || '').toLowerCase().includes(q) || (o.phone || '').toLowerCase().includes(q));
+  
+  if (SELECTED_DATE) {
+    list = list.filter(o => o.created_at && o.created_at.startsWith(SELECTED_DATE));
+  }
+  
+  if (!list.length) {
+    container.innerHTML = `
+      <div class="empty">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <h3>Buyurtma topilmadi</h3>
+        <p>${q ? 'Qidiruv bo\'yicha hech narsa yo\'q' : (SELECTED_DATE ? SELECTED_DATE + ' sanasida buyurtma yo\'q' : 'Hozircha buyurtmalar yo\'q')}</p>
+      </div>`;
+    return;
+  }
+  const currentlyOpenId = container.querySelector('.order.open')?.dataset.id || null;
+  container.innerHTML = list.map(orderHTML).join('');
+  container.querySelectorAll('.order-head').forEach(head => {
+    head.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const orderEl = head.parentElement;
+      if (orderEl.classList.contains('open')) orderEl.classList.remove('open');
+      else { container.querySelectorAll('.order').forEach(o => o.classList.remove('open')); orderEl.classList.add('open'); }
+    });
+  });
+  if (currentlyOpenId) {
+    const openEl = container.querySelector(`.order[data-id="${currentlyOpenId}"]`);
+    if (openEl) openEl.classList.add('open');
+  }
+}
+
+function orderHTML(o) {
+  const statusLabels = { new: 'Yangi', accepted: 'Qabul qilindi', cooking: 'Tayyorlanmoqda', delivering: 'Yetkazilmoqda', done: 'Yakunlangan', cancelled: 'Bekor qilindi' };
+  const statusLabel = statusLabels[o.status] || o.status;
+  const items = Array.isArray(o.items) ? o.items : [];
+  const itemsHTML = items.map(it => `<div class="item-row"><div class="qty">${it.qty}×</div><div class="name">${escapeHtml(it.name)}</div><div class="price">${fmt(it.sum)}</div></div>`).join('');
+  
+  const timeLabel = o.time_type === 'later' ? 'Keyinroq' : 'Hozir';
+  const payLabels = { cash: 'Naqd', karta: 'Karta', click: 'Click', payme: 'Payme' };
+  const payLabel = payLabels[o.pay_type] || o.pay_type;
+
+  const actions = actionsHTML(o);
+  const receiptHTML = o.receipt ? `<div style="margin-top: 15px;"><h4>To'lov cheki (Skrinshot)</h4><a href="${o.receipt}" target="_blank"><img src="${o.receipt}" class="receipt-img"></a></div>` : (o.pay_type === 'cash' ? `<p style="color: var(--muted); font-size: 0.85rem; margin-top: 10px;">💵 Naqd to'lov (chek talab qilinmaydi)</p>` : '');
+  
+  return `
+    <div class="order" data-id="${o.id}">
+      <div class="order-head">
+        ${o.status === 'new' ? '<span class="dot"></span>' : ''}
+        <div class="order-num">${o.order_num}</div>
+        <div class="order-meta"><span><b>${escapeHtml(o.name)}</b></span><span>${escapeHtml(o.phone)}</span><span>${formatDate(o.created_at)}</span></div>
+        <div class="order-total">${fmt(o.total)}</div>
+        <span class="order-status status-${o.status}">${statusLabel}</span>
+        <svg class="order-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="order-body">
+        <div class="order-section">
+          <h4>Mijoz va Manzil</h4>
+          <div class="info-grid">
+            <div class="info-item"><small>Ism</small><b>${escapeHtml(o.name)}</b></div>
+            <div class="info-item"><small>Telefon</small><b><a href="tel:${o.phone}">${escapeHtml(o.phone)}</a></b></div>
+            <div class="info-item"><small>Shahar / Manzil</small><b>${escapeHtml(o.district || '')}, ${escapeHtml(o.addr || '')} ${escapeHtml(o.house || '')}</b></div>
+            <div class="info-item"><small>Mo'ljal</small><b>${escapeHtml(o.landmark || '—')}</b></div>
+            <div class="info-item"><small>Vaqt</small><b>${timeLabel}</b></div>
+            <div class="info-item"><small>To'lov turi</small><b>${payLabel}</b></div>
+          </div>
+          ${receiptHTML}
+        </div>
+        <div class="order-section"><h4>Mahsulotlar (${items.length})</h4><div class="items-list">${itemsHTML}</div></div>
+        <div class="order-section">
+          <h4>Summa</h4>
+          <div class="summary">
+            <div class="sum-row"><span>Mahsulotlar</span><b>${fmt(o.subtotal)}</b></div>
+            <div class="sum-row"><span>Yetkazib berish</span><b>${o.delivery ? fmt(o.delivery) : 'Bepul'}</b></div>
+            <div class="sum-row total"><span>Jami</span><b>${fmt(o.total)}</b></div>
+          </div>
+        </div>
+        <div class="actions">
+          ${actions}
+          <a href="tel:${o.phone}" class="action-btn call"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></svg> Qo'ng'iroq</a>
+        </div>
+      </div>
+    </div>`;
+}
+
+function actionsHTML(o) {
+  const s = o.status;
+  const id = o.id;
+  const btns = [];
+  if (s === 'new') btns.push(`<button class="action-btn accept" onclick="changeStatus(${id},'accepted')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Qabul qilish</button>`);
+  if (s === 'new' || s === 'accepted') btns.push(`<button class="action-btn cook" onclick="changeStatus(${id},'cooking')"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg> Tayyorlash</button>`);
+  if (s === 'cooking') btns.push(`<button class="action-btn deliver" onclick="changeStatus(${id},'delivering')"><svg viewBox="0 0 24 24"><path d="M5 18H3V6h13v12H9"/><path d="M16 8h4l3 4v6h-3"/><circle cx="7.5" cy="18.5" r="1.5"/><circle cx="17.5" cy="18.5" r="1.5"/></svg> Yetkazishga</button>`);
+  if (s === 'delivering') btns.push(`<button class="action-btn done" onclick="changeStatus(${id},'done')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Yakunlash</button>`);
+  if (s !== 'done' && s !== 'cancelled') btns.push(`<button class="action-btn cancel" onclick="customConfirm('Bekor qilish', 'Haqiqatan ham bu buyurtmani bekor qilmoqchimisiz?', () => changeStatus(${id},'cancelled'))"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg> Bekor</button>`);
+  if (s === 'cancelled') btns.push(`<button class="action-btn delete" onclick="customConfirm('Butunlay o\\'chirish', 'Bu buyurtma bazadan butunlay o\\'chib ketadi. Davom etasizmi?', () => deleteOrder(${id}))"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> O'chirish</button>`);
+  return btns.join('');
+}
+
+function fmt(n) { return new Intl.NumberFormat('uz-UZ').format(Math.round(n || 0)) + ' so\'m'; }
+function fmtShort(n) { n = Math.round(n || 0); if (n >= 1000000) return (n / 1000000).toFixed(1) + ' mln'; if (n >= 1000) return (n / 1000).toFixed(0) + 'k'; return String(n); }
+function formatDate(str) {
+  if (!str) return '';
+  const d = new Date(str.replace(' ', 'T') + 'Z');
+  if (isNaN(d)) return str;
+  const now = new Date(); const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return 'hozir';
+  if (diff < 3600) return Math.floor(diff / 60) + ' daq oldin';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' soat oldin';
+  return d.toLocaleDateString('uz-UZ') + ' ' + d.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+}
+function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
+
+function toast(msg, type = 'success') {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<div class="t-ico">✓</div>${msg}`;
+  wrap.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 2600);
+}
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    STATE.filter = chip.dataset.status;
+    renderOrders();
+  });
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  const token = getToken();
+  if (token) {
+    try { const payload = JSON.parse(atob(token.split('.')[1])); showDashboard(payload.user || payload.username || 'admin'); }
+    catch (e) { clearToken(); }
+  }
+});
+</script>
 </body>
 </html>
