@@ -182,9 +182,6 @@ ul{list-style:none}
 
 @media(max-width:640px){
   .header-inner{padding:0 16px;height:62px}
-  .header .logo small{display:none}
-  .header-user span{display:none}
-  .header-user{padding:5px}
   .wrap{padding:20px 16px 50px}
   .order-head{padding:14px 16px;gap:10px}
   .order-body{padding:0 16px 16px}
@@ -352,7 +349,14 @@ ul{list-style:none}
 <!-- MAHSULOTLAR RO'YXATI MODAL -->
 <div class="modal-overlay" id="productsListModal">
   <div class="modal-box" style="text-align: left; max-width: 500px; max-height: 80vh; display: flex; flex-direction: column;">
-    <h3 style="text-align:center;">Mahsulotlar ro'yxati</h3>
+    <h3 style="text-align:center; margin-bottom: 15px;">Mahsulotlar ro'yxati</h3>
+    
+    <!-- QIDIRUV MAYDONI QO'SHILDI -->
+    <div style="padding: 0 0 15px 0; position: relative;">
+      <svg style="position:absolute; left:12px; top:12px; width:16px; height:16px; stroke:var(--muted); fill:none; stroke-width:2;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="adminProductSearch" placeholder="Mahsulot nomini qidirish..." oninput="renderAdminProducts()" style="width:100%; padding:10px 10px 10px 36px; border-radius:8px; border:1px solid var(--line-2); font-size:0.9rem; outline:none;">
+    </div>
+
     <div id="productsListContainer" style="overflow-y: auto; flex: 1; margin-bottom: 20px; padding-right: 5px;"></div>
     <div class="modal-actions"><button class="btn-cancel" onclick="closeModalBox('productsListModal')">Yopish</button></div>
   </div>
@@ -364,6 +368,8 @@ const TOKEN_KEY = 'yamato_admin_token';
 let STATE = { orders: [], stats: null, filter: 'all', loading: false, refreshInterval: null };
 let modalCallback = null;
 let SELECTED_DATE = null; 
+
+let ADMIN_PRODUCTS = []; // Mahsulotlarni qidiruv uchun global massiv
 
 function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
@@ -398,38 +404,19 @@ function clearDateFilter() {
   SELECTED_DATE = null; 
   closeCalendar();
   renderOrders(); 
-  renderStats(); // Bu funksiya joriy (bugungi) statistikani qaytaradi
+  renderStats(); 
   toast('Barcha buyurtmalar ko\'rsatilmoqda', 'success');
 }
 function updateStatsForDate(dateStr) {
   let daySum = 0, dayCount = 0;
-  const byStatus = {};
-  
-  // Tanlangan sana bo'yicha buyurtmalarni filtrlaymiz
-  const filteredOrders = STATE.orders.filter(o => {
-    const orderDate = (o.created_at || o.business_date || '').slice(0, 10);
-    return orderDate === dateStr;
-  });
-
-  // Statistikani hisoblaymiz
-  filteredOrders.forEach(o => {
-    if (o.status !== 'cancelled') {
+  STATE.orders.forEach(o => {
+    if (o.created_at && o.created_at.startsWith(dateStr) && o.status !== 'cancelled') { 
       dayCount++; 
       daySum += Number(o.total) || 0; 
     }
-    // Filtr tugmalari uchun sonlarni hisoblash
-    byStatus[o.status] = (byStatus[o.status] || 0) + 1;
   });
-
-  // Tepadagi kartalarni yangilash
   document.getElementById('statTodayOrders').textContent = dayCount;
   document.getElementById('statTodaySum').textContent = fmtShort(daySum);
-  
-  // Filtr tugmalaridagi sonlarni yangilash (muammo shu yerda hal bo'ladi)
-  const all = Object.values(byStatus).reduce((a, b) => a + b, 0);
-  setCount('c-all', all);
-  ['new', 'accepted', 'cooking', 'delivering', 'done'].forEach(st => setCount('c-' + st, byStatus[st] || 0));
-  setCount('c-cancelled', byStatus['cancelled'] || 0);
 }
 // ============================================
 
@@ -477,20 +464,39 @@ async function openProductsListModal() {
   const container = document.getElementById('productsListContainer');
   container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
   document.getElementById('productsListModal').classList.add('show');
+  document.getElementById('adminProductSearch').value = '';
+  
   try {
     const res = await fetch('/api/products');
     const data = await res.json();
-    if (data.success && data.products.length > 0) {
-      container.innerHTML = data.products.map(p => `
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px; border-bottom:1px solid var(--line);">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <img src="${p.img || 'images/placeholder.webp'}" onerror="this.src='images/placeholder.webp'" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
-            <div><div style="font-weight:600; font-size:0.9rem;">${escapeHtml(p.name)}</div><div style="font-size:0.8rem; color:var(--muted);">${fmt(p.price)}</div></div>
-          </div>
-          <button onclick="deleteProduct('${p.id}')" style="background:var(--red); color:#fff; padding:6px 12px; border-radius:6px; font-size:0.8rem; font-weight:bold; cursor:pointer;">O'chirish</button>
-        </div>`).join('');
+    if (data.success && data.products) {
+      ADMIN_PRODUCTS = data.products;
+      renderAdminProducts();
     } else { container.innerHTML = '<p style="text-align:center;">Mahsulotlar yo\'q</p>'; }
   } catch (e) { container.innerHTML = '<p style="text-align:center; color:var(--red);">Xatolik</p>'; }
+}
+
+function renderAdminProducts() {
+  const container = document.getElementById('productsListContainer');
+  const q = document.getElementById('adminProductSearch').value.trim().toLowerCase();
+  
+  const filtered = ADMIN_PRODUCTS.filter(p => 
+    p.name && p.name.toLowerCase().includes(q)
+  );
+
+  if (!filtered.length) {
+    container.innerHTML = '<p style="text-align:center; padding:20px 0;">Mahsulot topilmadi</p>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(p => `
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px; border-bottom:1px solid var(--line);">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img src="${p.img || 'images/placeholder.webp'}" onerror="this.src='images/placeholder.webp'" style="width:40px; height:40px; object-fit:contain; background:#fff; border-radius:6px;">
+        <div><div style="font-weight:600; font-size:0.9rem;">${escapeHtml(p.name)}</div><div style="font-size:0.8rem; color:var(--muted);">${fmt(p.price)}</div></div>
+      </div>
+      <button onclick="deleteProduct('${p.id}')" style="background:var(--red); color:#fff; padding:6px 12px; border-radius:6px; font-size:0.8rem; font-weight:bold; cursor:pointer;">O'chirish</button>
+    </div>`).join('');
 }
 
 async function deleteProduct(id) {
@@ -559,7 +565,6 @@ async function loadOrders(showLoading = false) {
     
     if (ordersData.success) {
       const newOrders = ordersData.orders || [];
-      // OVOZ BILDIRISHNOMASI MANTIQI
       let savedIdsStr = localStorage.getItem('yamato_seen_orders');
       let savedIds = [];
       if (savedIdsStr) {
