@@ -264,8 +264,9 @@ section{padding:64px 0}
   background:linear-gradient(135deg,#f5efe6,#e8dfd0);
 }
 .p-media img{
-  width:100%;height:100%;object-fit:cover;
+  width:100%;height:100%;object-fit:contain; /* RASMLAR KESILMAYDI */
   display:block;transition:transform .7s var(--ease);
+  padding:10px; /* Chetlardan bo'sh joy */
 }
 .p-card:hover .p-media img{transform:scale(1.07)}
 .p-badges{
@@ -651,7 +652,7 @@ section{padding:64px 0}
   width:72px;height:72px;border-radius:12px;
   overflow:hidden;flex-shrink:0;background:var(--washi-2);
 }
-.cart-item .ci-img img{width:100%;height:100%;object-fit:cover}
+.cart-item .ci-img img{width:100%;height:100%;object-fit:contain;padding:4px}
 .cart-item .info{flex:1;min-width:0}
 .cart-item .name{font-weight:600;font-size:.9rem;margin-bottom:4px}
 .cart-item .piece{font-size:.76rem;color:var(--muted);margin-bottom:8px}
@@ -721,7 +722,7 @@ section{padding:64px 0}
 .pd{display:grid;grid-template-columns:1fr}
 @media(min-width:768px){.pd{grid-template-columns:1fr 1fr}}
 .pd-media{position:relative;aspect-ratio:1/1;background:linear-gradient(135deg,#f5efe6,#e8dfd0)}
-.pd-media img{width:100%;height:100%;object-fit:cover}
+.pd-media img{width:100%;height:100%;object-fit:contain;padding:15px}
 .pd-info{padding:28px;display:flex;flex-direction:column;gap:16px}
 @media(min-width:768px){.pd-info{padding:36px}}
 .pd-info .rating{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted)}
@@ -793,7 +794,7 @@ section{padding:64px 0}
   width:56px;height:56px;border-radius:12px;
   overflow:hidden;flex-shrink:0;background:var(--washi-2);
 }
-.search-result .sr-img img{width:100%;height:100%;object-fit:cover}
+.search-result .sr-img img{width:100%;height:100%;object-fit:contain;padding:4px}
 .search-result .sr-info{flex:1}
 .search-result .sr-info b{font-size:.9rem;display:block}
 .search-result .sr-info small{font-size:.76rem;color:var(--muted)}
@@ -1005,4 +1006,3 @@ section{padding:64px 0}
    ========================================================= */
 .spacer-mob{height:80px}
 @media(min-width:768px){.spacer-mob{display:none}}
-
