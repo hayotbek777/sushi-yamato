@@ -107,7 +107,7 @@ let DEFAULT_PRODUCTS = [
   { "id": "alpen-gold-4567", "name": "Alpen Gold Соленый арахис", "desc": "Молочный шоколад с соленым арахисом и крекером", "price": 25000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold4567.png" },
   { "id": "alpen-gold-max", "name": "Alpen Gold Max Fun", "desc": "Взрывная карамель, мармелад, печенье", "price": 28000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/alpengoldmax.png" },
   { "id": "alpen-gold-oq", "name": "Alpen Gold Миндаль и Кокос", "desc": "Белый шоколад с миндалем и кокосом", "price": 26000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengoldoq.png" },
-  { "id": "bounty-1", "name": "Bounty Trio", "desc": "Кокосовая начинка в молочном шоколаде", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bounty1.png" },
+  { "id": "bounty-1", "name": "Bounty Trio", "desc": "Кокосовая начинка в молочном шоколаде", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bountiy1.png" },
   { "id": "bounty-2", "name": "Bounty", "desc": "Кокосовая начинка в молочном шоколаде", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bounty2.png" },
   { "id": "karak-tea", "name": "GOAL Karak Tea", "desc": "Инстант чай с молоком (1 шт)", "price": 6000, "pieces": 0, "cat": ["choy"], "img": "images/karaktea.png" },
   { "id": "maccoffee", "name": "MacCoffee 3 in 1", "desc": "Кофейный напиток (1 шт)", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/maccoffe.png" },
