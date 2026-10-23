@@ -1,7 +1,9 @@
-import { createOrder, generateOrderNum } from '../lib/db.js';
+/* =========================================================
+   POST /api/order — Yangi buyurtma qabul qilish
+   ========================================================= */
+import { createOrder } from '../lib/db.js';
 
 export default async function handler(req, res) {
-  // CORS sozlamalari
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -27,15 +29,19 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'Savat bo\'sh' });
     }
 
-    const orderNum = generateOrderNum();
+    // 100% TAKRORLANMAYDIGAN RAQAM GENERATSIYASI
+    // Vaqt + 5 xonali tasodifiy harf/raqam
+    const now = new Date();
+    const timeStr = now.getTime().toString().slice(-6); 
+    const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const orderNum = `#YM-${timeStr}-${randomStr}`;
 
     // VAQTNI BIRLASHTIRISH
     let finalTimeType = body.time || 'now';
     if (body.time === 'later' && body.time_value) {
-      finalTimeType = `later|${body.time_value}`;
+      finalTimeType = `later|${body.time_value}`; 
     }
 
-    // Bazaga saqlash
     await createOrder({
       order_num: orderNum,
       name: String(body.name).slice(0, 100),
@@ -44,7 +50,7 @@ export default async function handler(req, res) {
       addr: body.addr || '',
       house: body.house || '',
       landmark: body.landmark || '',
-      time_type: finalTimeType,
+      time_type: finalTimeType, 
       pay_type: body.pay || 'cash',
       receipt: body.receipt || null, 
       items: body.items,
@@ -57,7 +63,6 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Order error:', err);
-    // Agar xato bo'lsa ham, frontendga to'g'ri JSON qaytaramiz
     return res.status(500).json({ success: false, error: 'Server xatosi: ' + err.message });
   }
 }
