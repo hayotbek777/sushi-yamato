@@ -102,30 +102,27 @@ let DEFAULT_PRODUCTS = [
   { "id": "yaprok-choy-065", "name": "Япрок чой", "desc": "0.65 л", "price": 20000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
   { "id": "yaprok-choy-08", "name": "Япрок чой", "desc": "0.8 л", "price": 25000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
 
-   // --- YANGI QO'SHILGAN SHIRINLIKLAR VA SHAKARLAR ---
+  // --- YANGI QO'SHILGAN SHIRINLIKLAR VA SHAKARLAR ---
   { "id": "alpen-gold-1", "name": "Alpen Gold Фундук и Изюм", "desc": "Молочный шоколад с фундуком и изюмом", "price": 25000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/alpengold1.png" },
   { "id": "alpen-gold-2", "name": "Alpen Gold Фундук", "desc": "Молочный шоколад с цельным фундуком", "price": 25000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold2.png" },
   { "id": "alpen-gold-3", "name": "Alpen Gold Молочный", "desc": "Классический молочный шоколад", "price": 22000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold3.png" },
   { "id": "alpen-gold-4567", "name": "Alpen Gold Соленый арахис", "desc": "Молочный шоколад с соленым арахисом и крекером", "price": 25000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold4567.png" },
   { "id": "alpen-gold-max", "name": "Alpen Gold Max Fun", "desc": "Взрывная карамель, мармелад, печенье", "price": 28000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/alpengoldmax.png" },
   { "id": "alpen-gold-oq", "name": "Alpen Gold Миндаль и Кокос", "desc": "Белый шоколад с миндалем и кокосом", "price": 26000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengoldoq.png" },
-  
+
   { "id": "bounty-1", "name": "Bounty Trio", "desc": "Кокосовая начинка в молочном шоколаде", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bounty1.png" },
   { "id": "bounty-2", "name": "Bounty", "desc": "Кокосовая начинка в молочном шоколаде", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bounty2.png" },
-  
+
   { "id": "karak-tea", "name": "GOAL Karak Tea", "desc": "Инстант чай с молоком (1 шт)", "price": 6000, "pieces": 0, "cat": ["choy"], "img": "images/karaktea.png" },
   { "id": "maccoffee", "name": "MacCoffee 3 in 1", "desc": "Кофейный напиток (1 шт)", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/maccoffe.png" },
   { "id": "milka-1", "name": "Milka Alpine Milk", "desc": "Молочный шоколад", "price": 26000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/milka1.png" },
   { "id": "nestle-1", "name": "Nestle Almond & Raisin", "desc": "Молочный шоколад с миндалем и изюмом", "price": 24000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/nestle1.png" },
-  
+
   { "id": "snickers-1", "name": "Snickers", "desc": "Нуга, карамель, арахис", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/snickers1.png" },
   { "id": "snickers-2", "name": "Snickers Super", "desc": "Большой батончик с арахисом", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/snickers2.png" },
-  
-  { "id": "twix-1", "name": "Twix Xtra", "desc": "Печенье, карамель, шоколад", "price": 12000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix1.png" },
-  { "id": "twix-2", "name": "Twix", "desc": "Печенье, карамель, шоколад", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix2.png" },
 
-  { "id": "love-1", "name": "Love is... Арбуз", "desc": "Жевательная резинка без сахара (6 пластинок)", "price": 8000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/5saqich.png" },
-  { "id": "love-2", "name": "Love is... Сладкие ягоды", "desc": "Жевательная резинка без сахара (6 пластинок)", "price": 8000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/5saqich1.png" }
+  { "id": "twix-1", "name": "Twix Xtra", "desc": "Печенье, карамель, шоколад", "price": 12000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix1.png" },
+  { "id": "twix-2", "name": "Twix", "desc": "Печенье, карамель, шоколад", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix2.png" }
 ];
 
 /* =========================================================
@@ -141,7 +138,7 @@ const getP = id => PRODUCTS.find(p => p.id === id);
    ========================================================= */
 let CART = JSON.parse(localStorage.getItem('ym_cart') || '{}');
 let ACTIVE_FILTER = 'all';
-let PRODUCTS = []; 
+let PRODUCTS = [];
 
 const saveCart = () => localStorage.setItem('ym_cart', JSON.stringify(CART));
 const cartCount = () => Object.values(CART).reduce((a, b) => a + b, 0);
@@ -468,9 +465,9 @@ function selectPay(el, type) {
 
   const receiptField = document.getElementById('receiptField');
   if (type === 'online') {
-    receiptField.style.display = 'block'; 
+    receiptField.style.display = 'block';
   } else {
-    receiptField.style.display = 'none';  
+    receiptField.style.display = 'none';
   }
 }
 
@@ -489,7 +486,7 @@ function maskPhone(inp) {
 async function placeOrder() {
   const name = $('#ckName').value.trim();
   const phone = $('#ckPhone').value.trim();
-  const city = $('#ckCity').value; 
+  const city = $('#ckCity').value;
   const house = $('#ckHouse').value.trim();
   const addr = $('#ckAddr').value.trim();
   const landmark = $('#ckLandmark').value.trim();
@@ -500,10 +497,10 @@ async function placeOrder() {
     return;
   }
   if (!addr) { toast('Ko\'cha nomini kiriting'); return; }
-  
-  if (!landmark) { 
-    toast('Iltimos, mo\'ljalni to\'liq kiriting (majburiy)'); 
-    return; 
+
+  if (!landmark) {
+    toast('Iltimos, mo\'ljalni to\'liq kiriting (majburiy)');
+    return;
   }
 
   let receiptBase64 = '';
@@ -529,12 +526,12 @@ async function placeOrder() {
   const total = subtotal + delivery;
 
   const payload = {
-    name, phone, 
-    district: city, 
+    name, phone,
+    district: city,
     addr, house, landmark,
     time: CHECKOUT.time,
     pay: CHECKOUT.pay,
-    receipt: receiptBase64, 
+    receipt: receiptBase64,
     items, subtotal, delivery, total
   };
 
@@ -583,13 +580,13 @@ function openTracking(orderNum, payType) {
     head.style.display = 'none';
     body.innerHTML =
       '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 24px 56px;">' +
-        '<div style="width:120px;height:120px;border-radius:50%;background:#2FBF71;display:grid;place-items:center;box-shadow:0 12px 32px rgba(47,191,113,.35);margin-bottom:28px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);">' +
-          '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-            '<path d="m5 12 5 5L20 7"/>' +
-          '</svg>' +
-        '</div>' +
-        '<div style="font-size:1.4rem;font-weight:800;color:#0E0E10;margin-bottom:8px;">Buyurtma qabul qilindi</div>' +
-        '<div style="font-size:.92rem;color:#8a8a92;">Tez orada siz bilan bog\'lanamiz</div>' +
+      '<div style="width:120px;height:120px;border-radius:50%;background:#2FBF71;display:grid;place-items:center;box-shadow:0 12px 32px rgba(47,191,113,.35);margin-bottom:28px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);">' +
+      '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="m5 12 5 5L20 7"/>' +
+      '</svg>' +
+      '</div>' +
+      '<div style="font-size:1.4rem;font-weight:800;color:#0E0E10;margin-bottom:8px;">Buyurtma qabul qilindi</div>' +
+      '<div style="font-size:.92rem;color:#8a8a92;">Tez orada siz bilan bog\'lanamiz</div>' +
       '</div>' +
       '<style>@keyframes popIn{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}</style>';
   } else {
@@ -600,10 +597,10 @@ function openTracking(orderNum, payType) {
       '<div class="order-num">' + orderNum + '</div>';
     body.innerHTML =
       '<div style="text-align:center;padding:8px 4px 20px">' +
-        '<div style="font-size:1.15rem;font-weight:800;line-height:1.4;margin-bottom:10px">To\'lov qabul qilindi</div>' +
-        '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:22px">' +
-          "Buyurtmangiz tayyorlanmoqda. Operatorimiz chekni tasdiqlash uchun siz bilan bog'lanadi." +
-        '</p>' +
+      '<div style="font-size:1.15rem;font-weight:800;line-height:1.4;margin-bottom:10px">To\'lov qabul qilindi</div>' +
+      '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:22px">' +
+      "Buyurtmangiz tayyorlanmoqda. Operatorimiz chekni tasdiqlash uchun siz bilan bog'lanadi." +
+      '</p>' +
       '</div>';
   }
 
@@ -691,19 +688,19 @@ function toggleFav(e, id) {
    ISHGA TUSHIRISH
    ========================================================= */
 document.addEventListener('DOMContentLoaded', async () => {
-  PRODUCTS = [...DEFAULT_PRODUCTS]; 
+  PRODUCTS = [...DEFAULT_PRODUCTS];
 
   try {
     const res = await fetch('/api/products');
     const data = await res.json();
-    
+
     if (data.success && data.products) {
       data.products.forEach(newP => {
         const idx = PRODUCTS.findIndex(p => p.id === newP.id);
         if (idx !== -1) {
-          PRODUCTS[idx] = newP; 
+          PRODUCTS[idx] = newP;
         } else {
-          PRODUCTS.push(newP); 
+          PRODUCTS.push(newP);
         }
       });
     }
