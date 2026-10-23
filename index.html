@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0E0E10">
 <title>Yamato Sushi — Urganchda yapon oshxonasi</title>
 <meta name="description" content="Yamato Sushi — Urganchda yapon oshxonasi. Sushi, rollar, setlar. Tel: +998 87 645-05-05">
-<link rel="icon" type="image/png" href="images/logo2.png">
+<link rel="icon" type="image/png" href="images/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -444,8 +444,15 @@
       <div class="step">
         <div class="step-title"><div class="num">2</div><h4>YETKAZIB BERISH</h4></div>
         <div class="time-options">
-          <div class="time-opt active" onclick="selectTime(this)">⚡ Hozir</div>
-          <div class="time-opt" onclick="selectTime(this)">🕐 Keyinroq</div>
+          <div class="time-opt active" onclick="selectTime(this, 'now')">⚡ Hozir</div>
+          <div class="time-opt" onclick="selectTime(this, 'later')">🕐 Keyinroq</div>
+        </div>
+        <!-- VAQT TANLASH MAYDONI -->
+        <div id="timePickerField" style="display: none; margin-top: 15px;">
+          <div class="field" style="margin-bottom: 0;">
+            <label for="ckTime">Qaysi vaqtga?</label>
+            <input type="time" id="ckTime" style="width:100%; padding:13px 16px; border-radius:12px; border:1.5px solid var(--line-2); background:var(--white); font-size:.94rem; outline:none;">
+          </div>
         </div>
       </div>
       <div class="step">
