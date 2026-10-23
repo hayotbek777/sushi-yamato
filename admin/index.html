@@ -1685,7 +1685,9 @@
       const items = Array.isArray(o.items) ? o.items : [];
       const itemsHTML = items.map(it => `<div class="item-row"><div class="qty">${it.qty}×</div><div class="name">${escapeHtml(it.name)}</div><div class="price">${fmt(it.sum)}</div></div>`).join('');
 
-      const timeLabel = o.time_type === 'later' ? 'Keyinroq' : 'Hozir';
+      const timeLabel = o.time_type === 'later'
+        ? `Keyinroq (${o.time_value || 'Vaqt kiritilmagan'})`
+        : 'Hozir';
       const payLabels = { cash: 'Naqd', karta: 'Karta', click: 'Click', payme: 'Payme' };
       const payLabel = payLabels[o.pay_type] || o.pay_type;
 
