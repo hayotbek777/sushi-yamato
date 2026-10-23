@@ -102,29 +102,30 @@ let DEFAULT_PRODUCTS = [
   { "id": "yaprok-choy-065", "name": "Япрок чой", "desc": "0.65 л", "price": 20000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
   { "id": "yaprok-choy-08", "name": "Япрок чой", "desc": "0.8 л", "price": 25000, "pieces": 0, "cat": ["choy"], "img": "images/82.png" },
 
-  // --- YANGI QO'SHILGAN SHIRINLIKLAR VA SHAKARLAR ---
-  { "id": "alpen-gold-1", "name": "Alpen Gold Фундук и Изюм", "desc": "Молочный шоколад с фундуком и изюмом", "price": 25000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/photo_2026-10-21_18-00-22.jpg" },
-  { "id": "alpen-gold-2", "name": "Alpen Gold Фундук", "desc": "Молочный шоколад с цельным фундуком", "price": 25000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-21_18-00-24.jpg" },
-  { "id": "alpen-gold-3", "name": "Alpen Gold Молочный", "desc": "Классический молочный шоколад", "price": 22000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-21_18-00-24 (2).jpg" },
-  { "id": "alpen-gold-4", "name": "Alpen Gold Max Fun", "desc": "Взрывная карамель, мармелад, печенье", "price": 28000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/photo_2026-10-21_18-00-25.jpg" },
-  { "id": "milka-1", "name": "Milka Alpine Milk", "desc": "Молочный шоколад", "price": 26000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-21.jpg" },
-  { "id": "nestle-1", "name": "Nestle Almond & Raisin", "desc": "Молочный шоколад с миндалем и изюмом", "price": 24000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-22.jpg" },
-  { "id": "milka-2", "name": "Milka White", "desc": "Белый шоколад", "price": 27000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-22 (2).jpg" },
-  { "id": "nestle-2", "name": "Nestle Choco Bubbles", "desc": "Молочный и белый шоколад с пузырьками", "price": 24000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/photo_2026-10-23_12-23-23.jpg" },
-  { "id": "nestle-3", "name": "Nestle Milk Chocolate", "desc": "Классический молочный шоколад", "price": 22000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-23 (2).jpg" },
-  { "id": "love-1", "name": "Love is... Арбуз", "desc": "Жевательная резинка без сахара (6 пластинок)", "price": 8000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/photo_2026-10-23_12-23-24.jpg" },
-  { "id": "twix-xtra", "name": "Twix Xtra", "desc": "Печенье, карамель, шоколад", "price": 12000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-25 (2).jpg" },
-  { "id": "love-2", "name": "Love is... Сладкие ягоды", "desc": "Жевательная резинка без сахара (6 пластинок)", "price": 8000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-25.jpg" },
-  { "id": "bounty-1", "name": "Bounty Trio", "desc": "Кокосовая начинка в молочном шоколаде", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-26 (2).jpg" },
-  { "id": "bounty-2", "name": "Bounty", "desc": "Кокосовая начинка в молочном шоколаде", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-26 (3).jpg" },
-  { "id": "snickers-1", "name": "Snickers", "desc": "Нуга, карамель, арахис", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-26.jpg" },
-  { "id": "snickers-2", "name": "Snickers Super", "desc": "Большой батончик с арахисом", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-23-27 (2).jpg" },
-  { "id": "alpen-gold-5", "name": "Alpen Gold Миндаль и Кокос", "desc": "Белый шоколад с миндалем и кокосом", "price": 26000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-25-15.jpg" },
-  { "id": "alpen-gold-6", "name": "Alpen Gold Соленый арахис", "desc": "Молочный шоколад с соленым арахисом и крекером", "price": 25000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/photo_2026-10-23_12-25-30.jpg" },
+   // --- YANGI QO'SHILGAN SHIRINLIKLAR VA SHAKARLAR ---
+  { "id": "alpen-gold-1", "name": "Alpen Gold Фундук и Изюм", "desc": "Молочный шоколад с фундуком и изюмом", "price": 25000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/alpengold1.png" },
+  { "id": "alpen-gold-2", "name": "Alpen Gold Фундук", "desc": "Молочный шоколад с цельным фундуком", "price": 25000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold2.png" },
+  { "id": "alpen-gold-3", "name": "Alpen Gold Молочный", "desc": "Классический молочный шоколад", "price": 22000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold3.png" },
+  { "id": "alpen-gold-4567", "name": "Alpen Gold Соленый арахис", "desc": "Молочный шоколад с соленым арахисом и крекером", "price": 25000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengold4567.png" },
+  { "id": "alpen-gold-max", "name": "Alpen Gold Max Fun", "desc": "Взрывная карамель, мармелад, печенье", "price": 28000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/alpengoldmax.png" },
+  { "id": "alpen-gold-oq", "name": "Alpen Gold Миндаль и Кокос", "desc": "Белый шоколад с миндалем и кокосом", "price": 26000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/alpengoldoq.png" },
+  
+  { "id": "bounty-1", "name": "Bounty Trio", "desc": "Кокосовая начинка в молочном шоколаде", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bounty1.png" },
+  { "id": "bounty-2", "name": "Bounty", "desc": "Кокосовая начинка в молочном шоколаде", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/bounty2.png" },
+  
+  { "id": "karak-tea", "name": "GOAL Karak Tea", "desc": "Инстант чай с молоком (1 шт)", "price": 6000, "pieces": 0, "cat": ["choy"], "img": "images/karaktea.png" },
+  { "id": "maccoffee", "name": "MacCoffee 3 in 1", "desc": "Кофейный напиток (1 шт)", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/maccoffe.png" },
+  { "id": "milka-1", "name": "Milka Alpine Milk", "desc": "Молочный шоколад", "price": 26000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/milka1.png" },
+  { "id": "nestle-1", "name": "Nestle Almond & Raisin", "desc": "Молочный шоколад с миндалем и изюмом", "price": 24000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/nestle1.png" },
+  
+  { "id": "snickers-1", "name": "Snickers", "desc": "Нуга, карамель, арахис", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/snickers1.png" },
+  { "id": "snickers-2", "name": "Snickers Super", "desc": "Большой батончик с арахисом", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/snickers2.png" },
+  
+  { "id": "twix-1", "name": "Twix Xtra", "desc": "Печенье, карамель, шоколад", "price": 12000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix1.png" },
+  { "id": "twix-2", "name": "Twix", "desc": "Печенье, карамель, шоколад", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix2.png" },
 
-  // --- KOFE VA CHOY ---
-  { "id": "maccoffee-3in1", "name": "MacCoffee 3 in 1", "desc": "Кофейный напиток (1 шт)", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/photo_2026-10-23_12-23-27.jpg" },
-  { "id": "goal-karak-tea", "name": "GOAL Karak Tea", "desc": "Инстант чай с молоком (1 шт)", "price": 6000, "pieces": 0, "cat": ["choy"], "img": "images/photo_2026-10-23_12-23-28.jpg" }
+  { "id": "love-1", "name": "Love is... Арбуз", "desc": "Жевательная резинка без сахара (6 пластинок)", "price": 8000, "pieces": 0, "cat": ["shirinliklar", "yangi"], "badge": "new", "img": "images/5saqich.png" },
+  { "id": "love-2", "name": "Love is... Сладкие ягоды", "desc": "Жевательная резинка без сахара (6 пластинок)", "price": 8000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/5saqich1.png" }
 ];
 
 /* =========================================================
