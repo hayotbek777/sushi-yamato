@@ -70,8 +70,6 @@ let DEFAULT_PRODUCTS = [
   { "id": "set-guest", "name": "Сет “Гостевой”", "desc": "Ролл Филадельфия, Ролл саки маки, Жареный ролл с курицей, Запеченный ролл с курицей", "price": 241000, "pieces": 0, "cat": ["setlar"], "badge": "hit", "img": "images/62.png" },
   { "id": "set-grand", "name": "Grand Set", "desc": "Ролл Филадельфия, Ролл Филадельфия с угрем, Запеченный ролл с угрем в соусе спайси, Ролл калифорния с икрой", "price": 249000, "pieces": 0, "cat": ["setlar", "yangi"], "badge": "new", "img": "images/63.png" },
   { "id": "set-mega", "name": "Мега празник", "desc": "Мини запеченный с курицей, Мини запеченный с лосось, Жареный сендвич с лососем, Сладкий ролл с фруктами, Жареный овощной ролл, Ролл Филадельфия лайт, Вок с курицей, Вок с креветками, кола 1л", "price": 444000, "pieces": 0, "cat": ["setlar", "yangi"], "badge": "new", "img": "images/64.png" },
-  { "id": "fanta-glass", "name": "Фанта 0,25 (стекло)", "desc": "", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/65.png" },
-  { "id": "cola-glass", "name": "Кола 0,25 (стекло)", "desc": "", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/66.png" },
   { "id": "cola-05", "name": "Кола 0,5", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/67.png" },
   { "id": "fanta-05", "name": "Фанта 0,5", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/68.png" },
   { "id": "sprite-05", "name": "Спрайт 0,5", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/69.png" },
@@ -725,3 +723,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (e.key === 'Escape') closeAll();
   });
 });
+
+
