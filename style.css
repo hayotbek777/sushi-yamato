@@ -232,7 +232,7 @@ section{padding:64px 0}
 .cat-chip.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
 
 /* =========================================================
-   PRODUCT CARDS (MENYU UCHUN)
+   PRODUCT CARDS (MENYU)
    ========================================================= */
 .carousel{
   display:flex;gap:20px;overflow-x:auto;
@@ -263,9 +263,11 @@ section{padding:64px 0}
   overflow:hidden;
   background:linear-gradient(135deg,#f5efe6,#e8dfd0);
 }
+/* Menyudagi rasmlar kartaga to'liq sig'adi */
 .p-media img{
-  width:100%;height:100%;object-fit:cover; /* Menyu mahsulotlari to'liq qoplaydi */
+  width:100%;height:100%;object-fit:contain;
   display:block;transition:transform .7s var(--ease);
+  padding:12px;
 }
 .p-card:hover .p-media img{transform:scale(1.07)}
 .p-badges{
@@ -317,7 +319,7 @@ section{padding:64px 0}
 .p-card.added .p-add{background:var(--matcha)}
 
 /* =========================================================
-   SETS (TO'LIQ SIG'ADIGAN QILINDI)
+   SETS
    ========================================================= */
 .sets-grid{display:grid;gap:20px;grid-template-columns:1fr}
 @media(min-width:640px){.sets-grid{grid-template-columns:repeat(2,1fr)}}
@@ -333,13 +335,13 @@ section{padding:64px 0}
   position:absolute;
   inset:0;
   transition:transform .8s var(--ease);
-  background:linear-gradient(135deg,#f5efe6,#e8dfd0); /* Setlar orqa foni */
+  background:linear-gradient(135deg,#f5efe6,#e8dfd0);
 }
 .set-card .set-bg img{
   width:100%;
   height:100%;
-  object-fit:contain; /* Setlar to'liq sig'adi */
-  padding:15px 15px 80px 15px; /* Pastdan matn uchun joy */
+  object-fit:contain;
+  padding:15px 15px 80px 15px;
 }
 .set-card:hover .set-bg{transform:scale(1.08)}
 .set-card::after{
