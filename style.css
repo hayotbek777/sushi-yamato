@@ -1007,7 +1007,10 @@ section{padding:64px 0}
 @media(min-width:768px){.spacer-mob{display:none}}
 
 /* ===== Mahsulot rasmlari (shaffof fonli) — kesilmasin ===== */
-.p-media img,.pd-media img{object-fit:contain;padding:10px}
-.cart-item .ci-img img,.search-result .sr-img img{object-fit:contain;padding:3px}
-.set-card .set-bg{background:linear-gradient(135deg,#f5efe6,#e8dfd0)}
-.set-card .set-bg img{object-fit:contain;padding:18px 10px 120px}
+.p-media, .pd-media {
+  background: #fff; /* Orqa fon oq bo'lishi shart */
+}
+
+.p-media img, .pd-media img {
+  mix-blend-mode: multiply; /* Oq rangni yo'q qiladi */
+}
