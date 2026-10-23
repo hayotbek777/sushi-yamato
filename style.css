@@ -232,7 +232,7 @@ section{padding:64px 0}
 .cat-chip.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
 
 /* =========================================================
-   PRODUCT CARDS
+   PRODUCT CARDS (MENYU UCHUN)
    ========================================================= */
 .carousel{
   display:flex;gap:20px;overflow-x:auto;
@@ -264,9 +264,8 @@ section{padding:64px 0}
   background:linear-gradient(135deg,#f5efe6,#e8dfd0);
 }
 .p-media img{
-  width:100%;height:100%;object-fit:contain; /* RASMLAR KESILMAYDI */
+  width:100%;height:100%;object-fit:cover; /* Menyu mahsulotlari to'liq qoplaydi */
   display:block;transition:transform .7s var(--ease);
-  padding:10px; /* Chetlardan bo'sh joy */
 }
 .p-card:hover .p-media img{transform:scale(1.07)}
 .p-badges{
@@ -318,7 +317,7 @@ section{padding:64px 0}
 .p-card.added .p-add{background:var(--matcha)}
 
 /* =========================================================
-   SETS
+   SETS (TO'LIQ SIG'ADIGAN QILINDI)
    ========================================================= */
 .sets-grid{display:grid;gap:20px;grid-template-columns:1fr}
 @media(min-width:640px){.sets-grid{grid-template-columns:repeat(2,1fr)}}
@@ -330,8 +329,18 @@ section{padding:64px 0}
   transition:transform .35s var(--ease);
 }
 .set-card:hover{transform:translateY(-6px)}
-.set-card .set-bg{position:absolute;inset:0;transition:transform .8s var(--ease)}
-.set-card .set-bg img{width:100%;height:100%;object-fit:cover}
+.set-card .set-bg{
+  position:absolute;
+  inset:0;
+  transition:transform .8s var(--ease);
+  background:linear-gradient(135deg,#f5efe6,#e8dfd0); /* Setlar orqa foni */
+}
+.set-card .set-bg img{
+  width:100%;
+  height:100%;
+  object-fit:contain; /* Setlar to'liq sig'adi */
+  padding:15px 15px 80px 15px; /* Pastdan matn uchun joy */
+}
 .set-card:hover .set-bg{transform:scale(1.08)}
 .set-card::after{
   content:'';position:absolute;inset:0;
