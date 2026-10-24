@@ -861,8 +861,18 @@ function printReceipt(id) {
     </div>
   `;
 
-  document.getElementById('receipt-print-area').innerHTML = html;
+  const printArea = document.getElementById('receipt-print-area');
+  printArea.innerHTML = html;
+
+  // Orqa fonni yashirish
+  const originalBody = document.body.innerHTML;
+  document.body.innerHTML = printArea.outerHTML;
+
   window.print();
+
+  // Chop etishdan keyin hammasini qayta tiklash
+  document.body.innerHTML = originalBody;
+  location.reload(); // Sahifa holatini (event listenerlarni) tiklash uchun
 }
 
 function fmt(n) { return new Intl.NumberFormat('uz-UZ').format(Math.round(n || 0)) + ' so\'m'; }
