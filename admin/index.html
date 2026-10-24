@@ -200,16 +200,27 @@ ul{list-style:none}
 }
 
 @media print {
-  body * { display: none !important; }
+  /* Hamma narsani yashirish */
+  body * {
+    visibility: hidden;
+  }
+  /* Faqat chek joyini ko'rsatish */
+  #receipt-print-area, #receipt-print-area * {
+    visibility: visible;
+  }
+  /* Chekni sahifaning eng yuqorisiga joylash */
   #receipt-print-area {
-    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 80mm;
+    display: block !important;
     font-family: 'Courier New', Courier, monospace;
     font-size: 12px;
     color: #000;
     background: #fff;
     padding: 0;
-    margin: 0 auto;
+    margin: 0;
   }
   .r-center { text-align: center; }
   .r-title { font-size: 18px; font-weight: bold; margin-bottom: 0; }
@@ -221,6 +232,8 @@ ul{list-style:none}
   .r-table th:nth-child(3), .r-table td:nth-child(3), .r-table th:nth-child(4), .r-table td:nth-child(4) { text-align: right; }
   .r-total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-top: 4px; }
   .r-footer { text-align: center; font-size: 11px; margin-top: 10px; font-style: italic; }
+  
+  @page { margin: 0; }
 }
 </style>
 </head>
@@ -262,6 +275,7 @@ ul{list-style:none}
       <div class="header-actions">
         <div class="header-user"><div class="av">A</div><span id="userName">admin</span></div>
         
+        <!-- KALENDAR -->
         <button class="icon-btn" onclick="openCalendar()" title="Sanani tanlash">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -408,6 +422,7 @@ function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
 function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
 function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
 
+// OVOZ BILDIRISHNOMASI
 function playSound() { 
   try { 
     const audio = new Audio('/admin/ding.mp3'); 
