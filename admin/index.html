@@ -208,31 +208,33 @@ ul{list-style:none}
   }
   #receipt-print-area {
     position: absolute;
-    left: 50%;
+    left: 0;
     top: 0;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 400px;
+    width: 80mm; /* Termoprinter kengligi */
+    max-width: 80mm;
     display: block !important;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 16px;
+    font-size: 12px; /* Termoprinter uchun kichik shrift */
     color: #000;
     background: #fff;
-    padding: 20px;
+    padding: 0;
     margin: 0;
   }
   .r-center { text-align: center; }
-  .r-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-  .r-subtitle { font-size: 16px; margin-bottom: 15px; }
-  .r-line { border-bottom: 2px dashed #000; margin: 10px 0; }
-  .r-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  .r-table th, .r-table td { text-align: left; padding: 5px 0; }
+  .r-title { font-size: 18px; font-weight: bold; margin-bottom: 2px; }
+  .r-subtitle { font-size: 12px; margin-bottom: 10px; }
+  .r-line { border-bottom: 1px dashed #000; margin: 5px 0; }
+  .r-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .r-table th, .r-table td { text-align: left; padding: 2px 0; }
   .r-table th:nth-child(2), .r-table td:nth-child(2) { text-align: center; }
   .r-table th:nth-child(3), .r-table td:nth-child(3), .r-table th:nth-child(4), .r-table td:nth-child(4) { text-align: right; }
-  .r-total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; margin-top: 8px; }
-  .r-footer { text-align: center; font-size: 14px; margin-top: 20px; font-style: italic; }
+  .r-total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-top: 5px; }
+  .r-footer { text-align: center; font-size: 11px; margin-top: 15px; font-style: italic; }
   
-  @page { margin: 10mm; }
+  @page { 
+    margin: 0; 
+    size: 80mm auto; /* Aynan termoprinter o'lchami */
+  }
 }
 </style>
 </head>
