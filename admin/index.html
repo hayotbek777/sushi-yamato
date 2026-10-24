@@ -200,40 +200,39 @@ ul{list-style:none}
 }
 
 @media print {
-  /* Hamma narsani yashirish */
   body * {
     visibility: hidden;
   }
-  /* Faqat chek joyini ko'rsatish */
   #receipt-print-area, #receipt-print-area * {
     visibility: visible;
   }
-  /* Chekni sahifaning eng yuqorisiga joylash */
   #receipt-print-area {
     position: absolute;
-    left: 0;
+    left: 50%;
     top: 0;
-    width: 80mm;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 400px;
     display: block !important;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 12px;
+    font-size: 16px;
     color: #000;
     background: #fff;
-    padding: 0;
+    padding: 20px;
     margin: 0;
   }
   .r-center { text-align: center; }
-  .r-title { font-size: 18px; font-weight: bold; margin-bottom: 0; }
-  .r-subtitle { font-size: 12px; margin-bottom: 10px; }
-  .r-line { border-bottom: 1px dashed #000; margin: 6px 0; }
-  .r-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-  .r-table th, .r-table td { text-align: left; padding: 2px 0; }
+  .r-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+  .r-subtitle { font-size: 16px; margin-bottom: 15px; }
+  .r-line { border-bottom: 2px dashed #000; margin: 10px 0; }
+  .r-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .r-table th, .r-table td { text-align: left; padding: 5px 0; }
   .r-table th:nth-child(2), .r-table td:nth-child(2) { text-align: center; }
   .r-table th:nth-child(3), .r-table td:nth-child(3), .r-table th:nth-child(4), .r-table td:nth-child(4) { text-align: right; }
-  .r-total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-top: 4px; }
-  .r-footer { text-align: center; font-size: 11px; margin-top: 10px; font-style: italic; }
+  .r-total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; margin-top: 8px; }
+  .r-footer { text-align: center; font-size: 14px; margin-top: 20px; font-style: italic; }
   
-  @page { margin: 0; }
+  @page { margin: 10mm; }
 }
 </style>
 </head>
@@ -815,7 +814,7 @@ function printReceipt(id) {
     <div class="r-center r-subtitle">sushiyamato</div>
     <div class="r-line"></div>
     
-    <div style="font-size:11px; line-height: 1.4; margin-bottom: 5px;">
+    <div style="font-size:14px; line-height: 1.5; margin-bottom: 10px;">
       <div>Чек №: ${o.order_num}</div>
       <div>Официант: Admin</div>
       <div>Открыт: ${formattedDate}</div>
@@ -863,16 +862,14 @@ function printReceipt(id) {
 
   const printArea = document.getElementById('receipt-print-area');
   printArea.innerHTML = html;
-
-  // Orqa fonni yashirish
-  const originalBody = document.body.innerHTML;
-  document.body.innerHTML = printArea.outerHTML;
-
-  window.print();
-
-  // Chop etishdan keyin hammasini qayta tiklash
-  document.body.innerHTML = originalBody;
-  location.reload(); // Sahifa holatini (event listenerlarni) tiklash uchun
+  printArea.style.display = 'block'; // Ko'rinadigan qilish
+  
+  window.print(); // Chop etish oynasini ochish
+  
+  // Chop etish oynasi yopilgach, chekni yashirish
+  setTimeout(() => {
+    printArea.style.display = 'none';
+  }, 1000); 
 }
 
 function fmt(n) { return new Intl.NumberFormat('uz-UZ').format(Math.round(n || 0)) + ' so\'m'; }
