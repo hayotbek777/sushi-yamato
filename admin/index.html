@@ -1876,7 +1876,7 @@
     }
 
     /* =========================================================
-       TERMOPRINTER CHEK CHIQARISH MANTIQI
+       TERMOPRINTER CHEK CHIQARISH MANTIQI (LOGOTIP BILAN)
        ========================================================= */
     function printReceipt(id) {
       const o = STATE.orders.find(x => x.id === id);
@@ -1892,20 +1892,32 @@
     <tr>
       <td>${escapeHtml(it.name)}</td>
       <td>${it.qty}</td>
-      <td>${it.price}</td>
-      <td>${it.sum}</td>
+      <td>${fmtShort(it.price)}</td>
+      <td>${fmtShort(it.sum)}</td>
     </tr>
   `).join('');
 
+      // Logotip SVG ko'rinishida (Printer uchun eng yaxshi variant)
+      const logoSVG = `
+    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="#000" stroke-width="4"/>
+      <circle cx="50" cy="50" r="38" fill="none" stroke="#000" stroke-width="1"/>
+      <path d="M30 40 Q50 20 70 40 Q50 60 30 40 Z" fill="#000"/>
+      <path d="M30 60 Q50 80 70 60 Q50 40 30 60 Z" fill="#000"/>
+      <circle cx="70" cy="40" r="4" fill="#fff"/>
+      <circle cx="30" cy="60" r="4" fill="#fff"/>
+    </svg>
+  `;
+
       const html = `
-    <div class="r-center" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px;">
-      <!-- Logotip (rasm orqali) -->
-    <img src="${LOGO_DATA_URI}" style="width: 45px; height: 45px; object-fit: contain;">
+    <div class="r-center" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
+      <!-- Logotip -->
+      <div style="width: 35px; height: 35px;">${logoSVG}</div>
       
       <!-- YAMATO yozuvi -->
-      <div class="r-title" style="margin-bottom: 0; font-size: 26px; font-weight: 900; letter-spacing: 2px;">YAMATO</div>
+      <div class="r-title" style="margin-bottom: 0; font-size: 22px; font-weight: 900; letter-spacing: 2px;">YAMATO</div>
     </div>
-    <div class="r-center r-subtitle">sushiyamato</div>
+    <div class="r-center r-subtitle" style="margin-top: -5px;">sushiyamato</div>
     <div class="r-line"></div>
     
     <div style="font-size:11px; line-height: 1.4; margin-bottom: 5px;">
@@ -1939,11 +1951,11 @@
     
     <div class="r-total-row">
       <span>Итого:</span>
-      <span>${o.total}</span>
+      <span>${fmtShort(o.total)}</span>
     </div>
     <div class="r-total-row">
       <span>К оплате:</span>
-      <span>${o.total}</span>
+      <span>${fmtShort(o.total)}</span>
     </div>
 
     <div class="r-line"></div>
@@ -1956,11 +1968,10 @@
 
       const printArea = document.getElementById('receipt-print-area');
       printArea.innerHTML = html;
-      printArea.style.display = 'block'; // Ko'rinadigan qilish
+      printArea.style.display = 'block';
 
-      window.print(); // Chop etish oynasini ochish
+      window.print();
 
-      // Chop etish oynasi yopilgach, chekni yashirish
       setTimeout(() => {
         printArea.style.display = 'none';
       }, 1000);
@@ -2008,4 +2019,5 @@
     });
   </script>
 </body>
+
 </html>
