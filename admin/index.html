@@ -204,24 +204,25 @@ ul{list-style:none}
   body * {
     visibility: hidden;
   }
-  /* Faqat chek joyini ko'rsatish */
+  /* Faqat chekni ko'rsatish */
   #receipt-print-area, #receipt-print-area * {
     visibility: visible;
   }
   
-  /* Brauzerga A4 varaqni 80mm kenglikda deb o'ylashga majbur qilish */
+  /* Varaqni majburan 80mm qilib, ortiqcha bo'shliqlarni o'chirish */
   @page { 
     size: 80mm auto; 
     margin: 0; 
   }
 
-  /* Varaqning o'lchamini cheklash */
   html, body {
     width: 80mm !important;
-    height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden; /* Ortiqcha oq joylarni kesish */
+    background: #fff !important;
+    /* Ortiqcha oq joylarni kesib tashlash */
+    overflow: hidden !important; 
+    height: 100% !important;
   }
 
   #receipt-print-area {
@@ -236,6 +237,10 @@ ul{list-style:none}
     background: #fff;
     padding: 2mm; 
     margin: 0;
+    /* Ortiqcha varaqlarga o'tib ketmasligi uchun */
+    page-break-after: avoid;
+    page-break-before: avoid;
+    page-break-inside: avoid;
   }
   
   .r-center { text-align: center; }
