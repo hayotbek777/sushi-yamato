@@ -1153,18 +1153,20 @@
         visibility: visible;
       }
 
-      /* Varaqni majburan 80mm qilib, ortiqcha bo'shliqlarni o'chirish */
+      /* Qog'oz o'lchamini 80mm qilib belgilash va chekkalarni olib tashlash */
       @page {
         size: 80mm auto;
-        margin: 0;
+        margin: 0 !important;
+        /* Yonlarini ochib beradi */
       }
 
-      html, body {
+      html,
+      body {
         width: 80mm !important;
         margin: 0 !important;
         padding: 0 !important;
         background: #fff !important;
-        height: auto !important; /* 2-betga bo'lishni to'xtatadi */
+        height: auto !important;
       }
 
       #receipt-print-area {
@@ -1177,8 +1179,10 @@
         font-size: 12px;
         color: #000;
         background: #fff;
-        padding: 2mm;
+        padding: 0 2mm;
+        /* Yonlardan ozgina joy qoldirish */
         margin: 0;
+        box-sizing: border-box;
       }
 
       .r-center {
@@ -1879,13 +1883,12 @@
       const d = new Date(o.created_at || Date.now());
       const formattedDate = d.toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const printTime = new Date().toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-
-  const itemsRows = items.map(it => `
+      const itemsRows = items.map(it => `
     <tr>
-      <td>${escapeHtml(it.name)}</td>
-      <td>${it.qty}</td>
-      <td style="text-align: right;">${new Intl.NumberFormat('ru-RU').format(it.price)}</td>
-      <td style="text-align: right;">${new Intl.NumberFormat('ru-RU').format(it.sum)}</td>
+      <td style="width: 50%;">${escapeHtml(it.name)}</td>
+      <td style="width: 15%; text-align: center;">${it.qty}</td>
+      <td style="width: 17%; text-align: right;">${new Intl.NumberFormat('ru-RU').format(it.price)}</td>
+      <td style="width: 18%; text-align: right;">${new Intl.NumberFormat('ru-RU').format(it.sum)}</td>
     </tr>
   `).join('');
 
