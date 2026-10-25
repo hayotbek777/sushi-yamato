@@ -209,26 +209,32 @@ ul{list-style:none}
     visibility: visible;
   }
   
-  /* Qog'oz o'lchamini majburan 80mm qilish */
+  /* Qog'oz o'lchamini majburan 80mm va uzunlikni cheksiz qilish */
   @page { 
     size: 80mm auto; 
     margin: 0; 
   }
 
-  /* Chekni joylashtirish */
+  /* Chekni varaqning eng yuqorisiga, chapga joylashtirish */
   #receipt-print-area {
     position: absolute;
     left: 0;
     top: 0;
     width: 80mm; 
-    max-width: 80mm;
     display: block !important;
     font-family: 'Courier New', Courier, monospace;
     font-size: 12px;
     color: #000;
     background: #fff;
-    padding: 3mm; /* Termoprinter chetlaridan ozgina bo'sh joy */
+    padding: 2mm; /* Termoprinter chetlaridan ozgina bo'sh joy */
     margin: 0;
+  }
+  
+  /* Boshqa elementlar joy egallamasligi uchun */
+  #receipt-print-area {
+    page-break-after: avoid;
+    page-break-before: avoid;
+    page-break-inside: avoid;
   }
   
   .r-center { text-align: center; }
