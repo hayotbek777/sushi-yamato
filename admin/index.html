@@ -1973,7 +1973,7 @@
       }, 1000);
     }
 
-    function fmt(n) { return new Intl.NumberFormat('uz-UZ').format(Math.round(n || 0)) + ' so\'m'; }
+    function fmt(n) { return new Intl.NumberFormat('ru-RU').format(Math.round(n || 0)) + ' сўм'; }
     function fmtShort(n) { n = Math.round(n || 0); if (n >= 1000000) return (n / 1000000).toFixed(1) + ' mln'; if (n >= 1000) return (n / 1000).toFixed(0) + 'k'; return String(n); }
     function formatDate(str) {
       if (!str) return '';
