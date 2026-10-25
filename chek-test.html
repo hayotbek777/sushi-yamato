@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kassa Cheki - POS Test</title>
+  <style>
+    /* Umumiy web sahifa stillari */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    /* Ekrandagi Chek bloki (80mm termoprinterga moslangan) */
+    .receipt-card {
+      background: #ffffff;
+      width: 80mm;
+      padding: 12px;
+      border: 1px dashed #bbb;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px;
+      color: #000;
+      box-sizing: border-box;
+    }
+
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .bold { font-weight: bold; }
+    
+    .logo-title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+
+    .dashed-line {
+      border-bottom: 1px dashed #000;
+      margin: 8px 0;
+    }
+
+    .info-row, .item-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+
+    .item-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 5px 0;
+    }
+
+    .item-table th, .item-table td {
+      font-size: 12px;
+      padding: 2px 0;
+    }
+
+    .total-price {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .print-btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      transition: background 0.2s;
+    }
+
+    .print-btn:hover {
+      background-color: #059669;
+    }
+
+    /* 🖨️ CHOP ETILGANDA (PRINT WIDGET) FAQT CHEK CHIQISHI UCHUN STIL */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      #printable-receipt, #printable-receipt * {
+        visibility: visible;
+      }
+
+      #printable-receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80mm; /* Termoprinter qog'oz o'lchami */
+        margin: 0;
+        padding: 5px;
+        border: none;
+        box-shadow: none;
+      }
+
+      @page {
+        size: 80mm auto;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CHEK MA'LUMOTLARI -->
+  <div id="printable-receipt" class="receipt-card">
+    <div class="text-center">
+      <h1 class="logo-title">YAMATO</h1>
+      <p style="margin: 2px 0 6px 0;">sushiyamato</p>
+    </div>
+
+    <div class="dashed-line"></div>
+
+    <div class="info-row"><span>Chek №:</span><span>2129</span></div>
+    <div class="info-row"><span>Ofitsiant:</span><span>Dilshod</span></div>
+    <div class="info-row"><span>Ochilgan:</span><span>24 oktyabr 2026 15:52</span></div>
+    <div class="info-row"><span>Chop etilgan:</span><span id="current-time"></span></div>
+    <div class="info-row"><span>Stol №:</span><span>1 (Osnovnoy zal)</span></div>
+    <div class="info-row"><span>Mijoz:</span><span>Gʻozal (+998 90 433 18 12)</span></div>
+    <div class="info-row"><span>Bonuslar:</span><span>31380 soʻm</span></div>
+
+    <div class="dashed-line"></div>
+
+    <table class="item-table">
+      <thead>
+        <tr style="border-bottom: 1px dashed #000;">
+          <th align="left">Nomi</th>
+          <th align="center">Soni</th>
+          <th align="right">Narxi</th>
+          <th align="right">Jami</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sendvich c krevetkami</td>
+          <td align="center">1</td>
+          <td align="right">73000</td>
+          <td align="right">73000</td>
+        </tr>
+        <tr>
+          <td>Krevetka tempurniy 5sht</td>
+          <td align="center">1</td>
+          <td align="right">72000</td>
+          <td align="right">72000</td>
+        </tr>
+        <tr>
+          <td>Zapechennyy roll Dabl Chikken</td>
+          <td align="center">1</td>
+          <td align="right">77000</td>
+          <td align="right">77000</td>
+        </tr>
+        <tr>
+          <td>Roll Filadelfiya</td>
+          <td align="center">1</td>
+          <td align="right">75000</td>
+          <td align="right">75000</td>
+        </tr>
+        <tr>
+          <td>Kola 1,5</td>
+          <td align="center">1</td>
+          <td align="right">20000</td>
+          <td align="right">20000</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dashed-line"></div>
+
+    <div class="info-row">
+      <span>Итого:</span>
+      <span>317000 soʻm</span>
+    </div>
+
+    <div class="dashed-line"></div>
+
+    <div class="info-row total-price">
+      <span>К оплате:</span>
+      <span>317000 soʻm</span>
+    </div>
+
+    <div class="dashed-line"></div>
+
+    <div class="text-center" style="margin-top: 10px;">
+      <p style="margin: 2px 0;">SUSHI_YAMATO_ | +998876450505</p>
+      <p style="margin: 4px 0 0 0; font-weight: bold;">Vas jdet priyatnyy syurpriz!</p>
+    </div>
+  </div>
+
+  <!-- TUGMA (Chop etilganda ko'rinmaydi) -->
+  <button class="print-btn no-print" onclick="handlePrint()">
+    🖨️ Chekni chiqarish (Test)
+  </button>
+
+  <script>
+    // Joriy vaqtni avtomatik qo'yish
+    const now = new Date();
+    document.getElementById('current-time').innerText = now.toLocaleString('ru-RU');
+
+    // Chop etish funksiyasi
+    function handlePrint() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
