@@ -1159,15 +1159,12 @@
         margin: 0;
       }
 
-      html,
-      body {
+      html, body {
         width: 80mm !important;
         margin: 0 !important;
         padding: 0 !important;
         background: #fff !important;
-        /* Ortiqcha oq joylarni kesib tashlash */
-        overflow: hidden !important;
-        height: 100% !important;
+        height: auto !important; /* 2-betga bo'lishni to'xtatadi */
       }
 
       #receipt-print-area {
@@ -1182,10 +1179,6 @@
         background: #fff;
         padding: 2mm;
         margin: 0;
-        /* Ortiqcha varaqlarga o'tib ketmasligi uchun */
-        page-break-after: avoid;
-        page-break-before: avoid;
-        page-break-inside: avoid;
       }
 
       .r-center {
@@ -1887,12 +1880,12 @@
       const formattedDate = d.toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const printTime = new Date().toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-      const itemsRows = items.map(it => `
+  const itemsRows = items.map(it => `
     <tr>
       <td>${escapeHtml(it.name)}</td>
       <td>${it.qty}</td>
-      <td>${fmt(it.price)}</td> <!-- Shunchaki raqam emas, to'liq summa yoziladi -->
-      <td>${fmt(it.sum)}</td>
+      <td style="text-align: right;">${new Intl.NumberFormat('ru-RU').format(it.price)}</td>
+      <td style="text-align: right;">${new Intl.NumberFormat('ru-RU').format(it.sum)}</td>
     </tr>
   `).join('');
 
