@@ -830,7 +830,10 @@ function printReceipt(id) {
   `).join('');
 
   const html = `
-    <div class="r-center r-title">YAMATO</div>
+    <div class="r-center" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px;">
+      <img src="images/logo.png" alt="Yamato" style="width: 40px; height: 40px; object-fit: contain;">
+      <div class="r-title" style="margin-bottom: 0;">YAMATO</div>
+    </div>
     <div class="r-center r-subtitle">sushiyamato</div>
     <div class="r-line"></div>
     
