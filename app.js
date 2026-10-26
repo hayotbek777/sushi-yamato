@@ -551,7 +551,7 @@ async function placeOrder() {
     items, subtotal, delivery, total
   };
 
-  let orderNum = '#YM-' + Date.now().toString().slice(-6);
+   let orderNum = '#YM-' + Date.now().toString().slice(-6);
 
   try {
     const res = await fetch(`${API_URL}/order`, {
@@ -560,8 +560,9 @@ async function placeOrder() {
       body: JSON.stringify(payload)
     });
     const data = await res.json();
+    
     if (data.success && data.orderNum) {
-      orderNum = data.orderNum;
+      orderNum = data.orderNum; // Backenddan kelgan haqiqiy order raqamni olamiz
     } else {
       toast('Buyurtma yuborilmadi: ' + (data.error || ''));
       return;
@@ -572,13 +573,16 @@ async function placeOrder() {
     return;
   }
 
+  // Savatni tozalash
   CART = {};
   localStorage.removeItem('ym_cart');
   updateCartUI();
   renderCart();
   closeModal('checkoutModal');
 
+  // Tracking oynasini ochish (orderNum orqali)
   openTracking(orderNum, CHECKOUT.pay);
+
 }
 
 /* =========================================================

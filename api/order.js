@@ -1,7 +1,5 @@
-/* =========================================================
-   POST /api/order — Yangi buyurtma qabul qilish
-   ========================================================= */
 import { createOrder } from '../lib/db.js';
+import { sendOrderToPoster } from '../lib/poster.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,32 +14,25 @@ export default async function handler(req, res) {
   try {
     const body = req.body || {};
 
-    if (!body.name || !body.phone) {
-      return res.status(400).json({ success: false, error: 'Ism va telefon kerak' });
-    }
-    if (!body.landmark) {
-      return res.status(400).json({ success: false, error: 'Mo\'ljal kiritilmagan' });
-    }
-    if (body.pay !== 'cash' && !body.receipt) {
-      return res.status(400).json({ success: false, error: 'To\'lov cheki yuklanmagan' });
-    }
-    if (!Array.isArray(body.items) || body.items.length === 0) {
-      return res.status(400).json({ success: false, error: 'Savat bo\'sh' });
-    }
+    // Validatsiya
+    if (!body.name || !body.phone) return res.status(400).json({ success: false, error: 'Ism va telefon kerak' });
+    if (!body.landmark) return res.status(400).json({ success: false, error: 'Mo\'ljal kiritilmagan' });
+    if (body.pay !== 'cash' && !body.receipt) return res.status(400).json({ success: false, error: 'To\'lov cheki yuklanmagan' });
+    if (!Array.isArray(body.items) || body.items.length === 0) return res.status(400).json({ success: false, error: 'Savat bo\'sh' });
 
-    // 100% TAKRORLANMAYDIGAN RAQAM GENERATSIYASI
-    // Vaqt + 5 xonali tasodifiy harf/raqam
+    // Order raqamini yaratish
     const now = new Date();
     const timeStr = now.getTime().toString().slice(-6); 
     const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
     const orderNum = `#YM-${timeStr}-${randomStr}`;
 
-    // VAQTNI BIRLASHTIRISH
+    // Vaqtni birlashtirish
     let finalTimeType = body.time || 'now';
     if (body.time === 'later' && body.time_value) {
       finalTimeType = `later|${body.time_value}`; 
     }
 
+    // 1. Bazaga saqlash
     await createOrder({
       order_num: orderNum,
       name: String(body.name).slice(0, 100),
@@ -59,7 +50,15 @@ export default async function handler(req, res) {
       total: Number(body.total) || 0
     });
 
-    return res.status(200).json({ success: true, orderNum });
+    // 2. Poster'ga yuborish
+    const posterResult = await sendOrderToPoster(body);
+
+    // Agar Poster'ga o'tmasa ham, mijozga buyurtma qabul qilinganini aytamiz
+    return res.status(200).json({ 
+      success: true, 
+      orderNum,
+      poster_synced: posterResult.success 
+    });
 
   } catch (err) {
     console.error('Order error:', err);
