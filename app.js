@@ -111,8 +111,8 @@ let DEFAULT_PRODUCTS = [
   { "id": "maccoffee", "name": "MacCoffee 3 in 1", "desc": "Кофейный напиток (1 шт)", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/maccoffe.png" },
   { "id": "milka-1", "name": "Milka Alpine Milk", "desc": "Молочный шоколад", "price": 20000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/milka1.png" },
   { "id": "nestle-1", "name": "Nestle Almond & Raisin", "desc": "Молочный шоколад с миндалем и изюмом", "price": 16000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/nestle1.png" },
-    { "id": "nestle-1", "name": "Nestle Almond & Raisin", "desc": "«Шоколадные пузырьки» молочный и белый шоколад", "price": 16000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/nestle3.png" },
-        { "id": "nestle-1", "name": "Nestle Almond & Raisin", "desc": "Nestle Молочный", "price": 16000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/nestle2.png" },
+  { "id": "nestle-2", "name": "Nestle Almond & Raisin", "desc": "«Шоколадные пузырьки» молочный и белый шоколад", "price": 16000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/nestle3.png" },
+  { "id": "nestle-3", "name": "Nestle Almond & Raisin", "desc": "Nestle Молочный", "price": 16000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/nestle2.png" },
   { "id": "snickers-1", "name": "Snickers", "desc": "Нуга, карамель, арахис", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/snickers1.png" },
   { "id": "snickers-2", "name": "Snickers Super", "desc": "Большой батончик с арахисом", "price": 15000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/snickers2.png" },
   { "id": "twix-1", "name": "Twix Xtra", "desc": "Печенье, карамель, шоколад", "price": 16000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix1.png" },
@@ -140,7 +140,7 @@ const cartSubtotal = () => Object.entries(CART).reduce((s, [id, q]) => {
   const p = getP(id);
   return s + (p ? p.price * q : 0);
 }, 0);
-const cartDelivery = () => 0; // Yetkazib berish bepul yoki umuman yo'q
+const cartDelivery = () => 0; // Yetkazib berish olib tashlandi
 
 /* =========================================================
    KARTALAR
@@ -311,10 +311,13 @@ function renderCart() {
       </div>`;
   }).join('');
 
-  const sub = cartSubtotal(), del = cartDelivery();
+  const sub = cartSubtotal();
   $('#sumItems').textContent = fmt(sub);
-  $('#sumDelivery').textContent = del === 0 ? 'Bepul' : fmt(del);
-  $('#sumTotal').textContent = fmt(sub + del);
+  
+  const deliveryEl = $('#sumDelivery');
+  if (deliveryEl) deliveryEl.textContent = 'Bepul';
+  
+  $('#sumTotal').textContent = fmt(sub);
   foot.style.display = 'block';
 }
 
@@ -743,5 +746,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (e.key === 'Escape') closeAll();
   });
 });
-
-
