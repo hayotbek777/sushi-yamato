@@ -78,8 +78,6 @@ let DEFAULT_PRODUCTS = [
   { "id": "mojito", "name": "Мохито 0,45", "desc": "", "price": 14000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/70.png" },
   { "id": "sochnaya", "name": "Сочная долина (яблоко) 0,45", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/71.png" },
   { "id": "fusetea", "name": "Фьюзти 0,5", "desc": "", "price": 8000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/72.png" },
-  { "id": "cola-can", "name": "Кола 0,25 (банка)", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/73.png" },
-  { "id": "fanta-can", "name": "Фанта 0,25 (банка)", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/74.png" },
   { "id": "sprite-can", "name": "Спрайт 0,25 (банка)", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/75.png" },
   { "id": "energy18", "name": "18+ 0,45", "desc": "", "price": 14000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/76.png" },
   { "id": "adrenaline-025", "name": "Адреналин 0,25", "desc": "", "price": 14000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/77.png" },
@@ -142,7 +140,7 @@ const cartSubtotal = () => Object.entries(CART).reduce((s, [id, q]) => {
   const p = getP(id);
   return s + (p ? p.price * q : 0);
 }, 0);
-const cartDelivery = () => cartSubtotal() > 0 ? 15000 : 0;
+const cartDelivery = () => 0; // Yetkazib berish bepul yoki umuman yo'q
 
 /* =========================================================
    KARTALAR
