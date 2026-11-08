@@ -1,26 +1,5 @@
-/* =========================================================
-   POST /api/update — Holatni yangilash yoki butunlay o'chirish
-   ========================================================= */
-import jwt from 'jsonwebtoken';
-import { updateOrderStatus, deleteOrderFromDB } from '../lib/db.js';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'yamato-super-secret-key-2026';
-const ALLOWED = ['new', 'accepted', 'cooking', 'delivering', 'done', 'cancelled'];
-
-function auth(req, res) {
-  const header = req.headers.authorization || '';
-  const token = header.replace('Bearer ', '');
-  if (!token) {
-    res.status(401).json({ success: false, error: 'Token kerak' });
-    return null;
-  }
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch {
-    res.status(401).json({ success: false, error: 'Token yaroqsiz' });
-    return null;
-  }
-}
+import { updateOrderStatus, getOrderById } from '../lib/db.js';
+import { removePosterTransaction } from '../lib/poster.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -28,36 +7,51 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
-  }
-
-  const user = auth(req, res);
-  if (!user) return;
+  if (req.method !== 'POST') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   try {
-    const { id, status, note } = req.body || {};
+    const { id, status } = req.body || {};
 
-    if (!id) {
-      return res.status(400).json({ success: false, error: 'id kerak' });
+    if (!id || !status) {
+      return res.status(400).json({ success: false, error: 'ID va status kerak' });
     }
 
-    // Agar status 'delete' bo'lsa, bazadan butunlay o'chiramiz
+    // 1. Buyurtma butunlay o'chirilayotgan bo'lsa (delete)
     if (status === 'delete') {
-      await deleteOrderFromDB(id);
-      return res.status(200).json({ success: true, message: 'O\'chirildi' });
+      const order = await getOrderById(id);
+      
+      // Agar Poster'da transaction_id saqlangan bo'lsa, uni o'chiramiz
+      if (order && order.poster_transaction_id) {
+        const posterResult = await removePosterTransaction(order.poster_transaction_id);
+        if (!posterResult.success) {
+          console.warn(`Poster'dagi chekni o'chirishda xatolik (ID: ${order.poster_transaction_id}):`, posterResult.error);
+        }
+      }
+      
+      // Keyin bazadan o'chiramiz
+      await updateOrderStatus(id, 'delete');
+      return res.status(200).json({ success: true, message: 'Buyurtma va Poster cheki o\'chirildi' });
     }
 
-    // Aks holda, holatni yangilaymiz
-    if (!ALLOWED.includes(status)) {
-      return res.status(400).json({ success: false, error: 'Status noto\'g\'ri' });
+    // 2. Buyurtma bekor qilinayotgan bo'lsa (cancelled)
+    if (status === 'cancelled') {
+      await updateOrderStatus(id, 'cancelled');
+      
+      // Poster'dagi chekni ham o'chirishga harakat qilamiz (ixtiyoriy)
+      const order = await getOrderById(id);
+      if (order && order.poster_transaction_id) {
+        await removePosterTransaction(order.poster_transaction_id);
+      }
+      
+      return res.status(200).json({ success: true, message: 'Buyurtma bekor qilindi' });
     }
 
-    await updateOrderStatus(id, status, note || null);
-    return res.status(200).json({ success: true });
+    // 3. Boshqa statuslar (accepted, cooking, delivering, done)
+    await updateOrderStatus(id, status);
+    return res.status(200).json({ success: true, message: 'Holat yangilandi' });
 
   } catch (err) {
     console.error('Update error:', err);
-    return res.status(500).json({ success: false, error: 'Server xatosi' });
+    return res.status(500).json({ success: false, error: 'Server xatosi: ' + err.message });
   }
 }

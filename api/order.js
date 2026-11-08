@@ -32,7 +32,16 @@ export default async function handler(req, res) {
       finalTimeType = `later|${body.time_value}`; 
     }
 
-    // 1. Bazaga saqlash
+    // 1. Poster'ga yuboramiz (avval shuni qilamiz, transaction_id olish uchun)
+    const posterResult = await sendOrderToPoster(body);
+    
+    // Poster'dan transaction_id ni olamiz (agar muvaffaqiyatli bo'lsa)
+    let posterTransactionId = null;
+    if (posterResult.success && posterResult.transaction_id) {
+      posterTransactionId = posterResult.transaction_id;
+    }
+
+    // 2. Bazaga saqlash (transaction_id bilan birga)
     await createOrder({
       order_num: orderNum,
       name: String(body.name).slice(0, 100),
@@ -47,11 +56,9 @@ export default async function handler(req, res) {
       items: body.items,
       subtotal: Number(body.subtotal) || 0,
       delivery: Number(body.delivery) || 0,
-      total: Number(body.total) || 0
+      total: Number(body.total) || 0,
+      poster_transaction_id: posterTransactionId // Yangi maydon
     });
-
-    // 2. Poster'ga yuborish
-    const posterResult = await sendOrderToPoster(body);
 
     // Agar Poster'ga o'tmasa ham, mijozga buyurtma qabul qilinganini aytamiz
     return res.status(200).json({ 
