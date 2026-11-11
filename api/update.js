@@ -1,5 +1,5 @@
 import { updateOrderStatus, getOrderById } from '../lib/db.js';
-import { removePosterTransaction, removeIncomingOrder } from '../lib/poster.js';
+import { removeIncomingOrder } from '../lib/poster.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,37 +12,41 @@ export default async function handler(req, res) {
   try {
     const { id, status } = req.body || {};
 
-    if (!id || !status) return res.status(400).json({ success: false, error: 'ID va status kerak' });
+    if (!id || !status) {
+      return res.status(400).json({ success: false, error: 'ID va status kerak' });
+    }
 
-    // Agar o'chirilayotgan bo'lsa
+    // 1. Buyurtma o'chirilayotgan bo'lsa (delete)
     if (status === 'delete') {
       const order = await getOrderById(id);
       
+      // Agar Poster'da incoming_order_id saqlangan bo'lsa, uni o'chiramiz
       if (order && order.poster_transaction_id) {
-        // 1. Chekni o'chiramiz
-        await removePosterTransaction(order.poster_transaction_id);
-        // 2. Onlayn buyurtmani ham o'chiramiz
-        await removeIncomingOrder(order.poster_transaction_id); 
+        const posterResult = await removeIncomingOrder(order.poster_transaction_id);
+        if (!posterResult.success) {
+          console.warn(`Poster'dagi buyurtmani o'chirishda xatolik (ID: ${order.poster_transaction_id})`);
+        }
       }
       
+      // Keyin bazadan o'chiramiz
       await updateOrderStatus(id, 'delete');
       return res.status(200).json({ success: true, message: 'Buyurtma va Poster ma\'lumotlari o\'chirildi' });
     }
 
-    // Agar bekor qilinayotgan bo'lsa
+    // 2. Buyurtma bekor qilinayotgan bo'lsa (cancelled)
     if (status === 'cancelled') {
       await updateOrderStatus(id, 'cancelled');
       
+      // Poster'dagi onlayn buyurtmani ham o'chirishga harakat qilamiz
       const order = await getOrderById(id);
       if (order && order.poster_transaction_id) {
-        await removePosterTransaction(order.poster_transaction_id);
         await removeIncomingOrder(order.poster_transaction_id);
       }
       
       return res.status(200).json({ success: true, message: 'Buyurtma bekor qilindi' });
     }
 
-    // Boshqa statuslar
+    // 3. Boshqa statuslar (accepted, cooking, delivering, done)
     await updateOrderStatus(id, status);
     return res.status(200).json({ success: true, message: 'Holat yangilandi' });
 
