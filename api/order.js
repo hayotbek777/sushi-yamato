@@ -35,13 +35,13 @@ export default async function handler(req, res) {
     // 1. Poster'ga yuboramiz
     const posterResult = await sendOrderToPoster(body);
     
-    // MUHIM: Poster'dan qaytgan incoming_order_id ni olamiz (o'chirish uchun kerak)
-    let posterId = null;
-    if (posterResult.success && posterResult.incoming_order_id) {
-      posterId = posterResult.incoming_order_id;
+    // MUHIM: Poster'dan transaction_id (chek ID) ni olamiz
+    let posterTransactionId = null;
+    if (posterResult.success && posterResult.transaction_id) {
+      posterTransactionId = posterResult.transaction_id;
     }
 
-    // 2. Bazaga saqlash (incoming_order_id bilan birga)
+    // 2. Bazaga saqlash (chek ID si bilan birga)
     await createOrder({
       order_num: orderNum,
       name: String(body.name).slice(0, 100),
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
       subtotal: Number(body.subtotal) || 0,
       delivery: Number(body.delivery) || 0,
       total: Number(body.total) || 0,
-      poster_transaction_id: posterId // Bazada shu ustunga saqlaymiz
+      poster_transaction_id: posterTransactionId // Endi to'g'ri ID (masalan, 2524) saqlanadi
     });
 
     // Agar Poster'ga o'tmasa ham, mijozga buyurtma qabul qilinganini aytamiz
