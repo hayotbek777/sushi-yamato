@@ -457,11 +457,7 @@ function selectPay(el, type) {
     
     // Tanlangan to'lov turiga qarab karta raqamini chiqarish
     if (CHECKOUT.pay === 'click') {
-      cardInfo.innerHTML = "Click: <span style='color:#00A8E8;'>8600 1234 5678 9012</span> (Ali Valiyev)";
-    } else if (CHECKOUT.pay === 'payme') {
-      cardInfo.innerHTML = "Payme: <span style='color:#33CCCC;'>8600 9876 5432 1098</span> (Ali Valiyev)";
-    } else if (CHECKOUT.pay === 'karta') {
-      cardInfo.innerHTML = "Karta: <span style='color:#E31E24;'>8600 1111 2222 3333</span> (Ali Valiyev)";
+      cardInfo.innerHTML = "Click: <span style='color:#00A8E8;'>9860 1901 0449 1955</span> (Dilshod.R)";
     }
   } else {
     receiptField.style.display = 'none';  
