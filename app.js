@@ -88,7 +88,6 @@ let DEFAULT_PRODUCTS = [
   { "id": "112", "name": "Snickers", "desc": "Нуга, карамель, арахис", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/snickers1.png" },
   { "id": "108", "name": "Twix Xtra", "desc": "Печенье, карамель, шоколад", "price": 16000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix1.png" },
   { "id": "109", "name": "Twix", "desc": "Печенье, карамель, шоколад", "price": 10000, "pieces": 0, "cat": ["shirinliklar"], "img": "images/twix2.png" },
-  { "id": "115", "name": "Сутли чой", "desc": "", "price": 22000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/82.png" }
 ];
 
 /* =========================================================
