@@ -70,8 +70,6 @@ let DEFAULT_PRODUCTS = [
   { "id": "40", "name": "Сет “Гостевой”", "desc": "Ролл Филадельфия, Ролл саки маки, Жареный ролл с курицей, Запеченный ролл с курицей", "price": 241000, "pieces": 0, "cat": ["setlar"], "badge": "hit", "img": "images/62.png" },
   { "id": "97", "name": "Grand Set", "desc": "Ролл Филадельфия, Ролл Филадельфия с угрем, Запеченный ролл с угрем в соусе спайси, Ролл калифорния с икрой", "price": 249000, "pieces": 0, "cat": ["setlar", "yangi"], "badge": "new", "img": "images/63.png" },
   { "id": "98", "name": "Мега празник", "desc": "Мини запеченный с курицей, Мини запеченный с лосось, Жареный сендвич с лососем, Сладкий ролл с фруктами, Жареный овощной ролл, Ролл Филадельфия лайт, Вок с курицей, Вок с креветками, кола 1л", "price": 444000, "pieces": 0, "cat": ["setlar", "yangi"], "badge": "new", "img": "images/64.png" },
-  { "id": "45", "name": "Фанта 0,25 (стекло)", "desc": "", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/65.png" },
-  { "id": "42", "name": "Кола 0,25 (стекло)", "desc": "", "price": 5000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/66.png" },
   { "id": "44", "name": "Спрайт 0,5", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/69.png" },
   { "id": "99", "name": "Мохито 0,45", "desc": "", "price": 14000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/70.png" },
   { "id": "100", "name": "Сочная долина (яблоко) 0,45", "desc": "", "price": 10000, "pieces": 0, "cat": ["ichimliklar"], "img": "images/71.png" },
@@ -114,7 +112,7 @@ const cartSubtotal = () => Object.entries(CART).reduce((s, [id, q]) => {
   const p = getP(id);
   return s + (p ? p.price * q : 0);
 }, 0);
-const cartDelivery = () => 0; // Yetkazib berish olib tashlandi
+const cartDelivery = () => 0;
 
 /* =========================================================
    KARTALAR
@@ -460,7 +458,7 @@ function selectPay(el, type) {
       cardInfo.innerHTML = "Click: <span style='color:#00A8E8;'>9860 1901 0449 1955</span> (Dilshod.R)";
     }
   } else {
-    receiptField.style.display = 'none';  
+    receiptField.style.display = 'none';     
     paymentDetails.style.display = 'none';
   }
 }
@@ -478,6 +476,14 @@ function maskPhone(inp) {
 }
 
 async function placeOrder() {
+  // Tugmani topamiz va uni bloklaymiz (ikki marta bosilishini oldini oladi)
+  const submitBtn = document.querySelector('button[onclick="placeOrder()"]');
+  if (submitBtn && submitBtn.disabled) return;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "YUBORILMOQDA... ⏳";
+  }
+
   const name = $('#ckName').value.trim();
   const phone = $('#ckPhone').value.trim();
   const city = $('#ckCity').value; 
@@ -489,17 +495,24 @@ async function placeOrder() {
 
   if (!name || phone.replace(/\D/g, '').length < 12) {
     toast('Ism va telefon raqamini to\'ldiring');
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
     return;
   }
-  if (!addr) { toast('Ko\'cha nomini kiriting'); return; }
+  if (!addr) { 
+    toast('Ko\'cha nomini kiriting'); 
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
+    return; 
+  }
   
   if (!landmark) { 
     toast('Iltimos, mo\'ljalni to\'liq kiriting (majburiy)'); 
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
     return; 
   }
 
   if (CHECKOUT.time === 'later' && !timeVal) {
     toast('Iltimos, yetkazib berish vaqtini tanlang!');
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
     return;
   }
 
@@ -507,6 +520,7 @@ async function placeOrder() {
   if (CHECKOUT.pay !== 'cash') {
     if (!receiptInput.files[0]) {
       toast('Iltimos, to\'lov chekini (skrinshotni) yuklang!');
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
       return;
     }
     const file = receiptInput.files[0];
@@ -550,11 +564,13 @@ async function placeOrder() {
       orderNum = data.orderNum; // Backenddan kelgan haqiqiy order raqamni olamiz
     } else {
       toast('Buyurtma yuborilmadi: ' + (data.error || ''));
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
       return;
     }
   } catch (e) {
     console.warn('Buyurtma yuborishda xatolik:', e);
     toast('Server bilan aloqa yo\'q');
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
     return;
   }
 
@@ -567,7 +583,12 @@ async function placeOrder() {
 
   // Tracking oynasini ochish (orderNum orqali)
   openTracking(orderNum, CHECKOUT.pay);
-
+  
+  // Tugmani qayta yoqamiz (keyingi buyurtmalar uchun)
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "BUYURTMA BERISH →";
+  }
 }
 
 /* =========================================================
