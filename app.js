@@ -4,7 +4,7 @@
 const API_URL = '/api';
 
 /* =========================================================
-   MAHSULOTLAR (ASOSIY ZAXIRA RO'YXATI)
+   MAHSULOTLAR (BO'SH QOLDIRILDI, FAQAT BAZADAN YUKLANADI)
    ========================================================= */
 let DEFAULT_PRODUCTS = [
   { "id": "6", "name": "Ролл Филадельфия", "desc": "Рис, Сыр творожный, Огурец, Лосось", "price": 75000, "pieces": 0, "cat": ["klassik"], "badge": "hit", "img": "images/1.png" },
@@ -103,7 +103,7 @@ const getP = id => PRODUCTS.find(p => p.id === id);
    ========================================================= */
 let CART = JSON.parse(localStorage.getItem('ym_cart') || '{}');
 let ACTIVE_FILTER = 'all';
-let PRODUCTS = []; 
+let PRODUCTS = [];
 
 const saveCart = () => localStorage.setItem('ym_cart', JSON.stringify(CART));
 const cartCount = () => Object.values(CART).reduce((a, b) => a + b, 0);
@@ -121,7 +121,7 @@ function cardHTML(p) {
     p.badge === 'new' ? '<span class="badge new">Yangi</span>' :
       p.badge === 'top' ? '<span class="badge top">Top</span>' : '';
   const pieces = p.pieces ? `${p.pieces} dona` : '';
-  
+
   const pDesc = p.desc || p.description || p.tavsif;
   const safeDesc = (pDesc && pDesc !== 'undefined') ? pDesc : '';
 
@@ -158,7 +158,7 @@ function renderBest() {
 function renderSets() {
   const el = $('#setsGrid');
   if (!el) return;
-  el.innerHTML = PRODUCTS.filter(p => p.cat.includes('setlar')).map(p => `
+  el.innerHTML = PRODUCTS.filter(p => p.cat && p.cat.includes('setlar')).map(p => `
     <div class="set-card" onclick="openProduct('${p.id}')">
       <div class="set-bg"><img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.src='images/placeholder.webp'"></div>
       <div class="set-info">
@@ -172,7 +172,7 @@ function renderSets() {
 function renderMenu() {
   const el = $('#menuGrid');
   if (!el) return;
-  const list = ACTIVE_FILTER === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat.includes(ACTIVE_FILTER));
+  const list = ACTIVE_FILTER === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat && p.cat.includes(ACTIVE_FILTER));
   el.innerHTML = list.map(cardHTML).join('');
 }
 
@@ -207,7 +207,8 @@ function addToCart(id, qty = 1, event) {
   CART[id] = (CART[id] || 0) + qty;
   saveCart();
   updateCartUI();
-  toast(`${getP(id).name} savatga qo'shildi`);
+  const p = getP(id);
+  toast(`${p ? p.name : 'Mahsulot'} savatga qo'shildi`);
   if (event) {
     const card = event.target.closest('.p-card');
     if (card) {
@@ -284,10 +285,10 @@ function renderCart() {
 
   const sub = cartSubtotal();
   $('#sumItems').textContent = fmt(sub);
-  
+
   const deliveryEl = $('#sumDelivery');
   if (deliveryEl) deliveryEl.textContent = 'Bepul';
-  
+
   $('#sumTotal').textContent = fmt(sub);
   foot.style.display = 'block';
 }
@@ -335,7 +336,7 @@ function openProduct(id) {
         <p class="desc">${safeDesc}</p>
         <div class="pd-specs">
           ${p.pieces ? `<div><small>Miqdor</small><b>${p.pieces} dona</b></div>` : ''}
-          <div><small>Kategoriya</small><b>${p.cat.map(c => c[0].toUpperCase() + c.slice(1)).join(', ')}</b></div>
+          <div><small>Kategoriya</small><b>${p.cat ? p.cat.map(c => c[0].toUpperCase() + c.slice(1)).join(', ') : ''}</b></div>
           <div><small>Tayyorlash</small><b>10–15 daqiqa</b></div>
         </div>
         <div class="pd-foot">
@@ -430,7 +431,7 @@ function selectTime(el, type) {
   $$('.time-opt').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   CHECKOUT.time = type;
-  
+
   const picker = document.getElementById('timePickerField');
   if (type === 'later') {
     picker.style.display = 'block';
@@ -449,15 +450,14 @@ function selectPay(el, type) {
   const cardInfo = document.getElementById('cardInfo');
 
   if (type === 'online') {
-    receiptField.style.display = 'block'; 
+    receiptField.style.display = 'block';
     paymentDetails.style.display = 'block';
-    
-    // Tanlangan to'lov turiga qarab karta raqamini chiqarish
+
     if (CHECKOUT.pay === 'click') {
       cardInfo.innerHTML = "Click: <span style='color:#00A8E8;'>9860 1901 0449 1955</span> (Dilshod.R)";
     }
   } else {
-    receiptField.style.display = 'none';     
+    receiptField.style.display = 'none';
     paymentDetails.style.display = 'none';
   }
 }
@@ -475,7 +475,6 @@ function maskPhone(inp) {
 }
 
 async function placeOrder() {
-  // Tugmani topamiz va uni bloklaymiz (ikki marta bosilishini oldini oladi)
   const submitBtn = document.querySelector('button[onclick="placeOrder()"]');
   if (submitBtn && submitBtn.disabled) return;
   if (submitBtn) {
@@ -485,33 +484,40 @@ async function placeOrder() {
 
   const name = $('#ckName').value.trim();
   const phone = $('#ckPhone').value.trim();
-  const city = $('#ckCity').value; 
+  const city = $('#ckCity').value;
   const house = $('#ckHouse').value.trim();
   const addr = $('#ckAddr').value.trim();
   const landmark = $('#ckLandmark').value.trim();
   const receiptInput = document.getElementById('ckReceipt');
   const timeVal = document.getElementById('ckTime') ? document.getElementById('ckTime').value : '';
 
+  const resetBtn = () => {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "BUYURTMA BERISH →";
+    }
+  };
+
   if (!name || phone.replace(/\D/g, '').length < 12) {
     toast('Ism va telefon raqamini to\'ldiring');
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
+    resetBtn();
     return;
   }
-  if (!addr) { 
-    toast('Ko\'cha nomini kiriting'); 
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
-    return; 
+  if (!addr) {
+    toast('Ko\'cha nomini kiriting');
+    resetBtn();
+    return;
   }
-  
-  if (!landmark) { 
-    toast('Iltimos, mo\'ljalni to\'liq kiriting (majburiy)'); 
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
-    return; 
+
+  if (!landmark) {
+    toast('Iltimos, mo\'ljalni to\'liq kiriting (majburiy)');
+    resetBtn();
+    return;
   }
 
   if (CHECKOUT.time === 'later' && !timeVal) {
     toast('Iltimos, yetkazib berish vaqtini tanlang!');
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
+    resetBtn();
     return;
   }
 
@@ -519,7 +525,7 @@ async function placeOrder() {
   if (CHECKOUT.pay !== 'cash') {
     if (!receiptInput.files[0]) {
       toast('Iltimos, to\'lov chekini (skrinshotni) yuklang!');
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
+      resetBtn();
       return;
     }
     const file = receiptInput.files[0];
@@ -539,17 +545,17 @@ async function placeOrder() {
   const total = subtotal + delivery;
 
   const payload = {
-    name, phone, 
-    district: city, 
+    name, phone,
+    district: city,
     addr, house, landmark,
     time: CHECKOUT.time,
-    time_value: timeVal, // Tanlangan soat
+    time_value: timeVal,
     pay: CHECKOUT.pay,
-    receipt: receiptBase64, 
+    receipt: receiptBase64,
     items, subtotal, delivery, total
   };
 
-   let orderNum = '#YM-' + Date.now().toString().slice(-6);
+  let orderNum = '#YM-' + Date.now().toString().slice(-6);
 
   try {
     const res = await fetch(`${API_URL}/order`, {
@@ -558,36 +564,30 @@ async function placeOrder() {
       body: JSON.stringify(payload)
     });
     const data = await res.json();
-    
+
     if (data.success && data.orderNum) {
-      orderNum = data.orderNum; // Backenddan kelgan haqiqiy order raqamni olamiz
+      orderNum = data.orderNum;
     } else {
       toast('Buyurtma yuborilmadi: ' + (data.error || ''));
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
+      resetBtn();
       return;
     }
   } catch (e) {
     console.warn('Buyurtma yuborishda xatolik:', e);
     toast('Server bilan aloqa yo\'q');
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "BUYURTMA BERISH →"; }
+    resetBtn();
     return;
   }
 
-  // Savatni tozalash
   CART = {};
   localStorage.removeItem('ym_cart');
   updateCartUI();
   renderCart();
   closeModal('checkoutModal');
 
-  // Tracking oynasini ochish (orderNum orqali)
   openTracking(orderNum, CHECKOUT.pay);
-  
-  // Tugmani qayta yoqamiz (keyingi buyurtmalar uchun)
-  if (submitBtn) {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "BUYURTMA BERISH →";
-  }
+
+  resetBtn();
 }
 
 /* =========================================================
@@ -605,13 +605,13 @@ function openTracking(orderNum, payType) {
     head.style.display = 'none';
     body.innerHTML =
       '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 24px 56px;">' +
-        '<div style="width:120px;height:120px;border-radius:50%;background:#2FBF71;display:grid;place-items:center;box-shadow:0 12px 32px rgba(47,191,113,.35);margin-bottom:28px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);">' +
-          '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
-            '<path d="m5 12 5 5L20 7"/>' +
-          '</svg>' +
-        '</div>' +
-        '<div style="font-size:1.4rem;font-weight:800;color:#0E0E10;margin-bottom:8px;">Buyurtma qabul qilindi</div>' +
-        '<div style="font-size:.92rem;color:#8a8a92;">Tez orada siz bilan bog\'lanamiz</div>' +
+      '<div style="width:120px;height:120px;border-radius:50%;background:#2FBF71;display:grid;place-items:center;box-shadow:0 12px 32px rgba(47,191,113,.35);margin-bottom:28px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);">' +
+      '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="m5 12 5 5L20 7"/>' +
+      '</svg>' +
+      '</div>' +
+      '<div style="font-size:1.4rem;font-weight:800;color:#0E0E10;margin-bottom:8px;">Buyurtma qabul qilindi</div>' +
+      '<div style="font-size:.92rem;color:#8a8a92;">Tez orada siz bilan bog\'lanamiz</div>' +
       '</div>' +
       '<style>@keyframes popIn{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}</style>';
   } else {
@@ -622,10 +622,10 @@ function openTracking(orderNum, payType) {
       '<div class="order-num">' + orderNum + '</div>';
     body.innerHTML =
       '<div style="text-align:center;padding:8px 4px 20px">' +
-        '<div style="font-size:1.15rem;font-weight:800;line-height:1.4;margin-bottom:10px">To\'lov qabul qilindi</div>' +
-        '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:22px">' +
-          "Buyurtmangiz tayyorlanmoqda. Operatorimiz chekni tasdiqlash uchun siz bilan bog'lanadi." +
-        '</p>' +
+      '<div style="font-size:1.15rem;font-weight:800;line-height:1.4;margin-bottom:10px">To\'lov qabul qilindi</div>' +
+      '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:22px">' +
+      "Buyurtmangiz tayyorlanmoqda. Operatorimiz chekni tasdiqlash uchun siz bilan bog'lanadi." +
+      '</p>' +
       '</div>';
   }
 
@@ -713,19 +713,19 @@ function toggleFav(e, id) {
    ISHGA TUSHIRISH
    ========================================================= */
 document.addEventListener('DOMContentLoaded', async () => {
-  PRODUCTS = [...DEFAULT_PRODUCTS]; 
+  PRODUCTS = [...DEFAULT_PRODUCTS];
 
   try {
     const res = await fetch('/api/products');
     const data = await res.json();
-    
+
     if (data.success && data.products && data.products.length > 0) {
       data.products.forEach(newP => {
         const idx = PRODUCTS.findIndex(p => p.id === newP.id);
         if (idx !== -1) {
-          PRODUCTS[idx] = { ...PRODUCTS[idx], ...newP }; 
+          PRODUCTS[idx] = { ...PRODUCTS[idx], ...newP };
         } else {
-          PRODUCTS.push(newP); 
+          PRODUCTS.push(newP);
         }
       });
     }
