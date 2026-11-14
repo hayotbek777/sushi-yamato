@@ -39,6 +39,7 @@ export default async function handler(req, res) {
       const byStatus = {};
 
       allOrders.forEach(o => {
+        // Jami (barcha vaqt)
         if (o.status !== 'cancelled') {
           totalOrders++;
           totalSum += Number(o.total) || 0;
@@ -46,18 +47,8 @@ export default async function handler(req, res) {
         
         const orderDate = new Date(o.created_at.replace(' ', 'T') + 'Z');
         
-        // Agar sana tanlangan bo'lsa, o'sha sanani hisoblaymiz. Bo'lmasa, bugungini.
-        let isTargetDate = false;
-        if (filterDate) {
-          const target = new Date(filterDate);
-          isTargetDate = orderDate.getDate() === target.getDate() && 
-                         orderDate.getMonth() === target.getMonth() && 
-                         orderDate.getFullYear() === target.getFullYear();
-        } else {
-          isTargetDate = orderDate >= todayStart;
-        }
-
-        if (o.status !== 'cancelled' && isTargetDate) {
+        // Bugungi (faqat 00:00 dan keyingilar)
+        if (o.status !== 'cancelled' && orderDate >= todayStart) {
           byStatus[o.status] = (byStatus[o.status] || 0) + 1;
           todayOrders++;
           todaySum += Number(o.total) || 0;
@@ -75,7 +66,6 @@ export default async function handler(req, res) {
       const cancelled = allOrders.filter(o => {
         if (o.status !== 'cancelled') return false;
         if (!filterDate) return true;
-        
         const orderDate = new Date(o.created_at.replace(' ', 'T') + 'Z');
         const target = new Date(filterDate);
         return orderDate.getDate() === target.getDate() && 
@@ -89,7 +79,7 @@ export default async function handler(req, res) {
     const currentOrders = allOrders.filter(o => {
       if (o.status === 'cancelled') return false;
       
-      // Agar sana tanlangan bo'lsa, o'sha kungi buyurtmalarni qaytaramiz
+      // Agar kalendardan sana tanlangan bo'lsa, faqat o'sha kungilarni qaytaramiz
       if (filterDate) {
         const orderDate = new Date(o.created_at.replace(' ', 'T') + 'Z');
         const target = new Date(filterDate);
@@ -98,9 +88,8 @@ export default async function handler(req, res) {
                orderDate.getFullYear() === target.getFullYear();
       }
       
-      // Agar sana tanlanmagan bo'lsa, faqat bugungilarni qaytaramiz
-      const orderDate = new Date(o.created_at.replace(' ', 'T') + 'Z');
-      return orderDate >= todayStart;
+      // Agar sana tanlanmagan bo'lsa, BARCHA buyurtmalarni qaytaramiz
+      return true;
     });
 
     return res.status(200).json({ success: true, orders: currentOrders });
