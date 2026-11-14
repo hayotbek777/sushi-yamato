@@ -24,10 +24,11 @@ export default async function handler(req, res) {
   try {
     const status = req.query.status || 'all';
     const stats = req.query.stats === '1';
+    const filterDate = req.query.date || null; // Kalendardan keladigan sana
 
     const allOrders = await getOrders({ status: 'all', limit: 5000 });
 
-    // HAQIQIY YARIM TUNNI ANIQLASH (00:00:00)
+    // Bugungi yarim tun (00:00:00)
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
 
@@ -38,15 +39,25 @@ export default async function handler(req, res) {
       const byStatus = {};
 
       allOrders.forEach(o => {
-        // Umumiy hisob (Barcha vaqt uchun)
         if (o.status !== 'cancelled') {
           totalOrders++;
           totalSum += Number(o.total) || 0;
         }
         
-        // Bugungi hisob (Faqat bugun 00:00 dan keyingilar)
         const orderDate = new Date(o.created_at.replace(' ', 'T') + 'Z');
-        if (o.status !== 'cancelled' && orderDate >= todayStart) {
+        
+        // Agar sana tanlangan bo'lsa, o'sha sanani hisoblaymiz. Bo'lmasa, bugungini.
+        let isTargetDate = false;
+        if (filterDate) {
+          const target = new Date(filterDate);
+          isTargetDate = orderDate.getDate() === target.getDate() && 
+                         orderDate.getMonth() === target.getMonth() && 
+                         orderDate.getFullYear() === target.getFullYear();
+        } else {
+          isTargetDate = orderDate >= todayStart;
+        }
+
+        if (o.status !== 'cancelled' && isTargetDate) {
           byStatus[o.status] = (byStatus[o.status] || 0) + 1;
           todayOrders++;
           todaySum += Number(o.total) || 0;
@@ -61,15 +72,35 @@ export default async function handler(req, res) {
 
     // 2. Bekor qilinganlar
     if (status === 'cancelled') {
-      const cancelled = allOrders.filter(o => o.status === 'cancelled');
+      const cancelled = allOrders.filter(o => {
+        if (o.status !== 'cancelled') return false;
+        if (!filterDate) return true;
+        
+        const orderDate = new Date(o.created_at.replace(' ', 'T') + 'Z');
+        const target = new Date(filterDate);
+        return orderDate.getDate() === target.getDate() && 
+               orderDate.getMonth() === target.getMonth() && 
+               orderDate.getFullYear() === target.getFullYear();
+      });
       return res.status(200).json({ success: true, orders: cancelled });
     }
 
-    // 3. Asosiy ro'yxat (Faqat bugungi buyurtmalar)
+    // 3. Asosiy ro'yxat
     const currentOrders = allOrders.filter(o => {
       if (o.status === 'cancelled') return false;
+      
+      // Agar sana tanlangan bo'lsa, o'sha kungi buyurtmalarni qaytaramiz
+      if (filterDate) {
+        const orderDate = new Date(o.created_at.replace(' ', 'T') + 'Z');
+        const target = new Date(filterDate);
+        return orderDate.getDate() === target.getDate() && 
+               orderDate.getMonth() === target.getMonth() && 
+               orderDate.getFullYear() === target.getFullYear();
+      }
+      
+      // Agar sana tanlanmagan bo'lsa, faqat bugungilarni qaytaramiz
       const orderDate = new Date(o.created_at.replace(' ', 'T') + 'Z');
-      return orderDate >= todayStart; // Faqat bugun 00:00 dan keyingilar
+      return orderDate >= todayStart;
     });
 
     return res.status(200).json({ success: true, orders: currentOrders });
