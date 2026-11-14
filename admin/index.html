@@ -1400,14 +1400,16 @@
       const dateVal = document.getElementById('filterDate').value;
       if (!dateVal) return;
       SELECTED_DATE = dateVal;
+      sessionStorage.setItem('admin_selected_date', SELECTED_DATE); // Sana saqlanadi
       closeCalendar();
-      loadOrders(true); // Serverdan qayta yuklash
+      loadOrders(true);
       toast(`${SELECTED_DATE} sanasidagi ma'lumotlar`, 'success');
     }
     function clearDateFilter() {
       SELECTED_DATE = null;
+      sessionStorage.removeItem('admin_selected_date'); // Sana o'chiriladi
       closeCalendar();
-      loadOrders(true); // Serverdan qayta yuklash
+      loadOrders(true);
       toast('Barcha buyurtmalar ko\'rsatilmoqda', 'success');
     }
     function updateStatsForDate(dateStr) {
@@ -1775,7 +1777,14 @@
     window.addEventListener('DOMContentLoaded', () => {
       const token = getToken();
       if (token) {
-        try { const payload = JSON.parse(atob(token.split('.')[1])); showDashboard(payload.user || payload.username || 'admin'); }
+        try { 
+          // Saqlangan sanani tekshiramiz
+          const savedDate = sessionStorage.getItem('admin_selected_date');
+          if (savedDate) SELECTED_DATE = savedDate;
+
+          const payload = JSON.parse(atob(token.split('.')[1])); 
+          showDashboard(payload.user || payload.username || 'admin'); 
+        }
         catch (e) { clearToken(); }
       }
     });
