@@ -1400,14 +1400,12 @@
       const dateVal = document.getElementById('filterDate').value;
       if (!dateVal) return;
       SELECTED_DATE = dateVal;
-      sessionStorage.setItem('admin_selected_date', SELECTED_DATE); // Sana saqlanadi
       closeCalendar();
       loadOrders(true);
       toast(`${SELECTED_DATE} sanasidagi ma'lumotlar`, 'success');
     }
     function clearDateFilter() {
       SELECTED_DATE = null;
-      sessionStorage.removeItem('admin_selected_date'); // Sana o'chiriladi
       closeCalendar();
       loadOrders(true);
       toast('Barcha buyurtmalar ko\'rsatilmoqda', 'success');
@@ -1778,10 +1776,7 @@
       const token = getToken();
       if (token) {
         try { 
-          // Saqlangan sanani tekshiramiz
-          const savedDate = sessionStorage.getItem('admin_selected_date');
-          if (savedDate) SELECTED_DATE = savedDate;
-
+          SELECTED_DATE = null; // Har doim toza holatdan boshlaymiz
           const payload = JSON.parse(atob(token.split('.')[1])); 
           showDashboard(payload.user || payload.username || 'admin'); 
         }
