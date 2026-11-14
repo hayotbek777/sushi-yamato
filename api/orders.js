@@ -88,8 +88,9 @@ export default async function handler(req, res) {
                orderDate.getFullYear() === target.getFullYear();
       }
       
-      // Agar sana tanlanmagan bo'lsa, BARCHA buyurtmalarni qaytaramiz
-      return true;
+      // AGAR SANA TANLANMAGAN BO'LSA, FAQAT BUGUNGI (00:00 dan keyingi) BUYURTMALARNI QAYTARAMIZ
+      const orderDate = new Date(o.created_at.replace(' ', 'T') + 'Z');
+      return orderDate >= todayStart;
     });
 
     return res.status(200).json({ success: true, orders: currentOrders });
